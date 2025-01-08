@@ -37,4 +37,9 @@ public class ForumServiceImpl implements ForumService {
     public void updateForum(Forum forum) {
         forumRepository.save(forum);
     }
+
+    @Override
+    public List<Object[]> countTotalThreads() {
+        return forumRepository.countTotalThreadsByThreadsName();
+    }
 }
