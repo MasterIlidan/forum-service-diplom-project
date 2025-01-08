@@ -1,0 +1,22 @@
+/* Или пропорциональное уменьшение */
+.responsive-image {
+    max-width: 100%; /* Уменьшает размер изображения относительно контейнера */
+    height: auto;    /* Сохраняет пропорции */
+}
+.image-container img {
+    width: 200px; /* Устанавливаем желаемую ширину */
+    height: auto; /* Сохраняем пропорции изображения */
+    display: block; /* Убираем дополнительные отступы (если нужно) */
+}
+.forum-container {
+    display: grid;
+    column-gap: 14px;
+}
+.forum-block {
+    grid-column-start: 1;
+    grid-column-end: 3;
+}
+.last-post-block {
+    grid-column-start: 3;
+    grid-column-end: 4;
+}

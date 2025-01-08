@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Главная страница - BitTorrent Share</title>
+    <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+            crossorigin="anonymous">
+    <link th:href="@{/css/styles.css}" rel="stylesheet"/>
+</head>
+
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <div th:class="image-container">
+            <img th:href="@{/}" th:src="@{images/logo.png}" alt="BitTorrent OpenShare" class="responsive-image"/>
+        </div>
+        <button class="navbar-toggler" type="button" data-bstoggle="collapse" data-bs-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false"
+                aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <input class="ima" th:placeholder="Поиск">
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a sec:authorize="not isAuthenticated()" class="nav-link active" aria-current="page"
+                       th:href="@{/login}">Login</a>
+                    <a sec:authorize="not isAnonymous()" sec:authentication="name" th:class="nav-link"></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page"
+                       th:href="@{/register}">Зарегистрироваться</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="forum-container">
+    <div class="forum-block">
+        <h1 class="header ">Форум</h1>
+        <table class="table table-bordered table-striped" id="forums">
+            <thead>
+            <tr>
+                <th>Название форума</th>
+                <th>Веток</th>
+                <th>Тем</th>
+                <th>Сообщений</th>
+                <th>Последнее сообщение</th>
+            </tr>
+            </thead>
+            <tbody>>
+            <tr th:each="forum : ${forumsList}">
+                <td th:text="${forum.forumName}">
+
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="last-post-block">
+        <h1 class="header ">Активность на трекере</h1>
+        <table class="table table-bordered table-striped">
+            <tbody>
+            <tr>
+                <th>Последняя созданная тема</th>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+
+</div>
+</body>
+</html>
