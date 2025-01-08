@@ -15,7 +15,6 @@ public class ForumDto {
     @NotNull(message = "Название форума не должно быть пустым")
     private String forumName;
     private String description;
-    @NotNull(message = "Имя создавшего пользователя не должно быть пустым")
     private User createdBy;
 
 
