@@ -10,7 +10,7 @@
             rel="stylesheet"
             integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
             crossorigin="anonymous">
-    <link th:href="@{/css/styles.css}" rel="stylesheet"/>
+    <link href="css/styles.css" rel="stylesheet"/>
 </head>
 
 <body>
@@ -43,6 +43,7 @@
 <div class="forum-container">
     <div class="forum-block">
         <h1 class="header ">Форум</h1>
+        <a class="btn btn-primary" th:href="@{/forum/createForum}">+ Создать форум</a>
         <table class="table table-bordered table-striped" id="forums">
             <thead>
             <tr>
@@ -55,9 +56,13 @@
             </thead>
             <tbody>>
             <tr th:each="forum : ${forumsList}">
-                <td th:text="${forum.forumName}">
-
+                <td >
+                    <a th:href="@{/forum(forumId=${forum.getForumId()})}" th:text="${forum.forumName}"></a>
                 </td>
+                <td th:text="${threadCount}">
+                <td>Количество тем</td>
+                <td>Количество сообщений</td>
+                <td>Последнее сообщение</td>
             </tr>
             </tbody>
         </table>

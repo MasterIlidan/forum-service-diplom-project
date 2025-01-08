@@ -1,6 +1,7 @@
 package ru.students.forumservicediplomproject.service;
 
 import ru.students.forumservicediplomproject.entity.Forum;
+import ru.students.forumservicediplomproject.repository.IThreadCount;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,5 +16,6 @@ interface ForumService {
     void deleteForum(long id);
 
     void updateForum(Forum forum);
+    List<Object[]> countTotalThreads();
 
 }
