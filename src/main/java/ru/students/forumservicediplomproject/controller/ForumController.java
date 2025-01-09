@@ -1,35 +1,32 @@
 package ru.students.forumservicediplomproject.controller;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import ru.students.forumservicediplomproject.dto.ForumDto;
-import ru.students.forumservicediplomproject.dto.ThreadDto;
 import ru.students.forumservicediplomproject.entity.Thread;
 import ru.students.forumservicediplomproject.entity.*;
 import ru.students.forumservicediplomproject.service.ForumServiceImpl;
 import ru.students.forumservicediplomproject.service.ThreadService;
-import ru.students.forumservicediplomproject.service.ThreadServiceImpl;
 import ru.students.forumservicediplomproject.service.UserServiceImpl;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
 
 @Controller
 public class ForumController {
     private final ForumServiceImpl forumServiceImpl;
-    @Autowired
-    private ThreadService threadService;
-    @Autowired
-    private ThreadServiceImpl threadServiceImpl;
+    private final ThreadService threadService;
 
-    public ForumController(ForumServiceImpl forumServiceImpl) {
+    public ForumController(ForumServiceImpl forumServiceImpl, ThreadService threadService) {
         this.forumServiceImpl = forumServiceImpl;
+        this.threadService = threadService;
     }
     @Autowired
     private UserServiceImpl userService;
@@ -94,7 +91,7 @@ public class ForumController {
     @PostMapping({"/forum/saveForum"})
     public String saveForum(@Valid @ModelAttribute("forum") ForumDto forumDto,
                             BindingResult bindingResult, Model model) {
-        User currentUser = getCreatorUserCredentials();
+        User currentUser = userService.getCreatorUserCredentials();
         forumDto.setCreatedBy(currentUser);
 
         if (bindingResult.hasErrors()) {
@@ -108,44 +105,8 @@ public class ForumController {
         forumServiceImpl.saveForum(forum);
         return "redirect:/";
     }
-    @GetMapping({"/forum/{forumId}/createThread"})
-    public ModelAndView createNewThread(@PathVariable long forumId) {
-        ModelAndView modelAndView = new ModelAndView("forms/add-thread-page");
-        modelAndView.addObject("thread", new Thread());
-        modelAndView.addObject("onForumIdCreated", forumId);
-        return modelAndView;
-    }
-    @PostMapping({"/forum/{forumId}/saveThread"})
-    public String saveThread(@PathVariable long forumId,
-                             @Valid @ModelAttribute("thread") ThreadDto threadDto,
-                             BindingResult bindingResult, Model model) {
-        User currentUser = getCreatorUserCredentials();
-        threadDto.setCreatedBy(currentUser);
-        if (bindingResult.hasErrors()) {
-            return "forms/add-thread-page";
-        }
-        Thread thread = new Thread();
-        thread.setThreadName(threadDto.getThreadName());
-        thread.setCreatedBy(currentUser);
-        Optional<Forum> forum = forumServiceImpl.getForum(forumId);
-        if (forum.isPresent()) {
-            thread.setForumId(forum.get());
-        } else {
-            throw new RuntimeException(("При создании ветки произошла ошибка:" +
-                    " не найден форум, на котором создается ветка. ForumId %s").formatted(threadDto.getForumId()));
-        }
-        threadServiceImpl.saveThread(thread);
-        return "redirect:/forum?forumId={forumId}";
 
-    }
 
-    private User getCreatorUserCredentials() {
-        org.springframework.security.core.userdetails.User currentUser =
-                (org.springframework.security.core.userdetails.User) SecurityContextHolder
-                        .getContext()
-                        .getAuthentication()
-                        .getPrincipal();
-        return userService.findUserByEmail(currentUser.getUsername());
-    }
+
 
 }

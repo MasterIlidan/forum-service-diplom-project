@@ -2,10 +2,9 @@ package ru.students.forumservicediplomproject.service;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import ru.students.forumservicediplomproject.dto.UserDto;
 import ru.students.forumservicediplomproject.entity.Role;
 import ru.students.forumservicediplomproject.entity.User;
@@ -86,5 +85,13 @@ public class UserServiceImpl implements UserService {
         Role role = new Role();
         role.setRoleName("ADMIN");
         return roleRepository.save(role);
+    }
+    public User getCreatorUserCredentials() {
+        org.springframework.security.core.userdetails.User currentUser =
+                (org.springframework.security.core.userdetails.User) SecurityContextHolder
+                        .getContext()
+                        .getAuthentication()
+                        .getPrincipal();
+        return findUserByEmail(currentUser.getUsername());
     }
 }
