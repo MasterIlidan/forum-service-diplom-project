@@ -38,7 +38,7 @@ public class PostController {
     }
 
 
-    @GetMapping({"/forum/{forumId}/thread/{threadId}"})
+    @GetMapping({"/forum/{forumId}/thread/{threadId}/posts"})
     public ModelAndView getAllPosts(@PathVariable long forumId,
                                     @PathVariable long threadId, Model model) {
         ModelAndView modelAndView = new ModelAndView("thread-page");
@@ -100,7 +100,7 @@ public class PostController {
     }
 
 
-    //TODO: сделать отображение и создание постов
+/*    //TODO: сделать отображение и создание постов
     @GetMapping({"/forum/thread/post{postId}"})
     public ModelAndView postPage(@PathVariable long postId) {
         ModelAndView modelAndView = new ModelAndView("post");
@@ -108,5 +108,5 @@ public class PostController {
         List<Message> postList = new ArrayList<>();
         modelAndView.addObject("posts", postList);
         return modelAndView;
-    }
+    }*/
 }

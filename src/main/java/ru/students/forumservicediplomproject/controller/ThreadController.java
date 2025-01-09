@@ -13,6 +13,7 @@ import ru.students.forumservicediplomproject.entity.Post;
 import ru.students.forumservicediplomproject.entity.Thread;
 import ru.students.forumservicediplomproject.entity.User;
 import ru.students.forumservicediplomproject.service.ForumService;
+import ru.students.forumservicediplomproject.service.PostService;
 import ru.students.forumservicediplomproject.service.ThreadService;
 import ru.students.forumservicediplomproject.service.UserService;
 
@@ -26,6 +27,8 @@ public class ThreadController {
     private final ThreadService threadService;
     private final ForumService forumServiceImpl;
     private final UserService userService;
+    @Autowired
+    private PostService postService;
 
     public ThreadController(ForumService forumService,
                             ThreadService threadService,
@@ -48,15 +51,6 @@ public class ThreadController {
         } else {
             throw new RuntimeException("У ветки не найден форум! ForumId %s".formatted(forumId));
         }
-        return modelAndView;
-    }
-
-    @GetMapping({"/forum/{forumId}/thread/{threadId}"})
-    public ModelAndView threadPage(@PathVariable long threadId,
-                                   @PathVariable long forumId) {
-        ModelAndView modelAndView = new ModelAndView("thread-page");
-        List<Post> postList = new ArrayList<>();
-        modelAndView.addObject("posts", postList);
         return modelAndView;
     }
 

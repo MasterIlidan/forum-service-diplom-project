@@ -14,8 +14,6 @@ public class ForumServiceImpl implements ForumService {
 
     @Autowired
     private ForumRepository forumRepository;
-    @Autowired
-    private ForumService forumService;
 
     @Override
     public void saveForum(Forum forum) {
@@ -44,7 +42,7 @@ public class ForumServiceImpl implements ForumService {
 
     @Override
     public List<Object[]> countTotalThreads(Long forumId) {
-        Optional<Forum> forum = forumService.getForum(forumId);
+        Optional<Forum> forum = getForum(forumId);
         if (forum.isPresent()) {
             return forumRepository.countTotalThreadsByThreadsName(forum.get());
         } else {

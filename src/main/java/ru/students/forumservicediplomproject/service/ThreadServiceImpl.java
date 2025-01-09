@@ -50,4 +50,14 @@ public class ThreadServiceImpl implements ThreadService {
         }
         return List.of();
     }
+
+    @Override
+    public List<Object[]> countTotalPosts(Long threadId) {
+        Optional<Thread> thread = getThreadById(threadId);
+        if (thread.isPresent()) {
+            return threadRepository.countTotalPostsByThreadId(thread.get());
+        } else {
+            throw new RuntimeException("Ветка не найдена при подсчете постов! ThreadId %s".formatted(threadId));
+        }
+    }
 }

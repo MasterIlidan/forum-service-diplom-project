@@ -55,7 +55,7 @@
             <tbody>>
             <tr th:each="thread : ${threadList}">
                 <td >
-                    <a th:href="@{'/forum/' + ${forum.getForumId()} + '/thread/' + ${thread.getThreadId()}}" th:text="${thread.threadName}"></a>
+                    <a th:href="@{'/forum/' + ${forum.getForumId()} + '/thread/' + ${thread.getThreadId()} + '/posts'}" th:text="${thread.threadName}"></a>
                 </td>
                 <td>Количество тем</td>
                 <td>Количество cообщений</td>

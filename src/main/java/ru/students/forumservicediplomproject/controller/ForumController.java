@@ -35,18 +35,31 @@ public class ForumController {
     @GetMapping({"/"})
     public ModelAndView indexPage() {
         ModelAndView modelAndView = new ModelAndView("index");
-        //TODO: вернуть список форумов из репозитория
         List<Forum> forumsList = forumServiceImpl.getAllForums();
 
         HashMap<Long, Long> totalThreadsInForum = new HashMap<>();
+        HashMap<Long, Long> totalPostsInForum = new HashMap<>();
+        //TODO: подсчет количества сообщений
+        //TODO: когда было последнее сообщение
+
         //считаем количество веток для каждого форума
         for (Forum forum : forumsList) {
             List<Object[]> totalThread = forumServiceImpl.countTotalThreads(forum.getForumId());
             totalThreadsInForum.put(forum.getForumId(), (long) totalThread.get(0)[1]);
+            List<Thread> threadList = threadService.getAllThreadsByForum(forum.getForumId());
+            long threads = 0;
+            for (Thread thread: threadList) {
+                List<Object[]> totalPost = threadService.countTotalPosts(thread.getThreadId());
+                threads+=(long) totalPost.get(0)[1];
+            }
+            totalPostsInForum.put(forum.getForumId(),threads);
         }
+
+        //считаем количество тем
 
         modelAndView.addObject("forumsList", forumsList);
         modelAndView.addObject("threadCountMap", totalThreadsInForum);
+        modelAndView.addObject("postCountMap", totalPostsInForum);
         return modelAndView;
     }
 

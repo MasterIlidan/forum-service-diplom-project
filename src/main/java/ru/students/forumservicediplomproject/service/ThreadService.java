@@ -12,5 +12,6 @@ public interface ThreadService {
     void updateThread(Thread thread);
     List<Thread> getAllThreads();
     List<Thread> getAllThreadsByForum(Long forumId);
+    List<Object[]> countTotalPosts(Long threadId);
 
 }
