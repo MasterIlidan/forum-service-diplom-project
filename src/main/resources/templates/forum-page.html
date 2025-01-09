@@ -4,7 +4,7 @@
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
-    <title>Форум - BitTorrent Share</title>
+    <title>Темы - BitTorrent Share</title>
     <link
             href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
             rel="stylesheet"
@@ -55,7 +55,7 @@
             <tbody>>
             <tr th:each="thread : ${threadList}">
                 <td >
-                    <a th:href="@{/forum(forumId=${forum.getForumId()})/thread(threadId=${thread.getThreadId()})}" th:text="${thread.threadName}"></a>
+                    <a th:href="@{'/forum/' + ${forum.getForumId()} + '/thread/' + ${thread.getThreadId()}}" th:text="${thread.threadName}"></a>
                 </td>
                 <td>Количество тем</td>
                 <td>Количество cообщений</td>

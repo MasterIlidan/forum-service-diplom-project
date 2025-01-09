@@ -5,19 +5,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import ru.students.forumservicediplomproject.dto.ThreadDto;
 import ru.students.forumservicediplomproject.entity.Forum;
+import ru.students.forumservicediplomproject.entity.Post;
 import ru.students.forumservicediplomproject.entity.Thread;
 import ru.students.forumservicediplomproject.entity.User;
 import ru.students.forumservicediplomproject.service.ForumService;
 import ru.students.forumservicediplomproject.service.ThreadService;
 import ru.students.forumservicediplomproject.service.UserService;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Controller
@@ -34,6 +34,32 @@ public class ThreadController {
         this.threadService = threadService;
         this.userService = userService;
     }
+
+    @GetMapping({"/forum{forumId}"})
+    public ModelAndView forumPage(@PathVariable @RequestParam long forumId,
+                                  Model model) {
+        ModelAndView modelAndView = new ModelAndView("forum-page");
+        List<Thread> threadList = threadService.getAllThreadsByForum(forumId);
+        modelAndView.addObject("threadList", threadList);
+
+        Optional<Forum> forum = forumServiceImpl.getForum(forumId);
+        if (forum.isPresent()) {
+            modelAndView.addObject("forum", forum.get());
+        } else {
+            throw new RuntimeException("У ветки не найден форум! ForumId %s".formatted(forumId));
+        }
+        return modelAndView;
+    }
+
+    @GetMapping({"/forum/{forumId}/thread/{threadId}"})
+    public ModelAndView threadPage(@PathVariable long threadId,
+                                   @PathVariable long forumId) {
+        ModelAndView modelAndView = new ModelAndView("thread-page");
+        List<Post> postList = new ArrayList<>();
+        modelAndView.addObject("posts", postList);
+        return modelAndView;
+    }
+
     @GetMapping({"/forum/{forumId}/createThread"})
     public ModelAndView createNewThread(@PathVariable long forumId) {
         ModelAndView modelAndView = new ModelAndView("forms/add-thread-page");
@@ -41,6 +67,7 @@ public class ThreadController {
         modelAndView.addObject("onForumIdCreated", forumId);
         return modelAndView;
     }
+
     @PostMapping({"/forum/{forumId}/saveThread"})
     public String saveThread(@PathVariable long forumId,
                              @Valid @ModelAttribute("thread") ThreadDto threadDto,
@@ -50,7 +77,7 @@ public class ThreadController {
         if (bindingResult.hasErrors()) {
             return "forms/add-thread-page";
         }
-        ru.students.forumservicediplomproject.entity.Thread thread = new Thread();
+        Thread thread = new Thread();
         thread.setThreadName(threadDto.getThreadName());
         thread.setCreatedBy(currentUser);
         Optional<Forum> forum = forumServiceImpl.getForum(forumId);
