@@ -10,14 +10,14 @@
             rel="stylesheet"
             integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
             crossorigin="anonymous">
-    <link href="css/styles.css" rel="stylesheet"/>
+    <link th:href="@{css/styles.css}" rel="stylesheet"/>
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
-        <div th:class="image-container">
-            <img th:href="@{/}" th:src="@{images/logo.png}" alt="BitTorrent OpenShare" class="responsive-image"/>
-        </div>
+        <a th:href="@{/}" th:class="image-container">
+            <img  th:src="@{images/logo.png}" alt="BitTorrent OpenShare" class="responsive-image"/>
+        </a>
         <button class="navbar-toggler" type="button" data-bstoggle="collapse" data-bs-target="#navbarSupportedContent"
                 aria-controls="navbarSupportedContent" aria-expanded="false"
                 aria-label="Toggle navigation">
@@ -42,7 +42,7 @@
 <div class="forum-container">
     <div class="forum-block">
         <h1 class="header ">Ветки</h1>
-        <a class="btn btn-primary" th:href="@{/forum(forumId=${forum.getForumId()})/createThread}">+ Создать ветку</a>
+        <a class="btn btn-primary" th:href="@{'/forum/' + ${forum.getForumId()} + '/createThread'}">+ Создать ветку</a>
         <table class="table table-bordered table-striped" id="forums">
             <thead>
             <tr>
