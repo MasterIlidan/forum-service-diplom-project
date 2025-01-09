@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
-    <title>Форум - BitTorrent Share</title>
+    <title>Создание новой ветки - BitTorrent Share</title>
     <link
             href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
             rel="stylesheet"
@@ -11,6 +12,41 @@
     <link th:href="@{css/styles.css}" rel="stylesheet"/>
 </head>
 <body>
-
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <div th:class="image-container">
+            <img th:href="@{/}" th:src="@{images/logo.png}" alt="BitTorrent OpenShare" class="responsive-image"/>
+        </div>
+        <button class="navbar-toggler" type="button" data-bstoggle="collapse" data-bs-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false"
+                aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <input class="ima" th:placeholder="Поиск">
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a sec:authorize="not isAuthenticated()" class="nav-link active" aria-current="page"
+                       th:href="@{/login}">Login</a>
+                    <a sec:authorize="not isAnonymous()" sec:authentication="name" th:class="nav-link"></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page"
+                       th:href="@{/register}">Зарегистрироваться</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="container">
+    <hr/>
+    <h3>Создание ветки</h3>
+    <hr/>
+    <form th:action="@{'/forum/' + ${forumId} + '/saveThread'}" th:object="${thread}" method="POST">
+        <input type="text" th:field="*{threadName}" class="form-control col-4 mb-4"
+               placeholder="Введите название ветки"/>
+        <button type="submit" class="btn btn-primary col-2">Save</button>
+    </form>
+</div>
 </body>
 </html>

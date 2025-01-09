@@ -1,4 +1,4 @@
-package ru.students.forumservicediplomproject.entity;
+package ru.students.forumservicediplomproject.dto;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -6,21 +6,16 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.stereotype.Service;
+import ru.students.forumservicediplomproject.entity.Forum;
+import ru.students.forumservicediplomproject.entity.User;
 
 @Getter
 @Setter
-@Entity
 @AllArgsConstructor
 @NoArgsConstructor
-public class Thread {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long threadId;
-    @NotNull
+public class ThreadDto {
+    @NotNull(message = "Имя ветки не должно быть пустым")
     private String threadName;
-    @ManyToOne
-    private Forum forumId;
-    @ManyToOne
+    private long forumId;
     private User createdBy;
 }
