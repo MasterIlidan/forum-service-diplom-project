@@ -18,10 +18,7 @@ import ru.students.forumservicediplomproject.service.ThreadService;
 import ru.students.forumservicediplomproject.service.ThreadServiceImpl;
 import ru.students.forumservicediplomproject.service.UserServiceImpl;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Controller
 public class ForumController {
@@ -43,9 +40,17 @@ public class ForumController {
         //TODO: вернуть список форумов из репозитория
         List<Forum> forumsList = forumServiceImpl.getAllForums();
 
-        List<Object[]> totalThread = forumServiceImpl.countTotalThreads();
+
+
+        HashMap<Long,Long> totalThreadsInForum = new HashMap<>();
+
+        for (Forum forum:forumsList) {
+            List<Object[]> totalThread = forumServiceImpl.countTotalThreads(forum.getForumId());
+            totalThreadsInForum.put(forum.getForumId(), (long) totalThread.get(0)[1]);
+        }
+
         modelAndView.addObject("forumsList", forumsList);
-        modelAndView.addObject("threadCount",totalThread.size());
+        modelAndView.addObject("threadCountMap",totalThreadsInForum);
         return modelAndView;
     }
 
@@ -67,11 +72,11 @@ public class ForumController {
     @GetMapping({"/forum/thread{threadId}"})
     public ModelAndView threadPage(@PathVariable long threadId) {
         ModelAndView modelAndView = new ModelAndView("thread-page");
-        //TODO: вернуть список веток из репозитория
         List<Post> postList = new ArrayList<>();
         modelAndView.addObject("posts", postList);
         return modelAndView;
     }
+    //TODO: сделать отображение и создание постов
     @GetMapping({"/forum/thread/post{postId}"})
     public ModelAndView postPage(@PathVariable long postId) {
         ModelAndView modelAndView = new ModelAndView("post");

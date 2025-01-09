@@ -59,7 +59,7 @@
                 <td >
                     <a th:href="@{/forum(forumId=${forum.getForumId()})}" th:text="${forum.forumName}"></a>
                 </td>
-                <td th:text="${threadCount}">
+                <td th:text="${threadCountMap.get(forum.forumId)}">
                 <td>Количество тем</td>
                 <td>Количество сообщений</td>
                 <td>Последнее сообщение</td>
