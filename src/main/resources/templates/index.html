@@ -10,14 +10,14 @@
             rel="stylesheet"
             integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
             crossorigin="anonymous">
-    <link href="css/styles.css" rel="stylesheet"/>
+    <link th:href="@{/css/styles.css}" rel="stylesheet"/>
 </head>
 
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
         <a th:href="@{/}" th:class="image-container">
-            <img  th:src="@{images/logo.png}" alt="BitTorrent OpenShare" class="responsive-image"/>
+            <img  th:src="@{/images/logo.png}" alt="BitTorrent OpenShare" class="responsive-image"/>
         </a>
         <button class="navbar-toggler" type="button" data-bstoggle="collapse" data-bs-target="#navbarSupportedContent"
                 aria-controls="navbarSupportedContent" aria-expanded="false"

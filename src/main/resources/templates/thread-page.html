@@ -9,13 +9,13 @@
             rel="stylesheet"
             integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
             crossorigin="anonymous">
-    <link th:href="@{css/styles.css}" rel="stylesheet"/>
+    <link th:href="@{/css/styles.css}" rel="stylesheet"/>
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
         <a th:href="@{/}" th:class="image-container">
-            <img  th:src="@{images/logo.png}" alt="BitTorrent OpenShare" class="responsive-image"/>
+            <img  th:src="@{/images/logo.png}" alt="BitTorrent OpenShare" class="responsive-image"/>
         </a>
         <button class="navbar-toggler" type="button" data-bstoggle="collapse" data-bs-target="#navbarSupportedContent"
                 aria-controls="navbarSupportedContent" aria-expanded="false"
@@ -40,6 +40,10 @@
 </nav>
 <div class="forum-container">
     <div class="forum-block">
+        <a class="back-button" th:href="@{'/forum?forumId=' + ${forumId}}">
+            <img th:src="@{/images/back_button.png}" alt="Назад">
+            <span>Вернуться в ветку</span>
+        </a>
         <h1 class="header ">Темы</h1>
         <a class="btn btn-primary" th:href="@{'/forum/' + ${forumId} + '/thread/' + ${threadId} + '/createPost'}">+ Создать тему</a>
         <table class="table table-bordered table-striped" id="forums">

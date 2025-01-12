@@ -4,7 +4,7 @@
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
-    <title>Темы - BitTorrent Share</title>
+    <title th:text="${forum.getForumName()} + ' - BitTorrent Share'"></title>
     <link
             href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
             rel="stylesheet"
@@ -41,7 +41,11 @@
 </nav>
 <div class="forum-container">
     <div class="forum-block">
-        <h1 class="header ">Ветки</h1>
+        <a class="back-button" th:href="@{'/'}">
+            <img th:src="@{/images/back_button.png}" alt="Назад">
+            <span>Вернуться на главную</span>
+        </a>
+        <h1 class="header" th:text="${forum.getForumName()}"></h1>
         <a class="btn btn-primary" th:href="@{'/forum/' + ${forum.getForumId()} + '/createThread'}">+ Создать ветку</a>
         <table class="table table-bordered table-striped" id="forums">
             <thead>
@@ -52,7 +56,7 @@
                 <th>Последнее сообщение</th>
             </tr>
             </thead>
-            <tbody>>
+            <tbody>
             <tr th:each="thread : ${threadList}">
                 <td >
                     <a th:href="@{'/forum/' + ${forum.getForumId()} + '/thread/' + ${thread.getThreadId()} + '/posts'}" th:text="${thread.threadName}"></a>
@@ -64,7 +68,6 @@
             </tbody>
         </table>
     </div>
-
 </div>
 </body>
 </html>
