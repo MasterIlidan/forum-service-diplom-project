@@ -53,7 +53,7 @@
             <tbody>>
             <tr th:each="post : ${postList}">
                 <td >
-                    <a th:href="@{/forum(forumId=${forumId})/thread(threadId=${threadId})}" th:text="${post.getTitle()}"></a>
+                    <a th:href="@{'/forum/' + ${forumId} + '/thread/' + ${threadId} + '/post/' + ${post.getPostId()}}" th:text="${post.getTitle()}"></a>
                 </td>
                 <td>Количество cообщений</td>
                 <td>Последнее сообщение</td>
