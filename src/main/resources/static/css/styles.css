@@ -33,3 +33,7 @@
     grid-column-start: 5;
     grid-column-end: 6;
 }
+.flex-right {
+    display: flex; /* Включает Flexbox */
+    justify-content: flex-end; /* Выравнивает все элементы вправо */
+}

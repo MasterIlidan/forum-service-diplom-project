@@ -86,7 +86,7 @@ public class UserServiceImpl implements UserService {
         role.setRoleName("ADMIN");
         return roleRepository.save(role);
     }
-    public User getCreatorUserCredentials() {
+    public User getCurrentUserCredentials() {
         org.springframework.security.core.userdetails.User currentUser =
                 (org.springframework.security.core.userdetails.User) SecurityContextHolder
                         .getContext()

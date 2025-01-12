@@ -75,7 +75,7 @@ public class PostController {
                            @PathVariable long threadId,
                            @Valid @ModelAttribute("post") PostDto postDto, BindingResult result,
                            Model model) {
-        User currentUser = userService.getCreatorUserCredentials();
+        User currentUser = userService.getCurrentUserCredentials();
 
         if (result.hasErrors()) {
             return "forms/add-post-page";

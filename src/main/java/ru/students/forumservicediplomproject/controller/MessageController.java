@@ -1,7 +1,6 @@
 package ru.students.forumservicediplomproject.controller;
 
 import jakarta.validation.Valid;
-import org.hibernate.engine.jdbc.mutation.spi.BindingGroup;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -65,7 +64,7 @@ public class MessageController {
                                     @Valid @ModelAttribute("newMessage") MessageDto messageDto,
                                     BindingResult result) {
         ModelAndView modelAndView = new ModelAndView("post");
-        User currentUser = userService.getCreatorUserCredentials();
+        User currentUser = userService.getCurrentUserCredentials();
         Optional<Post> post = postService.getPostById(postId);
         Message message = new Message();
         if (post.isPresent()) {

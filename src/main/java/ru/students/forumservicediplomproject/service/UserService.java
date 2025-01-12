@@ -18,5 +18,5 @@ public interface UserService {
     Optional<User> findUserById(Long id);
 
     List<UserDto> findAllUsers();
-    User getCreatorUserCredentials();
+    User getCurrentUserCredentials();
 }

@@ -14,10 +14,8 @@ import ru.students.forumservicediplomproject.service.ForumServiceImpl;
 import ru.students.forumservicediplomproject.service.ThreadService;
 import ru.students.forumservicediplomproject.service.UserServiceImpl;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 
 @Controller
 public class ForumController {
@@ -76,7 +74,7 @@ public class ForumController {
     @PostMapping({"/forum/saveForum"})
     public String saveForum(@Valid @ModelAttribute("forum") ForumDto forumDto,
                             BindingResult bindingResult, Model model) {
-        User currentUser = userService.getCreatorUserCredentials();
+        User currentUser = userService.getCurrentUserCredentials();
         forumDto.setCreatedBy(currentUser);
 
         if (bindingResult.hasErrors()) {

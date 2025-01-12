@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import ru.students.forumservicediplomproject.dto.ThreadDto;
 import ru.students.forumservicediplomproject.entity.Forum;
-import ru.students.forumservicediplomproject.entity.Post;
 import ru.students.forumservicediplomproject.entity.Thread;
 import ru.students.forumservicediplomproject.entity.User;
 import ru.students.forumservicediplomproject.service.ForumService;
@@ -17,7 +16,6 @@ import ru.students.forumservicediplomproject.service.PostService;
 import ru.students.forumservicediplomproject.service.ThreadService;
 import ru.students.forumservicediplomproject.service.UserService;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -66,7 +64,7 @@ public class ThreadController {
     public String saveThread(@PathVariable long forumId,
                              @Valid @ModelAttribute("thread") ThreadDto threadDto,
                              BindingResult bindingResult, Model model) {
-        User currentUser = userService.getCreatorUserCredentials();
+        User currentUser = userService.getCurrentUserCredentials();
         threadDto.setCreatedBy(currentUser);
         if (bindingResult.hasErrors()) {
             return "forms/add-thread-page";
