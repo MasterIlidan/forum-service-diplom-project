@@ -59,7 +59,7 @@
             </thead>
             <tr th:each="message : ${messages}">
                 <td>
-                    <a th:text="${message.getMessageBy().getUserName()}"></a>
+                    <a th:text="${message.getMessageBy().getUserName()}" th:href="@{'/user?userId=' + ${message.getMessageBy().getUserId()}}"></a>
                 </td>
                 <td th:text="${message.getMessageBody()}">
             </tr>
