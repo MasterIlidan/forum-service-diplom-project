@@ -41,6 +41,10 @@
 </nav>
 <div class="forum-container">
     <div class="forum-block">
+        <a class="back-button" th:href="@{'/forum/' + ${forumId} + '/thread/' + ${threadId} + '/posts'}">
+            <img th:src="@{/images/back_button.png}" alt="Назад">
+    <span>Вернуться в ветку</span>
+        </a>
         <h1 class="header" th:text="${post.getTitle()}"></h1>
         <span class="" th:text="'Размер:  | Создана:  | Скачано: '"></span>
         <br>
@@ -60,7 +64,8 @@
                 <td th:text="${message.getMessageBody()}">
             </tr>
         </table>
-        <form th:action="@{'/forum/' + ${forumId} + '/thread/' + ${threadId} + '/post/' + ${postId}}" th:object="${newMessage}" method="post">
+        <form th:action="@{'/forum/' + ${forumId} + '/thread/' + ${threadId} + '/post/' + ${postId}}"
+              th:object="${newMessage}" method="post">
             <label>
                 Написать сообщение
                 <input th:field="*{messageBody}">
