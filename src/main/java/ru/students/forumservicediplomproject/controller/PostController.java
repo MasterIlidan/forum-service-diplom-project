@@ -96,7 +96,7 @@ public class PostController {
         message.setMessageBody(postDto.getMessageBody());
         message.setPostId(post);
         //messageService.save(message);
-        return "redirect:/forum/%s/thread/%s".formatted(forumId, threadId);
+        return "redirect:/forum/%s/thread/%s/posts".formatted(forumId, threadId);
     }
 
 
