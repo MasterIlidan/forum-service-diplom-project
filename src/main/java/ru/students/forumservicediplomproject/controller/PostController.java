@@ -14,11 +14,11 @@ import ru.students.forumservicediplomproject.entity.Message;
 import ru.students.forumservicediplomproject.entity.Post;
 import ru.students.forumservicediplomproject.entity.Thread;
 import ru.students.forumservicediplomproject.entity.User;
+import ru.students.forumservicediplomproject.service.MessageService;
 import ru.students.forumservicediplomproject.service.PostService;
 import ru.students.forumservicediplomproject.service.ThreadService;
 import ru.students.forumservicediplomproject.service.UserService;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,12 +29,14 @@ public class PostController {
 
     private final PostService postService;
     private final UserService userService;
+    private final MessageService messageService;
 
     public PostController(ThreadService threadService,
-                          PostService postService, UserService userService) {
+                          PostService postService, UserService userService, MessageService messageService) {
         this.threadService = threadService;
         this.postService = postService;
         this.userService = userService;
+        this.messageService = messageService;
     }
 
 
@@ -99,16 +101,4 @@ public class PostController {
         return "redirect:/forum/%s/thread/%s/posts".formatted(forumId, threadId);
     }
 
-
-    //TODO: сделать отображение и создание постов
-    @GetMapping({"/forum/{forumId}/thread/{threadId}/post/{postId}"})
-    public ModelAndView postPage(@PathVariable long forumId,
-                                 @PathVariable long threadId,
-                                 @PathVariable long postId) {
-        ModelAndView modelAndView = new ModelAndView("post");
-        //TODO: вернуть список веток из репозитория
-        List<Message> postList = new ArrayList<>();
-        modelAndView.addObject("posts", postList);
-        return modelAndView;
-    }
 }

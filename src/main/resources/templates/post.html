@@ -1,10 +1,73 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
-    <title>Форум - BitTorrent Share</title>
+    <title th:text="${post.getTitle()} + ' - BitTorrent Share'"></title>
+    <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+            crossorigin="anonymous">
+    <link th:href="@{/css/styles.css}" rel="stylesheet"/>
 </head>
 <body>
-
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a th:href="@{/}" th:class="image-container">
+            <img th:src="@{/images/logo.png}" alt="BitTorrent OpenShare" class="responsive-image"/>
+        </a>
+        <button class="navbar-toggler" type="button" data-bstoggle="collapse" data-bs-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false"
+                aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <input class="ima" th:placeholder="Поиск">
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a sec:authorize="not isAuthenticated()" class="nav-link active" aria-current="page"
+                       th:href="@{/login}">Login</a>
+                    <a sec:authorize="not isAnonymous()" sec:authentication="name" th:class="nav-link"></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page"
+                       th:href="@{/register}">Зарегистрироваться</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="forum-container">
+    <div class="forum-block">
+        <h1 class="header" th:text="${post.getTitle()}"></h1>
+        <span class="" th:text="'Размер:  | Создана:  | Скачано: '"></span>
+        <br>
+        <span class="" th:text="'Сиды: | Личи: '"></span>
+        <br>
+        <table class="table table-bordered table-striped" id="messages">
+            <thead>
+            <tr>
+                <th></th>
+                <th></th>
+            </tr>
+            </thead>
+            <tr th:each="message : ${messages}">
+                <td>
+                    <a th:text="${message.getMessageBy().getUserName()}"></a>
+                </td>
+                <td th:text="${message.getMessageBody()}">
+            </tr>
+        </table>
+        <form th:action="@{'/forum/' + ${forumId} + '/thread/' + ${threadId} + '/post/' + ${postId}}" th:object="${newMessage}" method="post">
+            <label>
+                Написать сообщение
+                <input th:field="*{messageBody}">
+            </label>
+            <button type="submit" class="btn btn-primary col-2">Отправить</button>
+        </form>
+    </div>
+</div>
 </body>
 </html>
