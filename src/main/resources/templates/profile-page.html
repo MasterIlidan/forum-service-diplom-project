@@ -41,9 +41,16 @@
     </div>
 </nav>
 
-<div >
-    <p th:text="${user.getUsername()}"></p>
-    <p th:text="${user.getEmail()}"></p>
+<div class="profile_container">
+    <div class="image-container">
+        <img class="responsive-image" th:src="@{/images/default_avatar.jpg}" alt="img user_avatar">
+    </div>
+    <div>
+        <p th:text="${user.getUsername()}"></p>
+        <p th:text="${user.getEmail()}"></p>
+    </div>
+
+
 </div>
 </body>
 </html>

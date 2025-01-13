@@ -46,6 +46,7 @@
             <span>Вернуться на главную</span>
         </a>
         <h1 class="header" th:text="${forum.getForumName()}"></h1>
+        <h5 class="header" th:text="${forum.getDescription()}"></h5>
         <a class="btn btn-primary" th:href="@{'/forum/' + ${forum.getForumId()} + '/createThread'}">+ Создать ветку</a>
         <table class="table table-bordered table-striped" id="forums">
             <thead>

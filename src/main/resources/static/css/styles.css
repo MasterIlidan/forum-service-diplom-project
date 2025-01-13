@@ -46,3 +46,8 @@
 .table-post td:nth-child(2) {
     width: 70%; /* 70% ширины таблицы */
 }
+.profile_container {
+    display: grid;
+    column-gap: 14px;
+
+}

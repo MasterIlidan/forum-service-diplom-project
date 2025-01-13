@@ -45,7 +45,7 @@
     <form th:action="@{'/forum/' + ${forumId} + '/saveThread'}" th:object="${thread}" method="POST">
         <input type="text" th:field="*{threadName}" class="form-control col-4 mb-4"
                placeholder="Введите название ветки"/>
-        <button type="submit" class="btn btn-primary col-2">Save</button>
+        <button type="submit" class="btn btn-primary col-2">Создать</button>
     </form>
 </div>
 </body>

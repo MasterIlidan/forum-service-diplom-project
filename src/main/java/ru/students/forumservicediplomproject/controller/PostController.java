@@ -54,6 +54,7 @@ public class PostController {
         modelAndView.addObject("postList", postList);
 
         modelAndView.addObject("forumId", forumId);
+        modelAndView.addObject("thread", thread.get());
         modelAndView.addObject("threadId", threadId);
         return modelAndView;
     }

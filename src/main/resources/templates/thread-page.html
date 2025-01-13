@@ -44,7 +44,7 @@
             <img th:src="@{/images/back_button.png}" alt="Назад">
             <span>Вернуться в ветку</span>
         </a>
-        <h1 class="header ">Темы</h1>
+        <h1 class="header" th:text="${thread.getThreadName()}"></h1>
         <a class="btn btn-primary" th:href="@{'/forum/' + ${forumId} + '/thread/' + ${threadId} + '/createPost'}">+ Создать тему</a>
         <table class="table table-bordered table-striped" id="forums">
             <thead>
