@@ -37,3 +37,12 @@
     display: flex; /* Включает Flexbox */
     justify-content: flex-end; /* Выравнивает все элементы вправо */
 }
+.table-post th:nth-child(1),
+.table-post td:nth-child(1) {
+    width: 30%; /* 30% ширины таблицы */
+}
+
+.table-post th:nth-child(2),
+.table-post td:nth-child(2) {
+    width: 70%; /* 70% ширины таблицы */
+}

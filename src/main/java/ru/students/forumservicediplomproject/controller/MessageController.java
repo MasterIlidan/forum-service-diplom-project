@@ -58,12 +58,11 @@ public class MessageController {
         return modelAndView;
     }
     @PostMapping({"/forum/{forumId}/thread/{threadId}/post/{postId}"})
-    public ModelAndView saveMessage(@PathVariable long forumId,
+    public String saveMessage(@PathVariable long forumId,
                                     @PathVariable long threadId,
                                     @PathVariable long postId,
                                     @Valid @ModelAttribute("newMessage") MessageDto messageDto,
                                     BindingResult result) {
-        ModelAndView modelAndView = new ModelAndView("post");
         User currentUser = userService.getCurrentUserCredentials();
         Optional<Post> post = postService.getPostById(postId);
         Message message = new Message();
@@ -77,7 +76,7 @@ public class MessageController {
         message.setMessageBy(currentUser);
 
         messageService.saveMessage(message);
-        return modelAndView;
+        return "redirect:/forum/%s/thread/%s/post/%s".formatted(forumId, threadId, postId);
     }
 }
 

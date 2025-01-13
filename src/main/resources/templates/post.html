@@ -58,17 +58,17 @@
             </tr>
             </thead>
             <tr th:each="message : ${messages}">
-                <td>
+                <td th:class="table-post">
                     <a th:text="${message.getMessageBy().getUserName()}" th:href="@{'/user?userId=' + ${message.getMessageBy().getUserId()}}"></a>
                 </td>
-                <td th:text="${message.getMessageBody()}">
+                <td th:class="table-post" th:text="${message.getMessageBody()}">
             </tr>
         </table>
         <form th:action="@{'/forum/' + ${forumId} + '/thread/' + ${threadId} + '/post/' + ${postId}}"
               th:object="${newMessage}" method="post">
             <label>
                 Написать сообщение
-                <input th:field="*{messageBody}">
+                <textarea th:field="*{messageBody}"></textarea>
             </label>
             <button type="submit" class="btn btn-primary col-2">Отправить</button>
         </form>
