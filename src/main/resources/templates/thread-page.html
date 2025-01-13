@@ -51,6 +51,7 @@
             <tr>
                 <th>Название</th>
                 <th>Сообщений</th>
+                <th>Создал</th>
                 <th>Последнее сообщение</th>
             </tr>
             </thead>
@@ -60,6 +61,9 @@
                     <a th:href="@{'/forum/' + ${forumId} + '/thread/' + ${threadId} + '/post/' + ${post.getPostId()}}" th:text="${post.getTitle()}"></a>
                 </td>
                 <td>Количество cообщений</td>
+                <td>
+                    <a th:text="${post.getCreatedBy().getUserName()}" th:href="@{'/user?userId=' + ${post.getCreatedBy().getUserId()}}"></a>
+                </td>
                 <td>Последнее сообщение</td>
             </tr>
             </tbody>

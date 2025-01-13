@@ -53,6 +53,7 @@
                 <th>Название</th>
                 <th>Тем</th>
                 <th>Сообщений</th>
+                <th>Создал</th>
                 <th>Последнее сообщение</th>
             </tr>
             </thead>
@@ -63,6 +64,9 @@
                 </td>
                 <td>Количество тем</td>
                 <td>Количество cообщений</td>
+                <td>
+                    <a th:text="${thread.getCreatedBy().getUserName()}" th:href="@{'/user?userId=' + ${thread.getCreatedBy().getUserId()}}"></a>
+                </td>
                 <td>Последнее сообщение</td>
             </tr>
             </tbody>

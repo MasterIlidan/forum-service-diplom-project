@@ -54,6 +54,7 @@
                 <th>Веток</th>
                 <th>Тем</th>
                 <th>Сообщений</th>
+                <th>Создал</th>
                 <th>Последнее сообщение</th>
             </tr>
             </thead>
@@ -65,6 +66,9 @@
                 <td th:text="${threadCountMap.get(forum.forumId)}">
                 <td th:text="${postCountMap.get(forum.forumId)}"></td>
                 <td>Количество сообщений</td>
+                <td>
+                    <a th:text="${forum.getCreatedBy().getUserName()}" th:href="@{'/user?userId=' + ${forum.getCreatedBy().getUserId()}}"></a>
+                </td>
                 <td>Последнее сообщение</td>
             </tr>
             </tbody>
