@@ -40,10 +40,9 @@ public class ForumController {
         HashMap<Long, Long> totalThreadsInForum = new HashMap<>();
         HashMap<Long, Long> totalPostsInForum = new HashMap<>();
         HashMap<Long, Long> totalMessagesInForum = new HashMap<>();
-        //TODO: подсчет количества сообщений
         //TODO: когда было последнее сообщение
 
-        //считаем количество веток для каждого форума
+        //считаем количество веток, тем и сообщений для каждого форума
         for (Forum forum : forumsList) {
             List<Object[]> totalThread = threadService.countTotalThreadsByForum(forum);
             totalThreadsInForum.put(forum.getForumId(), (long) totalThread.get(0)[1]);
@@ -65,7 +64,6 @@ public class ForumController {
             totalMessagesInForum.put(forum.getForumId(), messageCount);
         }
 
-        //считаем количество тем
 
         modelAndView.addObject("forumsList", forumsList);
         modelAndView.addObject("threadCountMap", totalThreadsInForum);
