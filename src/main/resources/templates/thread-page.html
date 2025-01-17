@@ -60,7 +60,7 @@
                 <td >
                     <a th:href="@{'/forum/' + ${forumId} + '/thread/' + ${threadId} + '/post/' + ${post.getPostId()}}" th:text="${post.getTitle()}"></a>
                 </td>
-                <td>Количество cообщений</td>
+                <td th:text="${messagesCountMap.get(post.getPostId())}">
                 <td>
                     <a th:text="${post.getCreatedBy().getUserName()}" th:href="@{'/user?userId=' + ${post.getCreatedBy().getUserId()}}"></a>
                 </td>

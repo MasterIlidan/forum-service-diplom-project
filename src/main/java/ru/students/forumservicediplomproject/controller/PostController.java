@@ -27,6 +27,7 @@ import ru.students.forumservicediplomproject.service.UserService;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -59,8 +60,19 @@ public class PostController {
         } else {
             throw new RuntimeException("Ветка поста не найдена! ThreadId %s".formatted(threadId));
         }
-        modelAndView.addObject("postList", postList);
 
+        HashMap<Long, Long> totalMessagesInPost = new HashMap<>();
+
+        for (Post post : postList) {
+            long messageCount = 0;
+            List<Object[]> totalMessages = messageService.countMessagesByPost(post);
+            messageCount += (long) totalMessages.get(0)[1];
+            totalMessagesInPost.put(post.getPostId(), messageCount);
+        }
+
+
+        modelAndView.addObject("postList", postList);
+        modelAndView.addObject("messagesCountMap", totalMessagesInPost);
         modelAndView.addObject("forumId", forumId);
         modelAndView.addObject("thread", thread.get());
         modelAndView.addObject("threadId", threadId);
