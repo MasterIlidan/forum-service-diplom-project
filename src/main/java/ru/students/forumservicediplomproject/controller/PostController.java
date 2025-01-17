@@ -25,22 +25,13 @@ import ru.students.forumservicediplomproject.service.PostService;
 import ru.students.forumservicediplomproject.service.ThreadService;
 import ru.students.forumservicediplomproject.service.UserService;
 
-import java.io.*;
+import java.io.IOException;
 import java.net.URI;
-import java.nio.CharBuffer;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 @Controller
 public class PostController {
-
-    public static String UPLOAD_DIRECTORY = System.getProperty("user.dir") + "/uploads";
 
     private final ThreadService threadService;
 
@@ -116,7 +107,7 @@ public class PostController {
             throw new RuntimeException("Ветка поста не найдена! PostId %s ForumId %s".formatted(threadId, forumId));
         }
         postService.savePost(post);
-
+        //Описание раздачи становится первым сообщением в теме
         Message message = new Message();
         message.setMessageBy(currentUser);
         message.setMessageBody(postDto.getMessageBody());
