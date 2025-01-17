@@ -42,11 +42,12 @@
     <hr/>
     <h3>Новая тема</h3>
     <hr/>
-    <form th:action="@{'/forum/' + ${forumId} + '/thread/' + ${threadId} + '/savePost'}" th:object="${post}" method="POST">
+    <form th:action="@{'/forum/' + ${forumId} + '/thread/' + ${threadId} + '/savePost'}" enctype="multipart/form-data" th:object="${post}" method="POST">
         <input type="text" th:field="*{title}" class="form-control col-4 mb-4"
                placeholder="Введите название темы"/>
         <input type="text" th:field="*{messageBody}" class="form-control col-4 mb-4"
                placeholder="Опишите раздачу"/>
+        <input type="file" name="torrentFile" accept="torrent" class="form-control-file">
         <button type="submit" class="btn btn-primary col-2">Создать</button>
         <input type="hidden" th:field="*{createBy}" th:value="${name}"/>
     </form>

@@ -1,14 +1,20 @@
 package ru.students.forumservicediplomproject.controller;
 
 import jakarta.validation.Valid;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.util.UriComponentsBuilder;
 import ru.students.forumservicediplomproject.dto.PostDto;
 import ru.students.forumservicediplomproject.entity.Message;
 import ru.students.forumservicediplomproject.entity.Post;
@@ -19,11 +25,22 @@ import ru.students.forumservicediplomproject.service.PostService;
 import ru.students.forumservicediplomproject.service.ThreadService;
 import ru.students.forumservicediplomproject.service.UserService;
 
+import java.io.*;
+import java.net.URI;
+import java.nio.CharBuffer;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 @Controller
 public class PostController {
+
+    public static String UPLOAD_DIRECTORY = System.getProperty("user.dir") + "/uploads";
 
     private final ThreadService threadService;
 
@@ -74,17 +91,23 @@ public class PostController {
     @PostMapping({"/forum/{forumId}/thread/{threadId}/savePost"})
     public String savePost(@PathVariable long forumId,
                            @PathVariable long threadId,
-                           @Valid @ModelAttribute("post") PostDto postDto, BindingResult result,
-                           Model model) {
+                           @Valid @ModelAttribute("post") PostDto postDto,
+                           @RequestParam("torrentFile") MultipartFile torrentFile,
+                           BindingResult result,
+                           Model model) throws IOException {
         User currentUser = userService.getCurrentUserCredentials();
 
         if (result.hasErrors()) {
             return "forms/add-post-page";
         }
 
+        String hash = registerNewTorrent(torrentFile);
+        model.addAttribute("msg", "Uploaded torrent file hash: " + hash);
+
         Post post = new Post();
         post.setTitle(postDto.getTitle());
         post.setCreatedBy(currentUser);
+        post.setHashInfo(hash);
         Optional<Thread> thread = threadService.getThreadById(threadId);
 
         if (thread.isPresent()) {
@@ -99,7 +122,28 @@ public class PostController {
         message.setMessageBody(postDto.getMessageBody());
         message.setPostId(post);
         messageService.saveMessage(message);
+
+
         return "redirect:/forum/%s/thread/%s/post/%s".formatted(forumId, threadId, post.getPostId());
+    }
+
+    private String registerNewTorrent(MultipartFile torrentFile) throws IOException {
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("torrentFile", torrentFile.getResource());
+
+        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+
+        RestTemplate restTemplate = new RestTemplate();
+        String uri = "http://localhost:8081/register";
+        URI uri1 = UriComponentsBuilder.fromUriString(uri)
+                .build().toUri();
+        ResponseEntity<String> response = restTemplate.postForEntity(uri1, requestEntity, String.class);
+
+        return response.getBody();
     }
 
 }
