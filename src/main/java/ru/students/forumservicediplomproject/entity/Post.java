@@ -22,7 +22,7 @@ public class Post {
     @ManyToOne
     @NotNull
     private Thread thread;
-    //@NotNull TODO: обязательно вернуть. прикрепление торрента обязательно для создания поста, пока так
+    @NotNull
     private String hashInfo; //хеш торрента
     @ManyToOne
     private User createdBy;

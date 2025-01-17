@@ -98,55 +98,19 @@ public class PostController {
                            @RequestParam("torrentFile") MultipartFile torrentFile,
                            BindingResult result,
                            Model model) throws IOException {
-        User currentUser = userService.getCurrentUserCredentials();
-
         if (result.hasErrors()) {
             return "forms/add-post-page";
         }
 
-        String hash = registerNewTorrent(torrentFile);
-        model.addAttribute("msg", "Uploaded torrent file hash: " + hash);
 
-        Post post = new Post();
-        post.setTitle(postDto.getTitle());
-        post.setCreatedBy(currentUser);
-        post.setHashInfo(hash);
-        Optional<Thread> thread = threadService.getThreadById(threadId);
-
-        if (thread.isPresent()) {
-            post.setThread(thread.get());
-        } else {
-            throw new RuntimeException("Ветка поста не найдена! PostId %s ForumId %s".formatted(threadId, forumId));
-        }
-        postService.savePost(post);
+        long postId = postService.savePost(torrentFile, postDto, threadId, forumId);
         //Описание раздачи становится первым сообщением в теме
-        Message message = new Message();
-        message.setMessageBy(currentUser);
-        message.setMessageBody(postDto.getMessageBody());
-        message.setPostId(post);
-        messageService.saveMessage(message);
+        //model.addAttribute("msg", "Uploaded torrent file hash: " + hash);
 
 
-        return "redirect:/forum/%s/thread/%s/post/%s".formatted(forumId, threadId, post.getPostId());
+        return "redirect:/forum/%s/thread/%s/post/%s".formatted(forumId, threadId, postId);
     }
 
-    private String registerNewTorrent(MultipartFile torrentFile) {
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-
-        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-        body.add("torrentFile", torrentFile.getResource());
-
-        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
-
-        RestTemplate restTemplate = new RestTemplate();
-        String uri = "http://localhost:8081/register";
-        URI uri1 = UriComponentsBuilder.fromUriString(uri)
-                .build().toUri();
-        ResponseEntity<String> response = restTemplate.postForEntity(uri1, requestEntity, String.class);
-
-        return response.getBody();
-    }
 
 }

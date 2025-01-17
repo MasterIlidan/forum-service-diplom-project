@@ -1,25 +1,78 @@
 package ru.students.forumservicediplomproject.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.util.UriComponentsBuilder;
+import ru.students.forumservicediplomproject.dto.PostDto;
+import ru.students.forumservicediplomproject.entity.Message;
 import ru.students.forumservicediplomproject.entity.Post;
 import ru.students.forumservicediplomproject.entity.Thread;
 import ru.students.forumservicediplomproject.repository.PostRepository;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class PostServiceImpl implements PostService {
     private final PostRepository postRepository;
+    private final UserService userService;
+    private final ThreadService threadService;
+    private final MessageService messageService;
 
-    public PostServiceImpl(PostRepository postRepository) {
+    public PostServiceImpl(PostRepository postRepository, UserService userService, ThreadService threadService, MessageService messageService) {
         this.postRepository = postRepository;
+        this.userService = userService;
+        this.threadService = threadService;
+        this.messageService = messageService;
     }
 
+    /**
+     *
+     * @param torrentFile
+     * Загруженный пользователем торрент файл
+     * @param postDto
+     * Заполненная пользователем форма создания темы
+     * @param threadId
+     * Идентификатор ветки
+     * @param forumId
+     * Идентификатор форума
+     * @return
+     * Хеш сумма раздачи
+     */
     @Override
-    public void savePost(Post post) {
+    public long savePost(MultipartFile torrentFile, PostDto postDto, long threadId, long forumId) {
+
+        String hash = registerNewTorrent(torrentFile);
+
+        Post post = new Post();
+        post.setTitle(postDto.getTitle());
+        post.setCreatedBy(userService.getCurrentUserCredentials());
+        post.setHashInfo(hash);
+        Optional<Thread> thread = threadService.getThreadById(threadId);
+
+        if (thread.isPresent()) {
+            post.setThread(thread.get());
+        } else {
+            throw new RuntimeException("Ветка поста не найдена! PostId %s ForumId %s".formatted(threadId, forumId));
+        }
+
         postRepository.save(post);
+
+        Message message = new Message();
+        message.setMessageBy(userService.getCurrentUserCredentials());
+        message.setMessageBody(postDto.getMessageBody());
+        message.setPostId(post);
+        messageService.saveMessage(message);
+
+        return post.getPostId();
     }
 
     @Override
@@ -49,5 +102,31 @@ public class PostServiceImpl implements PostService {
     @Override
     public List<Object[]> countPostsByThread(Thread threadId) {
         return postRepository.countTotalPostsByThread(threadId);
+    }
+
+    /**
+     *
+     * @param torrentFile
+     * Загруженный пользователем торрент файл
+     * @return
+     * Хеш сумма раздачи
+     */
+    private String registerNewTorrent(MultipartFile torrentFile) {
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("torrentFile", torrentFile.getResource());
+
+        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+
+        RestTemplate restTemplate = new RestTemplate();
+        String uri = "http://localhost:8081/register";
+        URI uri1 = UriComponentsBuilder.fromUriString(uri)
+                .build().toUri();
+        ResponseEntity<String> response = restTemplate.postForEntity(uri1, requestEntity, String.class);
+
+        return response.getBody();
     }
 }
