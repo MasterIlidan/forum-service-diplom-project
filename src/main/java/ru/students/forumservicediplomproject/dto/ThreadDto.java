@@ -1,12 +1,10 @@
 package ru.students.forumservicediplomproject.dto;
 
-import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ru.students.forumservicediplomproject.entity.Forum;
 import ru.students.forumservicediplomproject.entity.User;
 
 @Getter

@@ -19,14 +19,14 @@ import java.util.List;
 public class ForumController {
     private final ForumServiceImpl forumServiceImpl;
     private final ThreadService threadService;
-    @Autowired
-    private PostService postService;
-    @Autowired
-    private MessageService messageService;
+    private final PostService postService;
+    private final MessageService messageService;
 
-    public ForumController(ForumServiceImpl forumServiceImpl, ThreadService threadService) {
+    public ForumController(ForumServiceImpl forumServiceImpl, ThreadService threadService, PostService postService, MessageService messageService) {
         this.forumServiceImpl = forumServiceImpl;
         this.threadService = threadService;
+        this.postService = postService;
+        this.messageService = messageService;
     }
 
     @Autowired

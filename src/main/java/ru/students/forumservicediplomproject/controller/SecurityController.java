@@ -12,7 +12,6 @@ import ru.students.forumservicediplomproject.entity.Role;
 import ru.students.forumservicediplomproject.entity.User;
 import ru.students.forumservicediplomproject.repository.RoleRepository;
 import ru.students.forumservicediplomproject.service.UserService;
-import ru.students.forumservicediplomproject.service.UserServiceImpl;
 
 import java.util.List;
 
@@ -20,15 +19,12 @@ import java.util.List;
 public class SecurityController {
 
     private final RoleRepository roleRepository;
-    private UserService userService;
-    private UserServiceImpl userServiceImpl;
+    private final UserService userService;
 
     public SecurityController(UserService userService,
-                              RoleRepository roleRepository,
-                              UserServiceImpl userServiceImpl) {
+                              RoleRepository roleRepository) {
         this.userService = userService;
         this.roleRepository = roleRepository;
-        this.userServiceImpl = userServiceImpl;
     }
 
 
@@ -73,7 +69,7 @@ public class SecurityController {
         model.addAttribute("roleNames", roleNames);
         model.addAttribute("users", users);
         model.addAttribute("roles", roles);
-        return "users";
+        return "/users";
     }
 
     @GetMapping("/roles")

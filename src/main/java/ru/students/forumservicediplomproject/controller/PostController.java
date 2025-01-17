@@ -130,7 +130,7 @@ public class PostController {
         return "redirect:/forum/%s/thread/%s/post/%s".formatted(forumId, threadId, post.getPostId());
     }
 
-    private String registerNewTorrent(MultipartFile torrentFile) throws IOException {
+    private String registerNewTorrent(MultipartFile torrentFile) {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);

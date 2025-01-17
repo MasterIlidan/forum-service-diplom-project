@@ -23,17 +23,17 @@ public class ThreadController {
     private final ThreadService threadService;
     private final ForumService forumServiceImpl;
     private final UserService userService;
-    @Autowired
-    private PostService postService;
-    @Autowired
-    private MessageService messageService;
+    private final PostService postService;
+    private final MessageService messageService;
 
     public ThreadController(ForumService forumService,
                             ThreadService threadService,
-                            UserService userService) {
+                            UserService userService, PostService postService, MessageService messageService) {
         this.forumServiceImpl = forumService;
         this.threadService = threadService;
         this.userService = userService;
+        this.postService = postService;
+        this.messageService = messageService;
     }
 
     @GetMapping({"/forum{forumId}"})
