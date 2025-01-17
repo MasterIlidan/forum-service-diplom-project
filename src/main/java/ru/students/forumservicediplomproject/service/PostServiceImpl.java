@@ -43,4 +43,8 @@ public class PostServiceImpl implements PostService {
     public List<Post> getAllPostsByThread(Thread thread) {
         return postRepository.findByThread(thread);
     }
+    @Override
+    public List<Object[]> countPostsByThread(Thread threadId) {
+        return postRepository.countTotalPostsByThread(threadId);
+    }
 }

@@ -47,4 +47,8 @@ public class MessageServiceImpl implements MessageService {
     public List<Message> getAllMessagesByPost(Post post) {
         return messageRepository.findAllByPostId(post);
     }
+    @Override
+    public List<Object[]> countMessagesByPost(Post post) {
+        return messageRepository.countTotalMessagesByPostId(post);
+    }
 }

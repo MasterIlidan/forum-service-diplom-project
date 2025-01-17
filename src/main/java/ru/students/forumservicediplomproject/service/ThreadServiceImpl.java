@@ -1,6 +1,5 @@
 package ru.students.forumservicediplomproject.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.students.forumservicediplomproject.entity.Forum;
 import ru.students.forumservicediplomproject.entity.Thread;
@@ -12,10 +11,13 @@ import java.util.Optional;
 @Service
 public class ThreadServiceImpl implements ThreadService {
 
-    @Autowired
-    private ThreadRepository threadRepository;
-    @Autowired
-    private ForumServiceImpl forumServiceImpl;
+    private final ThreadRepository threadRepository;
+    private final ForumServiceImpl forumServiceImpl;
+
+    public ThreadServiceImpl(ThreadRepository threadRepository, ForumServiceImpl forumServiceImpl) {
+        this.threadRepository = threadRepository;
+        this.forumServiceImpl = forumServiceImpl;
+    }
 
     @Override
     public void saveThread(Thread thread) {
@@ -44,7 +46,7 @@ public class ThreadServiceImpl implements ThreadService {
 
     @Override
     public List<Thread> getAllThreadsByForum(Long forumId) {
-        Optional<Forum> forum =  forumServiceImpl.getForum(forumId);
+        Optional<Forum> forum = forumServiceImpl.getForum(forumId);
         if (forum.isPresent()) {
             return threadRepository.findByForumId(forum.get());
         }
@@ -52,12 +54,7 @@ public class ThreadServiceImpl implements ThreadService {
     }
 
     @Override
-    public List<Object[]> countTotalPosts(Long threadId) {
-        Optional<Thread> thread = getThreadById(threadId);
-        if (thread.isPresent()) {
-            return threadRepository.countTotalPostsByThreadId(thread.get());
-        } else {
-            throw new RuntimeException("Ветка не найдена при подсчете постов! ThreadId %s".formatted(threadId));
-        }
+    public List<Object[]> countTotalThreadsByForum(Forum forumId) {
+        return threadRepository.countTotalThreadsByForumId(forumId);
     }
 }

@@ -1,5 +1,6 @@
 package ru.students.forumservicediplomproject.service;
 
+import ru.students.forumservicediplomproject.entity.Forum;
 import ru.students.forumservicediplomproject.entity.Thread;
 
 import java.util.List;
@@ -12,6 +13,6 @@ public interface ThreadService {
     void updateThread(Thread thread);
     List<Thread> getAllThreads();
     List<Thread> getAllThreadsByForum(Long forumId);
-    List<Object[]> countTotalPosts(Long threadId);
 
+    List<Object[]> countTotalThreadsByForum(Forum forumId);
 }

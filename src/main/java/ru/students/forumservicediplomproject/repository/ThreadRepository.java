@@ -13,6 +13,6 @@ import java.util.List;
 public interface ThreadRepository extends JpaRepository<Thread, Long> {
     List<Thread> findByForumId(Forum forumId);
 
-    @Query("SELECT t.thread, COUNT(t.thread) FROM Post AS t where t.thread=:#{#threadId}")
-    List<Object[]> countTotalPostsByThreadId(@Param("threadId") Thread thread);
+    @Query("SELECT t.forumId, COUNT(t.forumId) FROM Thread AS t where t.forumId=:#{#forumId}")
+    List<Object[]> countTotalThreadsByForumId(Forum forumId);
 }

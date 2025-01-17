@@ -10,9 +10,7 @@ import org.springframework.web.servlet.ModelAndView;
 import ru.students.forumservicediplomproject.dto.ForumDto;
 import ru.students.forumservicediplomproject.entity.Thread;
 import ru.students.forumservicediplomproject.entity.*;
-import ru.students.forumservicediplomproject.service.ForumServiceImpl;
-import ru.students.forumservicediplomproject.service.ThreadService;
-import ru.students.forumservicediplomproject.service.UserServiceImpl;
+import ru.students.forumservicediplomproject.service.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +19,10 @@ import java.util.List;
 public class ForumController {
     private final ForumServiceImpl forumServiceImpl;
     private final ThreadService threadService;
+    @Autowired
+    private PostService postService;
+    @Autowired
+    private MessageService messageService;
 
     public ForumController(ForumServiceImpl forumServiceImpl, ThreadService threadService) {
         this.forumServiceImpl = forumServiceImpl;
@@ -37,20 +39,30 @@ public class ForumController {
 
         HashMap<Long, Long> totalThreadsInForum = new HashMap<>();
         HashMap<Long, Long> totalPostsInForum = new HashMap<>();
+        HashMap<Long, Long> totalMessagesInForum = new HashMap<>();
         //TODO: подсчет количества сообщений
         //TODO: когда было последнее сообщение
 
         //считаем количество веток для каждого форума
         for (Forum forum : forumsList) {
-            List<Object[]> totalThread = forumServiceImpl.countTotalThreads(forum.getForumId());
+            List<Object[]> totalThread = threadService.countTotalThreadsByForum(forum);
             totalThreadsInForum.put(forum.getForumId(), (long) totalThread.get(0)[1]);
+
             List<Thread> threadList = threadService.getAllThreadsByForum(forum.getForumId());
-            long threads = 0;
-            for (Thread thread: threadList) {
-                List<Object[]> totalPost = threadService.countTotalPosts(thread.getThreadId());
-                threads+=(long) totalPost.get(0)[1];
+            long postCount = 0;
+            long messageCount = 0;
+            for (Thread thread : threadList) {
+                List<Object[]> totalPost = postService.countPostsByThread(thread);
+                postCount += (long) totalPost.get(0)[1];
+
+                List<Post> postList = postService.getAllPostsByThread(thread);
+                for (Post post : postList) {
+                    List<Object[]> totalMessages = messageService.countMessagesByPost(post);
+                    messageCount += (long) totalMessages.get(0)[1];
+                }
             }
-            totalPostsInForum.put(forum.getForumId(),threads);
+            totalPostsInForum.put(forum.getForumId(), postCount);
+            totalMessagesInForum.put(forum.getForumId(), messageCount);
         }
 
         //считаем количество тем
@@ -58,10 +70,9 @@ public class ForumController {
         modelAndView.addObject("forumsList", forumsList);
         modelAndView.addObject("threadCountMap", totalThreadsInForum);
         modelAndView.addObject("postCountMap", totalPostsInForum);
+        modelAndView.addObject("messagesCountMap", totalMessagesInForum);
         return modelAndView;
     }
-
-
 
 
     @GetMapping({"/forum/createForum"})

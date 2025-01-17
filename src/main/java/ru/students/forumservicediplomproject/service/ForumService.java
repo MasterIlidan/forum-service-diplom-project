@@ -15,6 +15,6 @@ public interface ForumService {
     void deleteForum(long id);
 
     void updateForum(Forum forum);
-    List<Object[]> countTotalThreads(Long forumId);
 
+    List<Object[]> countTotalForums(Long forumId);
 }

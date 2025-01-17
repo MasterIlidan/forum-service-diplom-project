@@ -1,7 +1,5 @@
 package ru.students.forumservicediplomproject.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import ru.students.forumservicediplomproject.entity.Forum;
 import ru.students.forumservicediplomproject.repository.ForumRepository;
@@ -12,8 +10,11 @@ import java.util.Optional;
 @Service
 public class ForumServiceImpl implements ForumService {
 
-    @Autowired
-    private ForumRepository forumRepository;
+    private final ForumRepository forumRepository;
+
+    public ForumServiceImpl(ForumRepository forumRepository) {
+        this.forumRepository = forumRepository;
+    }
 
     @Override
     public void saveForum(Forum forum) {
@@ -41,14 +42,7 @@ public class ForumServiceImpl implements ForumService {
     }
 
     @Override
-    public List<Object[]> countTotalThreads(Long forumId) {
-        Optional<Forum> forum = getForum(forumId);
-        if (forum.isPresent()) {
-            return forumRepository.countTotalThreadsByThreadsName(forum.get());
-        } else {
-            throw new RuntimeException();
-        }
-
-
+    public List<Object[]> countTotalForums(Long forumId) {
+        return forumRepository.countTotalForums();
     }
 }

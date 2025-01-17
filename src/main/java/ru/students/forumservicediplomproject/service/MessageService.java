@@ -16,4 +16,6 @@ public interface MessageService {
     List<Message> getAllMessages();
 
     List<Message> getAllMessagesByPost(Post post);
+
+    List<Object[]> countMessagesByPost(Post post);
 }

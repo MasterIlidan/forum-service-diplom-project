@@ -58,14 +58,14 @@
                 <th>Последнее сообщение</th>
             </tr>
             </thead>
-            <tbody>>
+            <tbody>
             <tr th:each="forum : ${forumsList}">
                 <td >
                     <a th:href="@{/forum(forumId=${forum.getForumId()})}" th:text="${forum.forumName}"></a>
                 </td>
                 <td th:text="${threadCountMap.get(forum.forumId)}">
                 <td th:text="${postCountMap.get(forum.forumId)}"></td>
-                <td>Количество сообщений</td>
+                <td th:text="${messagesCountMap.get(forum.forumId)}"></td>
                 <td>
                     <a th:text="${forum.getCreatedBy().getUserName()}" th:href="@{'/user?userId=' + ${forum.getCreatedBy().getUserId()}}"></a>
                 </td>

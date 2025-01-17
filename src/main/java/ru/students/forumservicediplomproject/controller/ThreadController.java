@@ -21,7 +21,6 @@ import java.util.Optional;
 
 @Controller
 public class ThreadController {
-    @Autowired
     private final ThreadService threadService;
     private final ForumService forumServiceImpl;
     private final UserService userService;
