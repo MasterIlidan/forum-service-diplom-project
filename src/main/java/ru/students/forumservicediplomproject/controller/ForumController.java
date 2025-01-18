@@ -29,9 +29,6 @@ public class ForumController {
         this.messageService = messageService;
     }
 
-    @Autowired
-    private UserServiceImpl userService;
-
     @GetMapping({"/"})
     public ModelAndView indexPage() {
         ModelAndView modelAndView = new ModelAndView("index");

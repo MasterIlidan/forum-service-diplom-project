@@ -1,7 +1,6 @@
 package ru.students.forumservicediplomproject.controller;
 
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -11,7 +10,6 @@ import ru.students.forumservicediplomproject.dto.ThreadDto;
 import ru.students.forumservicediplomproject.entity.Forum;
 import ru.students.forumservicediplomproject.entity.Post;
 import ru.students.forumservicediplomproject.entity.Thread;
-import ru.students.forumservicediplomproject.entity.User;
 import ru.students.forumservicediplomproject.service.*;
 
 import java.util.HashMap;
@@ -22,16 +20,14 @@ import java.util.Optional;
 public class ThreadController {
     private final ThreadService threadService;
     private final ForumService forumServiceImpl;
-    private final UserService userService;
     private final PostService postService;
     private final MessageService messageService;
 
     public ThreadController(ForumService forumService,
                             ThreadService threadService,
-                            UserService userService, PostService postService, MessageService messageService) {
+                            PostService postService, MessageService messageService) {
         this.forumServiceImpl = forumService;
         this.threadService = threadService;
-        this.userService = userService;
         this.postService = postService;
         this.messageService = messageService;
     }

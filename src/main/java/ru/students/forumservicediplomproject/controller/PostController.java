@@ -83,7 +83,7 @@ public class PostController {
                            @Valid @ModelAttribute("post") PostDto postDto,
                            @RequestParam("torrentFile") MultipartFile torrentFile,
                            BindingResult result,
-                           Model model) throws IOException {
+                           Model model) {
         if (result.hasErrors()) {
             return "forms/add-post-page";
         }

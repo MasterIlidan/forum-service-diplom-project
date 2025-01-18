@@ -12,10 +12,8 @@ import org.springframework.web.servlet.ModelAndView;
 import ru.students.forumservicediplomproject.dto.MessageDto;
 import ru.students.forumservicediplomproject.entity.Message;
 import ru.students.forumservicediplomproject.entity.Post;
-import ru.students.forumservicediplomproject.entity.User;
 import ru.students.forumservicediplomproject.service.MessageService;
 import ru.students.forumservicediplomproject.service.PostService;
-import ru.students.forumservicediplomproject.service.UserService;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,12 +23,10 @@ public class MessageController {
 
     private final PostService postService;
     private final MessageService messageService;
-    private final UserService userService;
 
-    public MessageController(PostService postService, MessageService messageService, UserService userService) {
+    public MessageController(PostService postService, MessageService messageService) {
         this.postService = postService;
         this.messageService = messageService;
-        this.userService = userService;
     }
 
     //TODO: сделать отображение и создание сообщений
@@ -63,7 +59,6 @@ public class MessageController {
                                     @PathVariable long postId,
                                     @Valid @ModelAttribute("newMessage") MessageDto messageDto,
                                     BindingResult result) {
-
 
         messageService.saveMessage(messageDto, postId);
         return "redirect:/forum/%s/thread/%s/post/%s".formatted(forumId, threadId, postId);

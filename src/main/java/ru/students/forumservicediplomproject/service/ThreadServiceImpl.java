@@ -7,7 +7,6 @@ import ru.students.forumservicediplomproject.entity.Thread;
 import ru.students.forumservicediplomproject.repository.ThreadRepository;
 
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;

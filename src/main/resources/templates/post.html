@@ -60,7 +60,7 @@
             <tr th:each="message : ${messages}">
                 <td th:class="table-post">
                     <div class="image-container">
-                        <img class="responsive-image" th:src="@{/images/default_avatar.jpg}">
+                        <img class="responsive-image" th:src="@{/images/default_avatar.jpg}" alt="user_profile">
                     </div>
                     <a class="me-auto mb-2 mb-lg-0" th:text="${message.getMessageBy().getUserName()}" th:href="@{'/user?userId=' + ${message.getMessageBy().getUserId()}}"></a>
                     <div >
