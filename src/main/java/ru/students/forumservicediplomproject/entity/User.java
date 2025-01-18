@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.sql.Date;
 import java.util.List;
 
 @Getter
@@ -33,5 +34,6 @@ public class User {
     inverseJoinColumns = {@JoinColumn(name = "roles_role_id", referencedColumnName = "role_id")})
     @NotNull
     private List<Role> roles;
-
+    @NotNull
+    private Date registrationDate;
 }

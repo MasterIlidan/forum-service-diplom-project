@@ -11,6 +11,8 @@ import ru.students.forumservicediplomproject.entity.User;
 import ru.students.forumservicediplomproject.repository.RoleRepository;
 import ru.students.forumservicediplomproject.repository.UserRepository;
 
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -36,6 +38,7 @@ public class UserServiceImpl implements UserService {
         User user = new User();
         user.setUserName(userDto.getUsername());
         user.setEmail(userDto.getEmail());
+        user.setRegistrationDate(Date.valueOf(LocalDate.now()));
 
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
 
