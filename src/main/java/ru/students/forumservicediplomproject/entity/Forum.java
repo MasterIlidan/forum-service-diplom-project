@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.sql.Date;
 import java.util.List;
 
 
@@ -27,4 +28,6 @@ public class Forum{
     private User createdBy;
     @OneToMany
     private List<Thread> threads;
+    @NotNull
+    private Date creationDate;
 }

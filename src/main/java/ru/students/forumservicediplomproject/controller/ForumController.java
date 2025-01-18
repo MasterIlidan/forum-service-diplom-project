@@ -89,12 +89,8 @@ public class ForumController {
         if (bindingResult.hasErrors()) {
             return "forms/add-forum-page";
         }
-        Forum forum = new Forum();
 
-        forum.setForumName(forumDto.getForumName());
-        forum.setDescription(forumDto.getDescription());
-        forum.setCreatedBy(forumDto.getCreatedBy());
-        forumServiceImpl.saveForum(forum);
+        forumServiceImpl.saveForum(forumDto);
         return "redirect:/";
     }
 

@@ -1,9 +1,12 @@
 package ru.students.forumservicediplomproject.service;
 
 import org.springframework.stereotype.Service;
+import ru.students.forumservicediplomproject.dto.ForumDto;
 import ru.students.forumservicediplomproject.entity.Forum;
 import ru.students.forumservicediplomproject.repository.ForumRepository;
 
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,7 +20,13 @@ public class ForumServiceImpl implements ForumService {
     }
 
     @Override
-    public void saveForum(Forum forum) {
+    public void saveForum(ForumDto forumDto) {
+        Forum forum = new Forum();
+
+        forum.setForumName(forumDto.getForumName());
+        forum.setDescription(forumDto.getDescription());
+        forum.setCreatedBy(forumDto.getCreatedBy());
+        forum.setCreationDate(Date.valueOf(LocalDate.now()));
         forumRepository.save(forum);
     }
 
