@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.sql.Date;
+
 @Getter
 @Setter
 @Entity
@@ -26,5 +28,6 @@ public class Post {
     private String hashInfo; //хеш торрента
     @ManyToOne
     private User createdBy;
-
+    @NotNull
+    private Date creationDate;
 }

@@ -1,32 +1,20 @@
 package ru.students.forumservicediplomproject.controller;
 
 import jakarta.validation.Valid;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.util.UriComponentsBuilder;
 import ru.students.forumservicediplomproject.dto.PostDto;
-import ru.students.forumservicediplomproject.entity.Message;
 import ru.students.forumservicediplomproject.entity.Post;
 import ru.students.forumservicediplomproject.entity.Thread;
-import ru.students.forumservicediplomproject.entity.User;
 import ru.students.forumservicediplomproject.service.MessageService;
 import ru.students.forumservicediplomproject.service.PostService;
 import ru.students.forumservicediplomproject.service.ThreadService;
-import ru.students.forumservicediplomproject.service.UserService;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -37,14 +25,12 @@ public class PostController {
     private final ThreadService threadService;
 
     private final PostService postService;
-    private final UserService userService;
     private final MessageService messageService;
 
     public PostController(ThreadService threadService,
-                          PostService postService, UserService userService, MessageService messageService) {
+                          PostService postService, MessageService messageService) {
         this.threadService = threadService;
         this.postService = postService;
-        this.userService = userService;
         this.messageService = messageService;
     }
 
@@ -110,7 +96,4 @@ public class PostController {
 
         return "redirect:/forum/%s/thread/%s/post/%s".formatted(forumId, threadId, postId);
     }
-
-
-
 }
