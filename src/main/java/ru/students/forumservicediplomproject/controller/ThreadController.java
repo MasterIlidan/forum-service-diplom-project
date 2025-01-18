@@ -91,22 +91,11 @@ public class ThreadController {
     public String saveThread(@PathVariable long forumId,
                              @Valid @ModelAttribute("thread") ThreadDto threadDto,
                              BindingResult bindingResult, Model model) {
-        User currentUser = userService.getCurrentUserCredentials();
-        threadDto.setCreatedBy(currentUser);
         if (bindingResult.hasErrors()) {
             return "forms/add-thread-page";
         }
-        Thread thread = new Thread();
-        thread.setThreadName(threadDto.getThreadName());
-        thread.setCreatedBy(currentUser);
-        Optional<Forum> forum = forumServiceImpl.getForum(forumId);
-        if (forum.isPresent()) {
-            thread.setForumId(forum.get());
-        } else {
-            throw new RuntimeException(("При создании ветки произошла ошибка:" +
-                    " не найден форум, на котором создается ветка. ForumId %s").formatted(threadDto.getForumId()));
-        }
-        threadService.saveThread(thread);
+
+        threadService.saveThread(threadDto, forumId);
         return "redirect:/forum?forumId={forumId}";
 
     }

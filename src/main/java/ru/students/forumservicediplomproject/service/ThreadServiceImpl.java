@@ -1,10 +1,13 @@
 package ru.students.forumservicediplomproject.service;
 
 import org.springframework.stereotype.Service;
+import ru.students.forumservicediplomproject.dto.ThreadDto;
 import ru.students.forumservicediplomproject.entity.Forum;
 import ru.students.forumservicediplomproject.entity.Thread;
 import ru.students.forumservicediplomproject.repository.ThreadRepository;
 
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,14 +16,27 @@ public class ThreadServiceImpl implements ThreadService {
 
     private final ThreadRepository threadRepository;
     private final ForumServiceImpl forumServiceImpl;
+    private final UserService userService;
 
-    public ThreadServiceImpl(ThreadRepository threadRepository, ForumServiceImpl forumServiceImpl) {
+    public ThreadServiceImpl(ThreadRepository threadRepository, ForumServiceImpl forumServiceImpl, UserService userService) {
         this.threadRepository = threadRepository;
         this.forumServiceImpl = forumServiceImpl;
+        this.userService = userService;
     }
 
     @Override
-    public void saveThread(Thread thread) {
+    public void saveThread(ThreadDto threadDto, long forumId) {
+        Thread thread = new Thread();
+        thread.setThreadName(threadDto.getThreadName());
+        thread.setCreatedBy(userService.getCurrentUserCredentials());
+        thread.setCreationDate(Date.valueOf(LocalDate.now()));
+        Optional<Forum> forum = forumServiceImpl.getForum(forumId);
+        if (forum.isPresent()) {
+            thread.setForumId(forum.get());
+        } else {
+            throw new RuntimeException(("При создании ветки произошла ошибка:" +
+                    " не найден форум, на котором создается ветка. ForumId %s").formatted(threadDto.getForumId()));
+        }
         threadRepository.save(thread);
     }
 
