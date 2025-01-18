@@ -83,9 +83,6 @@ public class ForumController {
     @PostMapping({"/forum/saveForum"})
     public String saveForum(@Valid @ModelAttribute("forum") ForumDto forumDto,
                             BindingResult bindingResult, Model model) {
-        User currentUser = userService.getCurrentUserCredentials();
-        forumDto.setCreatedBy(currentUser);
-
         if (bindingResult.hasErrors()) {
             return "forms/add-forum-page";
         }

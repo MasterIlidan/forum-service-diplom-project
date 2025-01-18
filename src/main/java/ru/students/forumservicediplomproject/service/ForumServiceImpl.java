@@ -14,9 +14,11 @@ import java.util.Optional;
 public class ForumServiceImpl implements ForumService {
 
     private final ForumRepository forumRepository;
+    private final UserService userService;
 
-    public ForumServiceImpl(ForumRepository forumRepository) {
+    public ForumServiceImpl(ForumRepository forumRepository, UserService userService) {
         this.forumRepository = forumRepository;
+        this.userService = userService;
     }
 
     @Override
@@ -25,7 +27,7 @@ public class ForumServiceImpl implements ForumService {
 
         forum.setForumName(forumDto.getForumName());
         forum.setDescription(forumDto.getDescription());
-        forum.setCreatedBy(forumDto.getCreatedBy());
+        forum.setCreatedBy(userService.getCurrentUserCredentials());
         forum.setCreationDate(Date.valueOf(LocalDate.now()));
         forumRepository.save(forum);
     }
