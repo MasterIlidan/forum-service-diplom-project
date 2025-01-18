@@ -18,8 +18,10 @@ import ru.students.forumservicediplomproject.entity.Thread;
 import ru.students.forumservicediplomproject.repository.PostRepository;
 
 import java.net.URI;
-import java.sql.Date;
+import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -59,7 +61,7 @@ public class PostServiceImpl implements PostService {
         post.setTitle(postDto.getTitle());
         post.setCreatedBy(userService.getCurrentUserCredentials());
         post.setHashInfo(hash);
-        post.setCreationDate(Date.valueOf(LocalDate.now()));
+        post.setCreationDate(new Timestamp(new Date().getTime()));
         Optional<Thread> thread = threadService.getThreadById(threadId);
 
         if (thread.isPresent()) {

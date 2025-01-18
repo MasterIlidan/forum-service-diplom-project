@@ -55,6 +55,7 @@
                 <th>Тем</th>
                 <th>Сообщений</th>
                 <th>Создал</th>
+                <th>Дата создания</th>
                 <th>Последнее сообщение</th>
             </tr>
             </thead>
@@ -69,6 +70,7 @@
                 <td>
                     <a th:text="${forum.getCreatedBy().getUserName()}" th:href="@{'/user?userId=' + ${forum.getCreatedBy().getUserId()}}"></a>
                 </td>
+                <td th:text="${forum.getCreationDate()}"></td>
                 <td>Последнее сообщение</td>
             </tr>
             </tbody>

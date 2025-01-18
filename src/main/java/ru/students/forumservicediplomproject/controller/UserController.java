@@ -32,11 +32,13 @@ public class UserController {
         }
         UserDto userDto;
         if (user.isPresent()) {
+            User userObj = user.get();
             userDto = new UserDto();
 
-            userDto.setId(user.get().getUserId());
-            userDto.setUsername(user.get().getUserName());
-            userDto.setEmail(user.get().getEmail());
+            userDto.setId(userObj.getUserId());
+            userDto.setUsername(userObj.getUserName());
+            userDto.setEmail(userObj.getEmail());
+            userDto.setRegistrationDate(userObj.getRegistrationDate());
         } else {
             throw new RuntimeException("Пользователь не найден");
         }

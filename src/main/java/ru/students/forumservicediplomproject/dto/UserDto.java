@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 @Getter
@@ -26,4 +27,5 @@ public class UserDto {
     @NotEmpty(message = "Password should not be empty")
     private String password;
     private List<String> roles;
+    private Timestamp registrationDate;
 }

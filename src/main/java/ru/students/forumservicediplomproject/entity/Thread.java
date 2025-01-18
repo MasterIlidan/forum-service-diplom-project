@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.sql.Date;
+import java.sql.Timestamp;
 
 @Getter
 @Setter
@@ -25,5 +25,5 @@ public class Thread {
     @ManyToOne
     private User createdBy;
     @NotNull
-    private Date creationDate;
+    private Timestamp creationDate;
 }

@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.List;
 
 @Getter
@@ -35,5 +35,5 @@ public class User {
     @NotNull
     private List<Role> roles;
     @NotNull
-    private Date registrationDate;
+    private Timestamp registrationDate;
 }

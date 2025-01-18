@@ -7,8 +7,9 @@ import ru.students.forumservicediplomproject.entity.Message;
 import ru.students.forumservicediplomproject.entity.Post;
 import ru.students.forumservicediplomproject.repository.MessageRepository;
 
-import java.sql.Date;
-import java.time.LocalDate;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,7 +39,7 @@ public class MessageServiceImpl implements MessageService {
 
         message.setMessageBody(messageDto.getMessageBody());
         message.setMessageBy(userService.getCurrentUserCredentials());
-        message.setCreationDate(Date.valueOf(LocalDate.now()));
+        message.setCreationDate(new Timestamp(new Date().getTime()));
         messageRepository.save(message);
     }
 

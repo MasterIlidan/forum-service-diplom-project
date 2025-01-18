@@ -5,8 +5,9 @@ import ru.students.forumservicediplomproject.dto.ForumDto;
 import ru.students.forumservicediplomproject.entity.Forum;
 import ru.students.forumservicediplomproject.repository.ForumRepository;
 
-import java.sql.Date;
-import java.time.LocalDate;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,7 +29,7 @@ public class ForumServiceImpl implements ForumService {
         forum.setForumName(forumDto.getForumName());
         forum.setDescription(forumDto.getDescription());
         forum.setCreatedBy(userService.getCurrentUserCredentials());
-        forum.setCreationDate(Date.valueOf(LocalDate.now()));
+        forum.setCreationDate(new Timestamp(new Date().getTime()));
         forumRepository.save(forum);
     }
 

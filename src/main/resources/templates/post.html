@@ -63,6 +63,9 @@
                         <img class="responsive-image" th:src="@{/images/default_avatar.jpg}">
                     </div>
                     <a class="me-auto mb-2 mb-lg-0" th:text="${message.getMessageBy().getUserName()}" th:href="@{'/user?userId=' + ${message.getMessageBy().getUserId()}}"></a>
+                    <div >
+                        <span th:text="${message.getCreationDate()}"></span>
+                    </div>
                 </td>
                 <td th:class="table-post" th:text="${message.getMessageBody()}">
             </tr>

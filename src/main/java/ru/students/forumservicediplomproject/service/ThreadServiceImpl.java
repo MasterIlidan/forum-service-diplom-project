@@ -6,8 +6,9 @@ import ru.students.forumservicediplomproject.entity.Forum;
 import ru.students.forumservicediplomproject.entity.Thread;
 import ru.students.forumservicediplomproject.repository.ThreadRepository;
 
-import java.sql.Date;
-import java.time.LocalDate;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,7 +30,7 @@ public class ThreadServiceImpl implements ThreadService {
         Thread thread = new Thread();
         thread.setThreadName(threadDto.getThreadName());
         thread.setCreatedBy(userService.getCurrentUserCredentials());
-        thread.setCreationDate(Date.valueOf(LocalDate.now()));
+        thread.setCreationDate(new Timestamp(new Date().getTime()));
         Optional<Forum> forum = forumServiceImpl.getForum(forumId);
         if (forum.isPresent()) {
             thread.setForumId(forum.get());

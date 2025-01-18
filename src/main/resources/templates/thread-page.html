@@ -52,6 +52,7 @@
                 <th>Название</th>
                 <th>Сообщений</th>
                 <th>Создал</th>
+                <th>Дата создания</th>
                 <th>Последнее сообщение</th>
             </tr>
             </thead>
@@ -64,6 +65,7 @@
                 <td>
                     <a th:text="${post.getCreatedBy().getUserName()}" th:href="@{'/user?userId=' + ${post.getCreatedBy().getUserId()}}"></a>
                 </td>
+                <td th:text="${post.getCreationDate()}"></td>
                 <td>Последнее сообщение</td>
             </tr>
             </tbody>
