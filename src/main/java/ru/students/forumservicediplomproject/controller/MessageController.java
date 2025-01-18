@@ -63,19 +63,9 @@ public class MessageController {
                                     @PathVariable long postId,
                                     @Valid @ModelAttribute("newMessage") MessageDto messageDto,
                                     BindingResult result) {
-        User currentUser = userService.getCurrentUserCredentials();
-        Optional<Post> post = postService.getPostById(postId);
-        Message message = new Message();
-        if (post.isPresent()) {
-            message.setPostId(post.get());
-        } else {
-            throw new RuntimeException("Пост не найден! PostId %s".formatted(postId));
-        }
 
-        message.setMessageBody(messageDto.getMessageBody());
-        message.setMessageBy(currentUser);
 
-        messageService.saveMessage(message);
+        messageService.saveMessage(messageDto, postId);
         return "redirect:/forum/%s/thread/%s/post/%s".formatted(forumId, threadId, postId);
     }
 }
