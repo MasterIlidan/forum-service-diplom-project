@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
+import ru.students.forumservicediplomproject.Search;
 import ru.students.forumservicediplomproject.dto.MessageDto;
 import ru.students.forumservicediplomproject.entity.Message;
 import ru.students.forumservicediplomproject.entity.Post;
@@ -43,6 +44,8 @@ public class MessageController {
         } else {
             throw new RuntimeException("Пост не найден! PostId %s".formatted(postId));
         }
+
+        modelAndView.addObject("search", new Search());
 
         modelAndView.addObject("messages", messageList);
         modelAndView.addObject("post", post.get());

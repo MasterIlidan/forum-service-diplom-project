@@ -7,6 +7,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
+import ru.students.forumservicediplomproject.Search;
 import ru.students.forumservicediplomproject.dto.PostDto;
 import ru.students.forumservicediplomproject.entity.Post;
 import ru.students.forumservicediplomproject.entity.Thread;
@@ -56,6 +57,8 @@ public class PostController {
             totalMessagesInPost.put(post.getPostId(), messageCount);
         }
 
+
+        modelAndView.addObject("search", new Search());
 
         modelAndView.addObject("postList", postList);
         modelAndView.addObject("messagesCountMap", totalMessagesInPost);

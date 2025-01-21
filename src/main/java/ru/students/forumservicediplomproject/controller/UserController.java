@@ -6,6 +6,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.servlet.ModelAndView;
+import ru.students.forumservicediplomproject.Search;
 import ru.students.forumservicediplomproject.dto.UserDto;
 import ru.students.forumservicediplomproject.entity.User;
 import ru.students.forumservicediplomproject.service.UserService;
@@ -42,6 +43,8 @@ public class UserController {
         } else {
             throw new RuntimeException("Пользователь не найден");
         }
+
+        modelAndView.addObject("search", new Search());
 
         modelAndView.addObject("user", userDto);
 
