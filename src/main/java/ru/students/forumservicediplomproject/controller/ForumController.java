@@ -1,16 +1,22 @@
 package ru.students.forumservicediplomproject.controller;
 
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
+import ru.students.forumservicediplomproject.Search;
 import ru.students.forumservicediplomproject.dto.ForumDto;
+import ru.students.forumservicediplomproject.entity.Forum;
+import ru.students.forumservicediplomproject.entity.Post;
 import ru.students.forumservicediplomproject.entity.Thread;
-import ru.students.forumservicediplomproject.entity.*;
-import ru.students.forumservicediplomproject.service.*;
+import ru.students.forumservicediplomproject.service.ForumServiceImpl;
+import ru.students.forumservicediplomproject.service.MessageService;
+import ru.students.forumservicediplomproject.service.PostService;
+import ru.students.forumservicediplomproject.service.ThreadService;
 
 import java.util.HashMap;
 import java.util.List;
@@ -61,6 +67,8 @@ public class ForumController {
             totalMessagesInForum.put(forum.getForumId(), messageCount);
         }
 
+
+        modelAndView.addObject("search", new Search());
 
         modelAndView.addObject("forumsList", forumsList);
         modelAndView.addObject("threadCountMap", totalThreadsInForum);

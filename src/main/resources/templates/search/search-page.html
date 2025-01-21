@@ -4,7 +4,7 @@
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
-    <title>Главная страница - BitTorrent Share</title>
+    <title>Форум - BitTorrent Share</title>
     <link
             href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
             rel="stylesheet"
@@ -12,7 +12,6 @@
             crossorigin="anonymous">
     <link th:href="@{/css/styles.css}" rel="stylesheet"/>
 </head>
-
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
@@ -44,52 +43,9 @@
         </div>
     </div>
 </nav>
-<div class="forum-container">
-    <div class="forum-block">
-        <div class="forum-container">
-            <h1 class="header header-forum">Форyм</h1>
-            <a class="btn btn-primary new-forum-button" th:href="@{/forum/createForum}">+ Создать форум</a>
-        </div>
-
-        <table class="table table-bordered table-striped" id="forums">
-            <thead>
-            <tr>
-                <th>Название форума</th>
-                <th>Веток</th>
-                <th>Тем</th>
-                <th>Сообщений</th>
-                <th>Создал</th>
-                <th>Дата создания</th>
-                <th>Последнее сообщение</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="forum : ${forumsList}">
-                <td >
-                    <a th:href="@{/forum(forumId=${forum.getForumId()})}" th:text="${forum.forumName}"></a>
-                </td>
-                <td th:text="${threadCountMap.get(forum.forumId)}">
-                <td th:text="${postCountMap.get(forum.forumId)}"></td>
-                <td th:text="${messagesCountMap.get(forum.forumId)}"></td>
-                <td>
-                    <a th:text="${forum.getCreatedBy().getUserName()}" th:href="@{'/user?userId=' + ${forum.getCreatedBy().getUserId()}}"></a>
-                </td>
-                <td th:text="${forum.getCreationDate()}"></td>
-                <td>Последнее сообщение</td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
-    <div class="last-post-block">
-        <h1 class="header ">Активность на трекере</h1>
-        <table class="table table-bordered table-striped">
-            <tbody>
-            <tr>
-                <th>Последняя созданная тема</th>
-            </tr>
-            </tbody>
-        </table>
-    </div>
+<form method="get"></form>
+<div>
+    <p th:if="${messageResults.size()==0 && postResults.size()==0 && threadResults.size()==0}">Поиск не дал результатов</p>
 </div>
 </body>
 </html>
