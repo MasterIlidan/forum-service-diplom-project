@@ -24,17 +24,23 @@ public class SearchController {
     public ModelAndView search(Search keyword, BindingResult result) {
         ModelAndView modelAndView = new ModelAndView("/search/search-page");
 
-        List<Message> messageList = searchService.messageResult(keyword.getKeyword());
-        List<Post> postList = searchService.postResult(keyword.getKeyword());
-        List<Thread> threadList = searchService.threadResult(keyword.getKeyword());
+        if (keyword == null) keyword = new Search();
 
-        if (messageList.isEmpty() ||
-        postList.isEmpty() ||
-        threadList.isEmpty()) {
-            result.rejectValue("keyword", "not found", "Ничего не найдено по запросу");
+        List<Message> messageList;
+        List<Post> postList;
+        List<Thread> threadList;
+
+        if (keyword.getKeyword() == null || keyword.getKeyword().isEmpty()) {
+            messageList = List.of();
+            postList = List.of();
+            threadList = List.of();
+        } else {
+            messageList = searchService.messageResult(keyword.getKeyword());
+            postList = searchService.postResult(keyword.getKeyword());
+            threadList = searchService.threadResult(keyword.getKeyword());
         }
 
-        modelAndView.addObject("search", new Search());
+        modelAndView.addObject("search", keyword);
         modelAndView.addObject("messageResults", messageList);
         modelAndView.addObject("postResults", postList);
         modelAndView.addObject("threadResults", threadList);

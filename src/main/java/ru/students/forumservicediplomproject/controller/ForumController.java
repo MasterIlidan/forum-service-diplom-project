@@ -81,6 +81,9 @@ public class ForumController {
     @GetMapping({"/forum/createForum"})
     public ModelAndView createNewForum() {
         ModelAndView modelAndView = new ModelAndView("forms/add-forum-page");
+
+        modelAndView.addObject("search", new Search());
+
         modelAndView.addObject("forum", new Forum());
         return modelAndView;
     }

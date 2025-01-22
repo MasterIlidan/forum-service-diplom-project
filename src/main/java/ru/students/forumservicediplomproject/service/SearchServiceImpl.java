@@ -25,21 +25,21 @@ public class SearchServiceImpl implements SearchService {
     @Override
     public List<Thread> threadResult(String keyWord) {
         List<Thread> allThreads = threadService.getAllThreads();
-        return allThreads.stream().filter(thread -> thread.getThreadName().equals(keyWord) ||
+        return allThreads.stream().filter(thread -> thread.getThreadName().equalsIgnoreCase(keyWord) ||
                 thread.getThreadName().contains(keyWord)).collect(Collectors.toList());
     }
 
     @Override
     public List<Post> postResult(String keyWord) {
         List<Post> allThreads = postService.getAllPosts();
-        return allThreads.stream().filter(post -> post.getTitle().equals(keyWord) ||
+        return allThreads.stream().filter(post -> post.getTitle().equalsIgnoreCase(keyWord) ||
                 post.getTitle().contains(keyWord)).collect(Collectors.toList());
     }
 
     @Override
     public List<Message> messageResult(String keyWord) {
         List<Message> allThreads = messageService.getAllMessages();
-        return allThreads.stream().filter(message -> message.getMessageBody().equals(keyWord) ||
+        return allThreads.stream().filter(message -> message.getMessageBody().equalsIgnoreCase(keyWord) ||
                 message.getMessageBody().contains(keyWord)).collect(Collectors.toList());
     }
 }

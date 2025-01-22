@@ -15,7 +15,6 @@ import ru.students.forumservicediplomproject.service.MessageService;
 import ru.students.forumservicediplomproject.service.PostService;
 import ru.students.forumservicediplomproject.service.ThreadService;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -72,6 +71,8 @@ public class PostController {
     public ModelAndView createNewPost(@PathVariable long forumId,
                                       @PathVariable long threadId, Model model) {
         ModelAndView modelAndView = new ModelAndView("forms/add-post-page");
+
+        modelAndView.addObject("search", new Search());
 
         modelAndView.addObject("post", new PostDto());
 

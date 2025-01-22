@@ -81,6 +81,9 @@ public class ThreadController {
     @GetMapping({"/forum/{forumId}/createThread"})
     public ModelAndView createNewThread(@PathVariable long forumId) {
         ModelAndView modelAndView = new ModelAndView("forms/add-thread-page");
+
+        modelAndView.addObject("search", new Search());
+
         modelAndView.addObject("thread", new ru.students.forumservicediplomproject.entity.Thread());
         modelAndView.addObject("onForumIdCreated", forumId);
         return modelAndView;
