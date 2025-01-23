@@ -27,7 +27,7 @@ public class WebSecurityConfig {
                         .requestMatchers("/register/**").permitAll()
                         .requestMatchers("/images/**").permitAll()
                         .requestMatchers("/css/**").permitAll()
-                        .requestMatchers("/forum").permitAll()
+                        //.requestMatchers("/forum").permitAll()
                         .anyRequest().authenticated())).formLogin(form ->
                         form.loginPage("/login")
                                 .loginProcessingUrl("/login")
