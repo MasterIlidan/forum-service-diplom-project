@@ -70,7 +70,11 @@
                     <a th:text="${post.getCreatedBy().getUserName()}" th:href="@{'/user?userId=' + ${post.getCreatedBy().getUserId()}}"></a>
                 </td>
                 <td th:text="${post.getCreationDate()}"></td>
-                <td>Последнее сообщение</td>
+                <td >
+                    <div th:if="${lastMessageOnPost.get(post) != null}">
+                        <p th:text="${lastMessageOnPost.get(post).getLastMessage().getCreationDate()}"></p>
+                    </div>
+                </td>
             </tr>
             </tbody>
         </table>

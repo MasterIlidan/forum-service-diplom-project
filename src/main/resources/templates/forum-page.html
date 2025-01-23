@@ -74,7 +74,11 @@
                     <a th:text="${thread.getCreatedBy().getUserName()}" th:href="@{'/user?userId=' + ${thread.getCreatedBy().getUserId()}}"></a>
                 </td>
                 <td th:text="${thread.getCreationDate()}"></td>
-                <td>Последнее сообщение</td>
+                <td >
+                    <div th:if="${lastMessageOnThread.get(thread) != null}">
+                        <p th:text="${lastMessageOnThread.get(thread).getLastMessage().getCreationDate()}"></p>
+                    </div>
+                </td>
             </tr>
             </tbody>
         </table>

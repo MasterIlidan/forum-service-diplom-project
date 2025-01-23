@@ -11,6 +11,7 @@ import org.springframework.web.servlet.ModelAndView;
 import ru.students.forumservicediplomproject.Search;
 import ru.students.forumservicediplomproject.dto.ForumDto;
 import ru.students.forumservicediplomproject.entity.Forum;
+import ru.students.forumservicediplomproject.entity.LastMessage;
 import ru.students.forumservicediplomproject.entity.Post;
 import ru.students.forumservicediplomproject.entity.Thread;
 import ru.students.forumservicediplomproject.service.ForumServiceImpl;
@@ -43,7 +44,7 @@ public class ForumController {
         HashMap<Long, Long> totalThreadsInForum = new HashMap<>();
         HashMap<Long, Long> totalPostsInForum = new HashMap<>();
         HashMap<Long, Long> totalMessagesInForum = new HashMap<>();
-        //TODO: когда было последнее сообщение
+        HashMap<Forum, LastMessage> lastMessageOnForumHashMap = messageService.getAllLastMessagesByForum();
 
         //считаем количество веток, тем и сообщений для каждого форума
         for (Forum forum : forumsList) {
@@ -67,6 +68,8 @@ public class ForumController {
             totalMessagesInForum.put(forum.getForumId(), messageCount);
         }
 
+
+        modelAndView.addObject("lastMessageOnForum", lastMessageOnForumHashMap);
 
         modelAndView.addObject("search", new Search());
 

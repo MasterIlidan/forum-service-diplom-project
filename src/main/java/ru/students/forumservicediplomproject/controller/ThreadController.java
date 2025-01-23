@@ -9,6 +9,7 @@ import org.springframework.web.servlet.ModelAndView;
 import ru.students.forumservicediplomproject.Search;
 import ru.students.forumservicediplomproject.dto.ThreadDto;
 import ru.students.forumservicediplomproject.entity.Forum;
+import ru.students.forumservicediplomproject.entity.LastMessage;
 import ru.students.forumservicediplomproject.entity.Post;
 import ru.students.forumservicediplomproject.entity.Thread;
 import ru.students.forumservicediplomproject.service.*;
@@ -49,6 +50,7 @@ public class ThreadController {
 
         HashMap<Long, Long> totalPostsInThread = new HashMap<>();
         HashMap<Long, Long> totalMessagesInThread = new HashMap<>();
+        HashMap<Thread, LastMessage> lastMessageOnThreadHashMap = messageService.getAllLastMessagesByThread();
         //TODO: когда было последнее сообщение
 
         //считаем количество веток, тем и сообщений для каждого форума
@@ -68,6 +70,8 @@ public class ThreadController {
             totalPostsInThread.put(thread.getThreadId(), postCount);
             totalMessagesInThread.put(thread.getThreadId(), messageCount);
         }
+
+        modelAndView.addObject("lastMessageOnThread", lastMessageOnThreadHashMap);
 
         modelAndView.addObject("search", new Search());
 

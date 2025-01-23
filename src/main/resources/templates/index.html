@@ -75,7 +75,11 @@
                     <a th:text="${forum.getCreatedBy().getUserName()}" th:href="@{'/user?userId=' + ${forum.getCreatedBy().getUserId()}}"></a>
                 </td>
                 <td th:text="${forum.getCreationDate()}"></td>
-                <td>Последнее сообщение</td>
+                <td >
+                    <div th:if="${lastMessageOnForum.get(forum) != null}">
+                        <p th:text="${lastMessageOnForum.get(forum).getLastMessage().getCreationDate()}"></p>
+                    </div>
+                </td>
             </tr>
             </tbody>
         </table>
