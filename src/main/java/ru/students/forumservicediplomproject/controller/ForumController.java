@@ -68,7 +68,7 @@ public class ForumController {
             totalMessagesInForum.put(forum.getForumId(), messageCount);
         }
 
-
+        modelAndView.addObject("lastPost", postService.getLastCreatedPost());
         modelAndView.addObject("lastMessageOnForum", lastMessageOnForumHashMap);
 
         modelAndView.addObject("search", new Search());

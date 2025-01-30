@@ -1,5 +1,6 @@
 package ru.students.forumservicediplomproject.service;
 
+import jakarta.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -123,6 +124,13 @@ public class PostServiceImpl implements PostService {
         }
 
         return peersHashMap;
+    }
+
+    @Nullable
+    @Override
+    public Post getLastCreatedPost() {
+        List<Post> postList = postRepository.findAllByCreationDateBeforeOrderByCreationDateDesc(new Timestamp(new Date().getTime() + 1000));
+        return postList.get(0);
     }
 
     @Override

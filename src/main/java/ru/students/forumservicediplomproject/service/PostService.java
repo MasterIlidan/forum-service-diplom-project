@@ -1,5 +1,6 @@
 package ru.students.forumservicediplomproject.service;
 
+import jakarta.annotation.Nullable;
 import org.springframework.web.multipart.MultipartFile;
 import ru.students.forumservicediplomproject.dto.PostDto;
 import ru.students.forumservicediplomproject.entity.Peers;
@@ -23,6 +24,9 @@ public interface PostService {
     List<Post> getAllPosts();
 
     HashMap<Post, Peers> getPeers(List<Post> postList);
+
+    @Nullable
+    Post getLastCreatedPost();
 
     List<Post> getAllPostsByThread(Thread thread);
 

@@ -91,6 +91,22 @@
             <tr>
                 <th>Последняя созданная тема</th>
             </tr>
+            <tr th:if="${lastPost != null}">
+                <td>
+                    <a th:text="${lastPost.getThread().getForumId().getForumName()}"
+                    th:href="@{'/forum?forumId=' + ${lastPost.getThread().getForumId().getForumId()}}"></a>
+                    <span> - </span>
+                    <a th:text="${lastPost.getThread().getThreadName()}"
+                       th:href="@{'/forum/' + ${lastPost.getThread().getForumId().getForumId()}
+                    + '/thread/' + ${lastPost.getThread().getThreadId()} + '/posts'}"></a>
+                    <p th:text="${lastPost.getTitle()}"></p>
+                    <p th:text="'Создал: '+ ${lastPost.getCreatedBy().getUserName()}"></p>
+                    <p th:text="${lastPost.getCreationDate()}"></p>
+                    <a th:href="@{'/forum/' + ${lastPost.getThread().getForumId().getForumId()}
+                    + '/thread/' + ${lastPost.getThread().getThreadId()}
+                    + '/post/' + ${lastPost.getPostId()}}">К теме -></a>
+                </td>
+            </tr>
             </tbody>
         </table>
     </div>
