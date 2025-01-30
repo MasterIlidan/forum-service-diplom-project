@@ -12,8 +12,10 @@ import org.springframework.web.servlet.ModelAndView;
 import ru.students.forumservicediplomproject.Search;
 import ru.students.forumservicediplomproject.dto.MessageDto;
 import ru.students.forumservicediplomproject.entity.Message;
+import ru.students.forumservicediplomproject.entity.Peers;
 import ru.students.forumservicediplomproject.entity.Post;
 import ru.students.forumservicediplomproject.service.MessageService;
+import ru.students.forumservicediplomproject.service.PeersService;
 import ru.students.forumservicediplomproject.service.PostService;
 
 import java.util.List;
@@ -24,10 +26,12 @@ public class MessageController {
 
     private final PostService postService;
     private final MessageService messageService;
+    private final PeersService peersService;
 
-    public MessageController(PostService postService, MessageService messageService) {
+    public MessageController(PostService postService, MessageService messageService, PeersService peersService) {
         this.postService = postService;
         this.messageService = messageService;
+        this.peersService = peersService;
     }
 
     //TODO: сделать отображение и создание сообщений
@@ -44,9 +48,11 @@ public class MessageController {
         } else {
             throw new RuntimeException("Пост не найден! PostId %s".formatted(postId));
         }
+        Peers peers = peersService.getPeers(post.get());
 
         modelAndView.addObject("search", new Search());
 
+        modelAndView.addObject("peers", peers);
         modelAndView.addObject("messages", messageList);
         modelAndView.addObject("post", post.get());
 
