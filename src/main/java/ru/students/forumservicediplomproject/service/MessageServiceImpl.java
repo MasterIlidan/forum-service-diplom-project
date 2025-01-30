@@ -2,8 +2,6 @@ package ru.students.forumservicediplomproject.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import ru.students.forumservicediplomproject.dto.MessageDto;
 import ru.students.forumservicediplomproject.entity.Forum;
 import ru.students.forumservicediplomproject.entity.LastMessage;
@@ -24,7 +22,7 @@ public class MessageServiceImpl implements MessageService {
 
     private final MessageRepository messageRepository;
     @Autowired
-    private  PostService postService;
+    private PostService postService;
     private final UserService userService;
     @Autowired
     private LastMessageRepository lastMessageRepository;
@@ -40,7 +38,7 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    @Transactional(propagation= Propagation.REQUIRED, readOnly=true, noRollbackFor=Exception.class)
+    //@Transactional(propagation = Propagation.REQUIRED, noRollbackFor = Exception.class)
     public void saveMessage(MessageDto messageDto, long postId) {
         Optional<Post> post = postService.getPostById(postId);
         Message message = new Message();
@@ -83,33 +81,61 @@ public class MessageServiceImpl implements MessageService {
     public List<Message> getAllMessagesByPost(Post post) {
         return messageRepository.findAllByPostId(post);
     }
+
     @Override
     public List<Object[]> countMessagesByPost(Post post) {
         return messageRepository.countTotalMessagesByPostId(post);
     }
 
+    /** Сохранить последнее отправленное сообщение в таблице последних сообщений для отображения
+     * активности в разных разделах сайта
+     * @param message Только что созданное сообщение, которое отправил пользователь.
+     */
     @Override
-    @Transactional(propagation= Propagation.REQUIRED, readOnly=true, noRollbackFor=Exception.class)
     public void saveLastMessage(Message message) {
         //cохраняем последнее сообщение в посте
+            saveLastMessageInPost(message);
+        //сохраняем последнее сообщение в ветке
+            saveLastMessageInThread(message);
+        //сохраняем последнее сообщение в форуме
+            saveLastMessageInForum(message);
+    }
+
+    /**Последнее сообщение в посту. Время создания сообщения будет
+     *  отображаться как последнее созданное сообщение по теме.
+     * @param message Только что созданное сообщение, которое отправил пользователь.
+     */
+    private void saveLastMessageInPost(Message message) {
         LastMessage lastPostMessage = new LastMessage();
         lastPostMessage.setPost(message.getPostId());
         lastPostMessage.setLastMessage(message);
-        lastMessageRepository.deleteByPost(message.getPostId());
+        LastMessage oldMessage = lastMessageRepository.findByPost(message.getPostId());
+        if (oldMessage != null) lastMessageRepository.delete(oldMessage);
         lastMessageRepository.save(lastPostMessage);
+    }
 
-        //сохраняем последнее сообщение в ветке
+    /**Последнее сообщение в ветке. Время создания сообщения будет
+     *  отображаться как последнее созданное сообщение по ветке.
+     * @param message Только что созданное сообщение, которое отправил пользователь.
+     */
+    private void saveLastMessageInThread(Message message) {
         LastMessage lastThreadMessage = new LastMessage();
         lastThreadMessage.setThread(message.getPostId().getThread());
         lastThreadMessage.setLastMessage(message);
-        lastMessageRepository.deleteByThread(message.getPostId().getThread());
+        LastMessage oldMessage = lastMessageRepository.findByThread(message.getPostId().getThread());
+        if (oldMessage != null) lastMessageRepository.delete(oldMessage);
         lastMessageRepository.save(lastThreadMessage);
-
-        //сохраняем последнее сообщение в форуме
+    }
+    /**Последнее сообщение в форуме. Время создания сообщения будет
+     *  отображаться как последнее созданное сообщение на форуме.
+     * @param message Только что созданное сообщение, которое отправил пользователь.
+     */
+    private void saveLastMessageInForum(Message message) {
         LastMessage lastForumMessage = new LastMessage();
         lastForumMessage.setForum(message.getPostId().getThread().getForumId());
         lastForumMessage.setLastMessage(message);
-        lastMessageRepository.deleteByForum(message.getPostId().getThread().getForumId());
+        LastMessage oldMessage = lastMessageRepository.findByForum(message.getPostId().getThread().getForumId());
+        if (oldMessage != null) lastMessageRepository.delete(oldMessage);
         lastMessageRepository.save(lastForumMessage);
     }
 
@@ -124,7 +150,7 @@ public class MessageServiceImpl implements MessageService {
 
         HashMap<Forum, LastMessage> lastMessageHashMap = new HashMap<>(allForums.size());
 
-        for (Forum forum:allForums) {
+        for (Forum forum : allForums) {
             LastMessage lastMessage = getLastMessageByPost(forum);
             lastMessageHashMap.put(forum, lastMessage);
         }
@@ -143,7 +169,7 @@ public class MessageServiceImpl implements MessageService {
 
         HashMap<Thread, LastMessage> lastMessageHashMap = new HashMap<>(allThreads.size());
 
-        for (Thread thread:allThreads) {
+        for (Thread thread : allThreads) {
             LastMessage lastMessage = getLastMessageByThread(thread);
             lastMessageHashMap.put(thread, lastMessage);
         }
@@ -162,7 +188,7 @@ public class MessageServiceImpl implements MessageService {
 
         HashMap<Post, LastMessage> lastMessageHashMap = new HashMap<>(allPosts.size());
 
-        for (Post post:allPosts) {
+        for (Post post : allPosts) {
             LastMessage lastMessage = getLastMessageByPost(post);
             lastMessageHashMap.put(post, lastMessage);
         }

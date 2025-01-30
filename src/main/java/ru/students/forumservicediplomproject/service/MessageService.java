@@ -27,7 +27,6 @@ public interface MessageService {
 
     List<Object[]> countMessagesByPost(Post post);
 
-
     void saveLastMessage(Message message);
 
     LastMessage getLastMessageByPost(Forum forum);
