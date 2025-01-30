@@ -57,6 +57,8 @@
                 <th>Сообщений</th>
                 <th>Создал</th>
                 <th>Дата создания</th>
+                <th>Сиды</th>
+                <th>Личи</th>
                 <th>Последнее сообщение</th>
             </tr>
             </thead>
@@ -70,6 +72,8 @@
                     <a th:text="${post.getCreatedBy().getUserName()}" th:href="@{'/user?userId=' + ${post.getCreatedBy().getUserId()}}"></a>
                 </td>
                 <td th:text="${post.getCreationDate()}"></td>
+                <td th:text="${peersHashMap.get(post).getSeeders()}"></td>
+                <td th:text="${peersHashMap.get(post).getLeechers()}"></td>
                 <td >
                     <div th:if="${lastMessageOnPost.get(post) != null}">
                         <p th:text="${lastMessageOnPost.get(post).getLastMessage().getCreationDate()}"></p>

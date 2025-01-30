@@ -10,9 +10,11 @@ import org.springframework.web.servlet.ModelAndView;
 import ru.students.forumservicediplomproject.Search;
 import ru.students.forumservicediplomproject.dto.PostDto;
 import ru.students.forumservicediplomproject.entity.LastMessage;
+import ru.students.forumservicediplomproject.entity.Peers;
 import ru.students.forumservicediplomproject.entity.Post;
 import ru.students.forumservicediplomproject.entity.Thread;
 import ru.students.forumservicediplomproject.service.MessageService;
+import ru.students.forumservicediplomproject.service.PeersService;
 import ru.students.forumservicediplomproject.service.PostService;
 import ru.students.forumservicediplomproject.service.ThreadService;
 
@@ -27,12 +29,14 @@ public class PostController {
 
     private final PostService postService;
     private final MessageService messageService;
+    private final PeersService peersService;
 
     public PostController(ThreadService threadService,
-                          PostService postService, MessageService messageService) {
+                          PostService postService, MessageService messageService, PeersService peersService) {
         this.threadService = threadService;
         this.postService = postService;
         this.messageService = messageService;
+        this.peersService = peersService;
     }
 
 
@@ -50,15 +54,19 @@ public class PostController {
 
         HashMap<Long, Long> totalMessagesInPost = new HashMap<>();
         HashMap<Post, LastMessage> lastMessageOnPostHashMap = messageService.getAllLastMessagesByPost();
+        HashMap<Post, Peers> peersHashMap = new HashMap<>(postList.size());
 
         for (Post post : postList) {
             long messageCount = 0;
             List<Object[]> totalMessages = messageService.countMessagesByPost(post);
             messageCount += (long) totalMessages.get(0)[1];
             totalMessagesInPost.put(post.getPostId(), messageCount);
+
+            peersHashMap.put(post, peersService.getPeers(post));
         }
 
         modelAndView.addObject("lastMessageOnPost", lastMessageOnPostHashMap);
+        modelAndView.addObject("peersHashMap", peersHashMap);
 
         modelAndView.addObject("search", new Search());
 

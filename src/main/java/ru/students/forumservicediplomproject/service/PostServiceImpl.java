@@ -1,5 +1,6 @@
 package ru.students.forumservicediplomproject.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -15,14 +16,15 @@ import ru.students.forumservicediplomproject.dto.MessageDto;
 import ru.students.forumservicediplomproject.dto.PostDto;
 import ru.students.forumservicediplomproject.entity.Post;
 import ru.students.forumservicediplomproject.entity.Thread;
+import ru.students.forumservicediplomproject.repository.PeersRepository;
 import ru.students.forumservicediplomproject.repository.PostRepository;
+import ru.students.forumservicediplomproject.entity.Peers;
 
 import java.net.URI;
 import java.sql.Timestamp;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
+@Slf4j
 @Service
 public class PostServiceImpl implements PostService {
     private final PostRepository postRepository;
@@ -30,6 +32,10 @@ public class PostServiceImpl implements PostService {
     private final ThreadService threadService;
     @Autowired
     private MessageService messageService;
+    @Autowired
+    private PeersRepository peersRepository;
+    @Autowired
+    private PeersService peersService;
 
     public PostServiceImpl(PostRepository postRepository, UserService userService, ThreadService threadService) {
         this.postRepository = postRepository;
@@ -83,6 +89,11 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    public Post getPostByHashInfo(String hash) {
+        return postRepository.findByHashInfo(hash);
+    }
+
+    @Override
     public void deletePost(Post post) {
         postRepository.delete(post);
     }
@@ -94,7 +105,24 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public List<Post> getAllPosts() {
+
         return postRepository.findAll();
+    }
+    @Override
+    public HashMap<Post, Peers> getPeers(List<Post> postList) {
+
+        HashMap<Post, Peers> peersHashMap = new HashMap<>(postList.size());
+
+        for (Post post: postList) {
+            Optional<Peers> peers = peersRepository.findById(post);
+            if (peers.isPresent()) {
+                peersHashMap.put(post, peers.get());
+                continue;
+            }
+            log.warn("Пост с id {} Не имеет анонсированного торрента. Хеш {}", post.getPostId(), post.getHashInfo());
+        }
+
+        return peersHashMap;
     }
 
     @Override

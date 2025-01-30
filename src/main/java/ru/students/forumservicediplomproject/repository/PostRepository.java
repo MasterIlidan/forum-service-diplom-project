@@ -16,4 +16,6 @@ public interface PostRepository extends JpaRepository<Post,Long> {
 
     @Query("SELECT t.thread, COUNT(t.thread) FROM Post AS t where t.thread=:#{#thread}")
     List<Object[]> countTotalPostsByThread(@NotNull Thread thread);
+
+    Post findByHashInfo(@NotNull String hashInfo);
 }
