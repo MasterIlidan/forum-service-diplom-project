@@ -14,10 +14,7 @@ import ru.students.forumservicediplomproject.entity.Forum;
 import ru.students.forumservicediplomproject.entity.LastMessage;
 import ru.students.forumservicediplomproject.entity.Post;
 import ru.students.forumservicediplomproject.entity.Thread;
-import ru.students.forumservicediplomproject.service.ForumServiceImpl;
-import ru.students.forumservicediplomproject.service.MessageService;
-import ru.students.forumservicediplomproject.service.PostService;
-import ru.students.forumservicediplomproject.service.ThreadService;
+import ru.students.forumservicediplomproject.service.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -28,12 +25,14 @@ public class ForumController {
     private final ThreadService threadService;
     private final PostService postService;
     private final MessageService messageService;
+    private final StatisticService statisticService;
 
-    public ForumController(ForumServiceImpl forumServiceImpl, ThreadService threadService, PostService postService, MessageService messageService) {
+    public ForumController(ForumServiceImpl forumServiceImpl, ThreadService threadService, PostService postService, MessageService messageService, StatisticService statisticService) {
         this.forumServiceImpl = forumServiceImpl;
         this.threadService = threadService;
         this.postService = postService;
         this.messageService = messageService;
+        this.statisticService = statisticService;
     }
 
     @GetMapping({"/"})
@@ -70,6 +69,7 @@ public class ForumController {
 
         modelAndView.addObject("lastPost", postService.getLastCreatedPost());
         modelAndView.addObject("lastMessageOnForum", lastMessageOnForumHashMap);
+        modelAndView.addObject("statistics", statisticService.getTrackerStatistics());
 
         modelAndView.addObject("search", new Search());
 

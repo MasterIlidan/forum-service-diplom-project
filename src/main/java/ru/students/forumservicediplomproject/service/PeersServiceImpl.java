@@ -12,6 +12,7 @@ import ru.students.forumservicediplomproject.entity.Post;
 import ru.students.forumservicediplomproject.repository.PeersRepository;
 
 import java.net.URI;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -109,5 +110,22 @@ public class PeersServiceImpl implements PeersService {
     public Peers getPeers(Post post) {
         Peers peers = peersRepository.findByPost(post);
         return peers == null ? new Peers(0, post, 0, 0) : peers;
+    }
+    @Override
+    public HashMap<String, Long> getCountOfAllPeers() {
+        List<Peers> peersList = peersRepository.findAll();
+        HashMap<String,Long> allPeers = new HashMap<>(2);
+
+        long seeders = 0;
+        long leechers = 0;
+
+        for (Peers peers:peersList) {
+            seeders += peers.getSeeders();
+            leechers += peers.getLeechers();
+        }
+
+        allPeers.put("seeders", seeders);
+        allPeers.put("leechers", leechers);
+        return allPeers;
     }
 }

@@ -18,6 +18,9 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query("SELECT t.thread, COUNT(t.thread) FROM Post AS t where t.thread=:#{#thread}")
     List<Object[]> countTotalPostsByThread(@NotNull Thread thread);
 
+    @Query("SELECT COUNT(t.postId) FROM Post AS t")
+    List<Object[]> countTotalPosts();
+
     Post findByHashInfo(@NotNull String hashInfo);
 
     List<Post> findAllByCreationDateBeforeOrderByCreationDateDesc(@NotNull Timestamp creationDateBefore);

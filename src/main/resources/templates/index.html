@@ -107,6 +107,20 @@
                     + '/post/' + ${lastPost.getPostId()}}">К теме -></a>
                 </td>
             </tr>
+            <tr>
+                <td>
+                    <p>Статистика</p>
+                    <p>
+                        <span th:text="'Раздач: ' + ${statistics.getAllTrackerPosts()}"></span>
+                        <span th:text="'Размер: ' + ${statistics.getAllTrackerSize()}"></span>
+                    </p>
+                    <p th:text="'Пиров: ' + ${statistics.getAllTrackerPeers().get('seeders') + statistics.getAllTrackerPeers().get('leechers')}"></p>
+                    <p>
+                        <span th:text="'Сидеров: ' + ${statistics.getAllTrackerPeers().get('seeders')}"></span>
+                        <span th:text="'Личеров: ' + ${statistics.getAllTrackerPeers().get('leechers')}"></span>
+                    </p>
+                </td>
+            </tr>
             </tbody>
         </table>
     </div>
