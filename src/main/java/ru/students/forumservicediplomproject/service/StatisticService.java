@@ -10,7 +10,8 @@ public interface StatisticService {
 
     long getCountOfAllPosts();
 
-    long getTrackerSize();
 
     HashMap<String, Long> getCountOfAllPeers();
+
+    double getAllTrackerSize();
 }

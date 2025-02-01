@@ -112,7 +112,7 @@
                     <p>Статистика</p>
                     <p>
                         <span th:text="'Раздач: ' + ${statistics.getAllTrackerPosts()}"></span>
-                        <span th:text="'Размер: ' + ${statistics.getAllTrackerSize()}"></span>
+                        <span th:text="'Размер: ' + ${statistics.getAllTrackerSize()} + 'MB'"></span>
                     </p>
                     <p th:text="'Пиров: ' + ${statistics.getAllTrackerPeers().get('seeders') + statistics.getAllTrackerPeers().get('leechers')}"></p>
                     <p>

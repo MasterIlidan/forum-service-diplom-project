@@ -12,5 +12,5 @@ import java.util.HashMap;
 public class Statistics {
     private HashMap<String, Long> allTrackerPeers;
     private long allTrackerPosts;
-    private long allTrackerSize;
+    private double allTrackerSize;
 }
