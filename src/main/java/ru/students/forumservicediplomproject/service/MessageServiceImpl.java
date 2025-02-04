@@ -1,16 +1,18 @@
 package ru.students.forumservicediplomproject.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 import ru.students.forumservicediplomproject.dto.MessageDto;
-import ru.students.forumservicediplomproject.entity.Forum;
-import ru.students.forumservicediplomproject.entity.LastMessage;
-import ru.students.forumservicediplomproject.entity.Message;
-import ru.students.forumservicediplomproject.entity.Post;
 import ru.students.forumservicediplomproject.entity.Thread;
+import ru.students.forumservicediplomproject.entity.*;
 import ru.students.forumservicediplomproject.repository.LastMessageRepository;
 import ru.students.forumservicediplomproject.repository.MessageRepository;
 
+import java.net.URI;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.HashMap;
@@ -18,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@Slf4j
 public class MessageServiceImpl implements MessageService {
 
     private final MessageRepository messageRepository;
@@ -52,6 +55,29 @@ public class MessageServiceImpl implements MessageService {
         message.setMessageBy(userService.getCurrentUserCredentials());
         message.setCreationDate(new Timestamp(new Date().getTime()));
         messageRepository.save(message);
+
+        RestTemplate restTemplate = new RestTemplate();
+        String url = "http://localhost:8082/registerNewResource";
+        URI uri1 = UriComponentsBuilder.fromUriString(url)
+                .build().toUri();
+        ResponseEntity<String> response = null;
+
+        int retry = 0;
+        while (response == null) {
+            try {
+                response = restTemplate.getForEntity(uri1, String.class);
+            } catch (Exception e) {
+                retry++;
+                log.warn("Не удалось зарегистрировать ресурс. Попытка {}", retry);
+                if (retry > 3) {
+                    log.error("Ошибка при регистрации ресурса", e);
+                    throw e;
+                }
+            }
+
+        }
+
+        log.info(response.getBody());
 
         saveLastMessage(message);
 
