@@ -79,7 +79,8 @@ public class PostServiceImpl implements PostService {
 
         MessageDto messageDto = new MessageDto();
         messageDto.setMessageBody(postDto.getMessageBody());
-        messageService.saveMessage(messageDto, post.getPostId());
+        //TODO: прикрепление вложений при создании поста
+        messageService.saveMessage(messageDto, post.getPostId(), null);
 
         return post.getPostId();
     }
@@ -130,6 +131,9 @@ public class PostServiceImpl implements PostService {
     @Override
     public Post getLastCreatedPost() {
         List<Post> postList = postRepository.findAllByCreationDateBeforeOrderByCreationDateDesc(new Timestamp(new Date().getTime() + 1000));
+        if (postList.size() == 0) {
+            return null;
+        }
         return postList.get(0);
     }
 

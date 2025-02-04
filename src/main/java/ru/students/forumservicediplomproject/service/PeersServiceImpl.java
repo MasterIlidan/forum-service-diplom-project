@@ -63,7 +63,10 @@ public class PeersServiceImpl implements PeersService {
         }
         for (String hash : peersMap.keySet()) {
             Post post = postService.getPostByHashInfo(hash);
-
+            if (post == null) {
+                log.warn("При обновлении таблицы пиров найден хеш {} у которого нет темы", hash);
+                continue;
+            }
             Peers peers = new Peers();
             peers.setSeeders(peersMap.get(hash).get("seeders"));
             peers.setLeechers(peersMap.get(hash).get("leechers"));

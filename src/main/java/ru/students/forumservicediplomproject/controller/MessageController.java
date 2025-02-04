@@ -4,10 +4,8 @@ import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import ru.students.forumservicediplomproject.Search;
 import ru.students.forumservicediplomproject.dto.MessageDto;
@@ -67,9 +65,10 @@ public class MessageController {
                                     @PathVariable long threadId,
                                     @PathVariable long postId,
                                     @Valid @ModelAttribute("newMessage") MessageDto messageDto,
+                                    @RequestParam("image") MultipartFile[] files,
                                     BindingResult result) {
 
-        messageService.saveMessage(messageDto, postId);
+        messageService.saveMessage(messageDto, postId, files);
         return "redirect:/forum/%s/thread/%s/post/%s".formatted(forumId, threadId, postId);
     }
 }

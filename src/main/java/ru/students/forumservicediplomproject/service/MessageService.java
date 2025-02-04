@@ -1,5 +1,6 @@
 package ru.students.forumservicediplomproject.service;
 
+import org.springframework.web.multipart.MultipartFile;
 import ru.students.forumservicediplomproject.dto.MessageDto;
 import ru.students.forumservicediplomproject.entity.Forum;
 import ru.students.forumservicediplomproject.entity.LastMessage;
@@ -13,7 +14,7 @@ import java.util.Optional;
 
 public interface MessageService {
 
-    void saveMessage(MessageDto messageDto, long postId);
+    void saveMessage(MessageDto messageDto, long postId, MultipartFile[] files);
 
     Optional<Message> getMessageById(long id);
 

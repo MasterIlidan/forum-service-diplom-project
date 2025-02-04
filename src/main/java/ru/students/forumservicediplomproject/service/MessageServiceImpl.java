@@ -1,10 +1,18 @@
 package ru.students.forumservicediplomproject.service;
 
+import jakarta.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 import ru.students.forumservicediplomproject.dto.MessageDto;
 import ru.students.forumservicediplomproject.entity.Thread;
@@ -14,10 +22,7 @@ import ru.students.forumservicediplomproject.repository.MessageRepository;
 
 import java.net.URI;
 import java.sql.Timestamp;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -33,6 +38,8 @@ public class MessageServiceImpl implements MessageService {
     private ForumService forumService;
     @Autowired
     private ThreadService threadService;
+    @Autowired
+    private ResourceService resourceService;
 
 
     public MessageServiceImpl(MessageRepository messageRepository, UserService userService) {
@@ -42,7 +49,7 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     //@Transactional(propagation = Propagation.REQUIRED, noRollbackFor = Exception.class)
-    public void saveMessage(MessageDto messageDto, long postId) {
+    public void saveMessage(MessageDto messageDto, long postId, @Nullable MultipartFile[] files) {
         Optional<Post> post = postService.getPostById(postId);
         Message message = new Message();
         if (post.isPresent()) {
@@ -50,37 +57,77 @@ public class MessageServiceImpl implements MessageService {
         } else {
             throw new RuntimeException("Пост не найден! PostId %s".formatted(postId));
         }
-
         message.setMessageBody(messageDto.getMessageBody());
         message.setMessageBy(userService.getCurrentUserCredentials());
         message.setCreationDate(new Timestamp(new Date().getTime()));
         messageRepository.save(message);
 
+        //TODO: уведомление пользователя о неудаче при сохранении сообщения
+
+        if (files != null && !Arrays.stream(files).allMatch(MultipartFile::isEmpty)) {
+            try {
+                List<String> resources = registerNewResources(message, files);
+                List<Resource> content = new ArrayList<>(resources.size());
+                for (String uuid:resources) {
+                    Resource resource = new Resource();
+                    resource.setMessage(message);
+                    resource.setUuid(uuid);
+                    resourceService.saveResource(resource);
+                    content.add(resource);
+                }
+                message.setContent(content);
+            } catch (Exception e) {
+                log.error("Ошибка при регистрации ресурсов. Сообщение сохранено без них", e);
+            }
+        }
+
+
+        saveLastMessage(message);
+
+    }
+
+    private List<String> registerNewResources(Message message, MultipartFile[] files) throws RestClientException {
+        files = Arrays.stream(files).filter(file -> !file.isEmpty()).toList().toArray(new MultipartFile[0]);
+
+        log.debug("Регистрация новых ресурсов для сообщения {} количество {}", message.getMessageId(), files.length);
+
         RestTemplate restTemplate = new RestTemplate();
         String url = "http://localhost:8082/registerNewResource";
         URI uri1 = UriComponentsBuilder.fromUriString(url)
                 .build().toUri();
-        ResponseEntity<String> response = null;
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+
+        for (MultipartFile file: files) {
+            body.add("image", file.getResource());
+        }
+        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+
+        ResponseEntity<List> response = null;
 
         int retry = 0;
         while (response == null) {
             try {
-                response = restTemplate.getForEntity(uri1, String.class);
-            } catch (Exception e) {
+                response = restTemplate.postForEntity(uri1, requestEntity, List.class);
+            } catch (RestClientException e) {
                 retry++;
                 log.warn("Не удалось зарегистрировать ресурс. Попытка {}", retry);
                 if (retry > 3) {
                     log.error("Ошибка при регистрации ресурса", e);
-                    throw e;
+                    throw new RestClientException("Ошибка при регистрации ресурса", e);
                 }
             }
 
         }
-
-        log.info(response.getBody());
-
-        saveLastMessage(message);
-
+        if (response.getBody() == null) {
+            log.warn("Произошла проблема при регистрации ресурсов. Сервис вернул пустой ответ, ожидалось {}", files.length);
+            return List.of();
+        }
+        log.info(Arrays.toString(response.getBody().toArray()));
+        return response.getBody();
     }
 
     @Override

@@ -84,11 +84,14 @@
             </tr>
         </table>
         <form th:action="@{'/forum/' + ${forumId} + '/thread/' + ${threadId} + '/post/' + ${postId}}"
-              th:object="${newMessage}" method="post">
+              th:object="${newMessage}" method="post" enctype="multipart/form-data">
             <label>
                 Написать сообщение
                 <textarea th:field="*{messageBody}"></textarea>
             </label>
+            <input type="file" name="image" accept="image/jpeg" class="form-control-file">
+            <input type="file" name="image" accept="image/jpeg" class="form-control-file">
+            <input type="file" name="image" accept="image/jpeg" class="form-control-file">
             <button type="submit" class="btn btn-primary col-2">Отправить</button>
         </form>
     </div>
