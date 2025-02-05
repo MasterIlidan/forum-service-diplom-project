@@ -51,9 +51,18 @@
                placeholder="Введите название темы"/>
         <input type="text" th:field="*{messageBody}" class="form-control col-4 mb-4"
                placeholder="Опишите раздачу"/>
-        <input type="file" name="torrentFile" accept="torrent" class="form-control-file">
+        <label>
+            <input type="file" name="torrentFile" accept="torrent" class="form-control-file">
+            Торрент-файл</label>
+
         <button type="submit" class="btn btn-primary col-2">Создать</button>
         <input type="hidden" th:field="*{createBy}" th:value="${name}"/>
+        <div>
+            <p>Изображения</p>
+            <input type="file" name="image" accept="image/jpeg" class="form-control-file">
+            <input type="file" name="image" accept="image/jpeg" class="form-control-file">
+            <input type="file" name="image" accept="image/jpeg" class="form-control-file">
+        </div>
     </form>
 </div>
 </body>

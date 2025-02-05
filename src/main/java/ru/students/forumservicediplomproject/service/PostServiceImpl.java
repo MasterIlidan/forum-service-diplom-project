@@ -35,8 +35,6 @@ public class PostServiceImpl implements PostService {
     private MessageService messageService;
     @Autowired
     private PeersRepository peersRepository;
-    @Autowired
-    private PeersService peersService;
 
     public PostServiceImpl(PostRepository postRepository, UserService userService, ThreadService threadService) {
         this.postRepository = postRepository;
@@ -58,7 +56,7 @@ public class PostServiceImpl implements PostService {
      * Хеш сумма раздачи
      */
     @Override
-    public long savePost(MultipartFile torrentFile, PostDto postDto, long threadId, long forumId) {
+    public long savePost(MultipartFile torrentFile, MultipartFile[] images, PostDto postDto, long threadId, long forumId) {
 
         String hash = registerNewTorrent(torrentFile);
 
@@ -79,8 +77,7 @@ public class PostServiceImpl implements PostService {
 
         MessageDto messageDto = new MessageDto();
         messageDto.setMessageBody(postDto.getMessageBody());
-        //TODO: прикрепление вложений при создании поста
-        messageService.saveMessage(messageDto, post.getPostId(), null);
+        messageService.saveMessage(messageDto, post.getPostId(), images);
 
         return post.getPostId();
     }

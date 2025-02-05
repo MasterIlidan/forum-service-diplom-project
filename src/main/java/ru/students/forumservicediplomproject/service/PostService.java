@@ -14,7 +14,7 @@ import java.util.Optional;
 public interface PostService {
 
 
-    long savePost(MultipartFile torrentFile, PostDto postDto, long threadId, long forumId);
+    long savePost(MultipartFile torrentFile, MultipartFile[] images, PostDto postDto, long threadId, long forumId);
 
     Optional<Post> getPostById(long id);
 

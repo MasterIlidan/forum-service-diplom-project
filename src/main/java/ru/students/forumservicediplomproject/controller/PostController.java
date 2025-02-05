@@ -97,6 +97,7 @@ public class PostController {
                            @PathVariable long threadId,
                            @Valid @ModelAttribute("post") PostDto postDto,
                            @RequestParam("torrentFile") MultipartFile torrentFile,
+                           @RequestParam("image") MultipartFile[] images,
                            BindingResult result,
                            Model model) {
         if (result.hasErrors()) {
@@ -104,7 +105,7 @@ public class PostController {
         }
 
 
-        long postId = postService.savePost(torrentFile, postDto, threadId, forumId);
+        long postId = postService.savePost(torrentFile, images, postDto, threadId, forumId);
         //Описание раздачи становится первым сообщением в теме
         //model.addAttribute("msg", "Uploaded torrent file hash: " + hash);
 
