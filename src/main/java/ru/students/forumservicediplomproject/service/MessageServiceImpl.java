@@ -2,7 +2,6 @@ package ru.students.forumservicediplomproject.service;
 
 import jakarta.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -29,22 +28,22 @@ import java.util.*;
 public class MessageServiceImpl implements MessageService {
 
     private final MessageRepository messageRepository;
-    @Autowired
-    private PostService postService;
+    private final PostService postService;
     private final UserService userService;
-    @Autowired
-    private LastMessageRepository lastMessageRepository;
-    @Autowired
-    private ForumService forumService;
-    @Autowired
-    private ThreadService threadService;
-    @Autowired
-    private ResourceService resourceService;
+    private final LastMessageRepository lastMessageRepository;
+    private final ForumService forumService;
+    private final ThreadService threadService;
+    private final ResourceService resourceService;
 
 
-    public MessageServiceImpl(MessageRepository messageRepository, UserService userService) {
+    public MessageServiceImpl(MessageRepository messageRepository, PostService postService, UserService userService, LastMessageRepository lastMessageRepository, ForumService forumService, ThreadService threadService, ResourceService resourceService) {
         this.messageRepository = messageRepository;
+        this.postService = postService;
         this.userService = userService;
+        this.lastMessageRepository = lastMessageRepository;
+        this.forumService = forumService;
+        this.threadService = threadService;
+        this.resourceService = resourceService;
     }
 
     @Override
@@ -60,7 +59,6 @@ public class MessageServiceImpl implements MessageService {
         message.setMessageBody(messageDto.getMessageBody());
         message.setMessageBy(userService.getCurrentUserCredentials());
         message.setCreationDate(new Timestamp(new Date().getTime()));
-        messageRepository.save(message);
 
         //TODO: уведомление пользователя о неудаче при сохранении сообщения
 
@@ -70,7 +68,6 @@ public class MessageServiceImpl implements MessageService {
                 List<Resource> content = new ArrayList<>(resources.size());
                 for (String uuid:resources) {
                     Resource resource = new Resource();
-                    resource.setMessage(message);
                     resource.setUuid(uuid);
                     resourceService.saveResource(resource);
                     content.add(resource);
@@ -80,8 +77,7 @@ public class MessageServiceImpl implements MessageService {
                 log.error("Ошибка при регистрации ресурсов. Сообщение сохранено без них", e);
             }
         }
-
-
+        messageRepository.save(message);
         saveLastMessage(message);
 
     }

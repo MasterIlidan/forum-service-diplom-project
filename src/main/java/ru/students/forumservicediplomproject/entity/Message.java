@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -29,7 +30,7 @@ public class Message {
     @NotNull
     private Post postId;
     @OneToMany
-    private List<Resource> content;
+    private List<Resource> content = new ArrayList<>();
     @NotNull
     private Timestamp creationDate;
 }

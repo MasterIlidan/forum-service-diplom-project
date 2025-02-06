@@ -76,11 +76,19 @@
                     </div>
                     <a class="me-auto mb-2 mb-lg-0" th:text="${message.getMessageBy().getUserName()}"
                        th:href="@{'/user?userId=' + ${message.getMessageBy().getUserId()}}"></a>
+                    <span th:text="${message.getCreationDate()}"></span>
+                </td>
+
+                <td th:class="table-post" >
+                    <p th:text="${message.getMessageBody()}"></p>
                     <div>
-                        <span th:text="${message.getCreationDate()}"></span>
+
+                        <div class="responsive-image" >
+                            <img th:each="image : ${message.getContent()}" th:class="responsive-image" th:src="@{'data:image/jpeg;base64,' + ${image.getBase64Image()}}" alt="image">
+                        </div>
+
                     </div>
                 </td>
-                <td th:class="table-post" th:text="${message.getMessageBody()}">
             </tr>
         </table>
         <form th:action="@{'/forum/' + ${forumId} + '/thread/' + ${threadId} + '/post/' + ${postId}}"

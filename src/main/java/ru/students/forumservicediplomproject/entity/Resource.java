@@ -14,12 +14,10 @@ import lombok.Setter;
 @Setter
 public class Resource {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @NotNull
-    private long longId;
-    @NotNull
+    @Column(unique = true)
     private String uuid;
-    @OneToOne
-    @NotNull
-    private Message message;
+    @Transient
+    private String base64Image;
+
 }
