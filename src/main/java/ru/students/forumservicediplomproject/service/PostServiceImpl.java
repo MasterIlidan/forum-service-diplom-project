@@ -2,7 +2,6 @@ package ru.students.forumservicediplomproject.service;
 
 import jakarta.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -13,17 +12,19 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
-import ru.students.forumservicediplomproject.dto.MessageDto;
 import ru.students.forumservicediplomproject.dto.PostDto;
+import ru.students.forumservicediplomproject.entity.Peers;
 import ru.students.forumservicediplomproject.entity.Post;
 import ru.students.forumservicediplomproject.entity.Thread;
 import ru.students.forumservicediplomproject.repository.PeersRepository;
 import ru.students.forumservicediplomproject.repository.PostRepository;
-import ru.students.forumservicediplomproject.entity.Peers;
 
 import java.net.URI;
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -31,15 +32,14 @@ public class PostServiceImpl implements PostService {
     private final PostRepository postRepository;
     private final UserService userService;
     private final ThreadService threadService;
-    @Autowired
-    private MessageService messageService;
-    @Autowired
-    private PeersRepository peersRepository;
+    private final PeersRepository peersRepository;
 
-    public PostServiceImpl(PostRepository postRepository, UserService userService, ThreadService threadService) {
+    public PostServiceImpl(PostRepository postRepository, UserService userService,
+                           ThreadService threadService, PeersRepository peersRepository) {
         this.postRepository = postRepository;
         this.userService = userService;
         this.threadService = threadService;
+        this.peersRepository = peersRepository;
     }
 
     /**
@@ -56,7 +56,8 @@ public class PostServiceImpl implements PostService {
      * Хеш сумма раздачи
      */
     @Override
-    public long savePost(MultipartFile torrentFile, MultipartFile[] images, PostDto postDto, long threadId, long forumId) {
+    public long savePost(MultipartFile torrentFile,
+                         PostDto postDto, long threadId, long forumId) {
 
         String hash = registerNewTorrent(torrentFile);
 
@@ -74,11 +75,6 @@ public class PostServiceImpl implements PostService {
         }
 
         postRepository.save(post);
-
-        MessageDto messageDto = new MessageDto();
-        messageDto.setMessageBody(postDto.getMessageBody());
-        messageService.saveMessage(messageDto, post.getPostId(), images);
-
         return post.getPostId();
     }
 

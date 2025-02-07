@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import ru.students.forumservicediplomproject.Search;
+import ru.students.forumservicediplomproject.dto.MessageDto;
 import ru.students.forumservicediplomproject.dto.PostDto;
 import ru.students.forumservicediplomproject.entity.LastMessage;
 import ru.students.forumservicediplomproject.entity.Peers;
@@ -105,7 +106,8 @@ public class PostController {
         }
 
 
-        long postId = postService.savePost(torrentFile, images, postDto, threadId, forumId);
+        long postId = postService.savePost(torrentFile, postDto, threadId, forumId);
+        messageService.saveMessage(new MessageDto(postDto.getMessageBody()), postId, images);
         //Описание раздачи становится первым сообщением в теме
         //model.addAttribute("msg", "Uploaded torrent file hash: " + hash);
 
