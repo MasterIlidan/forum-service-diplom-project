@@ -16,6 +16,10 @@ public interface PostService {
 
     long savePost(MultipartFile torrentFile, PostDto postDto, long threadId, long forumId);
 
+    void changePost(Post post);
+
+    void changePostStatus(String hash, String status);
+
     Optional<Post> getPostById(long id);
 
     Post getPostByHashInfo(String hash);
@@ -33,4 +37,8 @@ public interface PostService {
     List<Object[]> countPostsByThread(Thread threadId);
 
     long getCountOfAllPosts();
+
+    void registerNewTorrent(MultipartFile torrentFile, Post post);
+
+    void approvePost(long postId);
 }

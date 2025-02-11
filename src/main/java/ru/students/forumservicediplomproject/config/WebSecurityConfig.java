@@ -27,13 +27,14 @@ public class WebSecurityConfig {
                         .requestMatchers("/register/**").permitAll()
                         .requestMatchers("/images/**").permitAll()
                         .requestMatchers("/css/**").permitAll()
+                        .requestMatchers("/inactivePosts").permitAll() //убрать
                         //.requestMatchers("/forum").permitAll()
                         .anyRequest().authenticated())).formLogin(form ->
                         form.loginPage("/login")
                                 .loginProcessingUrl("/login")
                                 .defaultSuccessUrl("/")
                                 .permitAll())
-                .logout(logout -> logout.logoutUrl("logout").permitAll());
+                .logout(logout -> logout.logoutUrl("logout").permitAll()).csrf().disable();
         return httpSecurity.build();
     }
 }

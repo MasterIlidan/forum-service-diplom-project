@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
@@ -65,7 +66,21 @@
             <tbody>>
             <tr th:each="post : ${postList}">
                 <td >
-                    <a th:href="@{'/forum/' + ${forumId} + '/thread/' + ${threadId} + '/post/' + ${post.getPostId()}}" th:text="${post.getTitle()}"></a>
+                    <a th:if="${post.getPostStatus().name.equalsIgnoreCase('ACTIVE')}"
+                       th:href="@{'/forum/' + ${forumId} + '/thread/' + ${threadId} + '/post/' + ${post.getPostId()}}"
+                       th:text="${post.getTitle()}"></a>
+                    <a th:if="${post.getPostStatus().name.equalsIgnoreCase('APPROVED')}"
+                       th:href="@{'/forum/' + ${forumId} + '/thread/' + ${threadId} + '/post/' + ${post.getPostId()}}"
+                       th:text="${post.getTitle() + ' APP'}"></a>
+                    <a th:if="${post.getPostStatus().name.equalsIgnoreCase('INACTIVE')}"
+                       th:href="@{'/forum/' + ${forumId} + '/thread/' + ${threadId} + '/post/' + ${post.getPostId()}}"
+                       th:text="${post.getTitle()  + ' I'}"></a>
+                    <a th:if="${post.getPostStatus().name.equalsIgnoreCase('ARCHIVE')}"
+                       th:href="@{'/forum/' + ${forumId} + '/thread/' + ${threadId} + '/post/' + ${post.getPostId()}}"
+                       th:text="${post.getTitle()  + ' A'}"></a>
+                    <a th:if="${post.getPostStatus().name.equalsIgnoreCase('NEW')}"
+                       th:href="@{'/forum/' + ${forumId} + '/thread/' + ${threadId} + '/post/' + ${post.getPostId()}}"
+                       th:text="${post.getTitle()  + ' N'}"></a>
                 </td>
                 <td th:text="${messagesCountMap.get(post.getPostId())}">
                 <td>

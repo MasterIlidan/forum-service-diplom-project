@@ -1,6 +1,9 @@
 package ru.students.forumservicediplomproject.controller;
 
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -23,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Controller
 public class PostController {
 
@@ -114,4 +118,23 @@ public class PostController {
 
         return "redirect:/forum/%s/thread/%s/post/%s".formatted(forumId, threadId, postId);
     }
+
+    @PostMapping("/inactivePosts")
+    public ResponseEntity inactivePosts(@RequestParam String hash, @RequestParam String status) {
+        postService.changePostStatus(hash, status);
+        return new ResponseEntity(HttpStatus.OK);
+    }
+
+    @PostMapping("/approvePost{postId}")
+    public String approvePost(@PathVariable long postId) {
+        postService.approvePost(postId);
+        Post postById = postService.getPostById(postId).get();
+        return "redirect:/forum/%s/thread/%s/post/%s".formatted(
+                postById.getThread().getForumId().getForumId(),
+                postById.getThread().getThreadId(),
+                postById.getPostId()
+        );
+    }
+
+
 }

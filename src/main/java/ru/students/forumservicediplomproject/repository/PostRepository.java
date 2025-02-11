@@ -24,4 +24,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     Post findByHashInfo(@NotNull String hashInfo);
 
     List<Post> findAllByCreationDateBeforeOrderByCreationDateDesc(@NotNull Timestamp creationDateBefore);
+
+    boolean existsByHashInfo(@NotNull String hashInfo);
 }

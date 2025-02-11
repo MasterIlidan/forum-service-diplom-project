@@ -29,5 +29,13 @@ public class Post {
     @ManyToOne
     private User createdBy;
     @NotNull
+    private Status postStatus;
+    @NotNull
     private Timestamp creationDate;
+
+    public enum Status {
+        NEW, APPROVED, ACTIVE, INACTIVE, ARCHIVE
+    }
 }
+
+

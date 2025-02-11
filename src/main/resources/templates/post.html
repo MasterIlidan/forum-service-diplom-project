@@ -51,6 +51,10 @@
             <span>Вернуться в ветку</span>
         </a>
         <h1 class="header" th:text="${post.getTitle()}"></h1>
+        <form th:if="${post.getPostStatus().name().equalsIgnoreCase('NEW')}" th:action="@{/approvePost{postId}(postId=${postId})}" method="post">
+            <button type="submit" class="btn btn-primary col-2">approve</button>
+        </form>
+        <h2 class="header" th:text="${post.getPostStatus()}"></h2>
         <div id="post-info">
             <span id="torrent-size" th:text="'Размер: '"></span>
             <span id="torrent-create-time" th:text="' | Создана: ' + ${post.getCreationDate()}"></span>

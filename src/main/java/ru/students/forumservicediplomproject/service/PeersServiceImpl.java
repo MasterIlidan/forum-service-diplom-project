@@ -33,7 +33,7 @@ public class PeersServiceImpl implements PeersService {
      */
     @Override
     @Async
-    @Scheduled(cron = "*/15 * * * * *")
+    @Scheduled(cron = "*/59 * * * * *")
     public void updatePeers() {
         //TODO: нужна ли возможность отключения "кеша" и постоянного запроса по каждой раздаче?
         log.info("Обновление таблицы раздач и пиров");

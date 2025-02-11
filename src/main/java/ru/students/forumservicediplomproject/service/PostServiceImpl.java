@@ -43,29 +43,28 @@ public class PostServiceImpl implements PostService {
     }
 
     /**
-     *
-     * @param torrentFile
-     * Загруженный пользователем торрент файл
-     * @param postDto
-     * Заполненная пользователем форма создания темы
-     * @param threadId
-     * Идентификатор ветки
-     * @param forumId
-     * Идентификатор форума
-     * @return
-     * Хеш сумма раздачи
+     * @param torrentFile Загруженный пользователем торрент файл
+     * @param postDto     Заполненная пользователем форма создания темы
+     * @param threadId    Идентификатор ветки
+     * @param forumId     Идентификатор форума
+     * @return Хеш сумма раздачи
      */
     @Override
     public long savePost(MultipartFile torrentFile,
                          PostDto postDto, long threadId, long forumId) {
 
-        String hash = registerNewTorrent(torrentFile);
-
+        String hash = getHash(torrentFile);
+        if (postRepository.existsByHashInfo(hash)) {
+            log.error("Тема с таким хешем {} уже существует", hash);
+            throw new RuntimeException("Тема с таким хешем %s уже существует".formatted(hash));
+        }
         Post post = new Post();
         post.setTitle(postDto.getTitle());
         post.setCreatedBy(userService.getCurrentUserCredentials());
         post.setHashInfo(hash);
         post.setCreationDate(new Timestamp(new Date().getTime()));
+        //TODO: создание начинается с NEW
+        post.setPostStatus(Post.Status.NEW);
         Optional<Thread> thread = threadService.getThreadById(threadId);
 
         if (thread.isPresent()) {
@@ -75,7 +74,59 @@ public class PostServiceImpl implements PostService {
         }
 
         postRepository.save(post);
+
+        registerNewTorrent(torrentFile, post);
+
         return post.getPostId();
+    }
+
+    private String getHash(MultipartFile torrentFile) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("torrentFile", torrentFile.getResource());
+
+        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+
+        RestTemplate restTemplate = new RestTemplate();
+        String uri = "http://localhost:8081/getHash";
+        URI uri1 = UriComponentsBuilder.fromUriString(uri)
+                .build().toUri();
+        ResponseEntity<String> response = restTemplate.postForEntity(uri1, requestEntity, String.class);
+
+        if (response.getBody().length() != 40) {
+            log.error("Returned hashInfo not 40 digits, actual {}", response.getBody().length());
+            throw new RuntimeException("Returned hashInfo not 40 digits, actual %d".formatted(response.getBody().length()));
+        }
+        return response.getBody();
+    }
+
+    @Override
+    public void changePost(Post post) {
+        if (!postRepository.existsById(post.getPostId())) {
+            log.error("Trying edit not existing post {}", post.getPostId());
+            return;
+        }
+        postRepository.save(post);
+    }
+
+    @Override
+    public void changePostStatus(String hash, String status) {
+        log.info("Received new status {} for post with hash {}", status, hash);
+        Post post = getPostByHashInfo(hash);
+        if (status.equalsIgnoreCase(Post.Status.INACTIVE.name())) {
+            post.setPostStatus(Post.Status.INACTIVE);
+        } else if (status.equalsIgnoreCase(Post.Status.ACTIVE.name())) {
+            post.setPostStatus(Post.Status.ACTIVE);
+        } else if (status.equalsIgnoreCase(Post.Status.ARCHIVE.name())) {
+            post.setPostStatus(Post.Status.ARCHIVE);
+        } else {
+            log.warn("Received unknown status {} for {}", status, hash);
+            return;
+        }
+        log.debug("Set status {} for post with id {}", status, post.getPostId());
+        changePost(post);
     }
 
     @Override
@@ -103,12 +154,13 @@ public class PostServiceImpl implements PostService {
 
         return postRepository.findAll();
     }
+
     @Override
     public HashMap<Post, Peers> getPeers(List<Post> postList) {
 
         HashMap<Post, Peers> peersHashMap = new HashMap<>(postList.size());
 
-        for (Post post: postList) {
+        for (Post post : postList) {
             Optional<Peers> peers = peersRepository.findById(post);
             if (peers.isPresent()) {
                 peersHashMap.put(post, peers.get());
@@ -134,29 +186,28 @@ public class PostServiceImpl implements PostService {
     public List<Post> getAllPostsByThread(Thread thread) {
         return postRepository.findByThread(thread);
     }
+
     @Override
     public List<Object[]> countPostsByThread(Thread threadId) {
         return postRepository.countTotalPostsByThread(threadId);
     }
+
     @Override
     public long getCountOfAllPosts() {
         return (long) postRepository.countTotalPosts().get(0)[0];
     }
 
     /**
-     *
-     * @param torrentFile
-     * Загруженный пользователем торрент файл
-     * @return
-     * Хеш сумма раздачи
+     * @param torrentFile Загруженный пользователем торрент файл
      */
-    private String registerNewTorrent(MultipartFile torrentFile) {
-
+    @Override
+    public void registerNewTorrent(MultipartFile torrentFile, Post post) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
         body.add("torrentFile", torrentFile.getResource());
+        body.add("name", "%s [post-%d]".formatted(post.getTitle(), post.getPostId()));
 
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
 
@@ -166,6 +217,33 @@ public class PostServiceImpl implements PostService {
                 .build().toUri();
         ResponseEntity<String> response = restTemplate.postForEntity(uri1, requestEntity, String.class);
 
-        return response.getBody();
+        response.getBody();
+    }
+    @Override
+    public void approvePost(long postId) {
+        Optional<Post> optionalPost = postRepository.findById(postId);
+        if (optionalPost.isEmpty()) {
+            log.error("Произошла ошибка при проверке поста! Пост не найден {}", postId);
+            throw new RuntimeException("Произошла ошибка при проверке поста! Пост не найден");
+        }
+        Post post = optionalPost.get();
+
+        HttpHeaders headers = new HttpHeaders();
+
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("hashInfo", post.getHashInfo());
+
+        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+
+        RestTemplate restTemplate = new RestTemplate();
+        String uri = "http://localhost:8081/announce";
+        URI uri1 = UriComponentsBuilder.fromUriString(uri)
+                .build().toUri();
+        ResponseEntity responseEntity = restTemplate.postForEntity(uri1, requestEntity, String.class);
+
+
+        post.setPostStatus(Post.Status.APPROVED);
+
+        postRepository.save(post);
     }
 }
