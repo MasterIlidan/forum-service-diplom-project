@@ -101,17 +101,25 @@ public class PostController {
     public String savePost(@PathVariable long forumId,
                            @PathVariable long threadId,
                            @Valid @ModelAttribute("post") PostDto postDto,
-                           @RequestParam("torrentFile") MultipartFile torrentFile,
-                           @RequestParam("image") MultipartFile[] images,
+                           //@RequestParam("torrentFile") MultipartFile torrentFile,
+                           //@RequestParam("image") MultipartFile[] images,
                            BindingResult result,
                            Model model) {
-        if (result.hasErrors()) {
-            return "forms/add-post-page";
+        if (postDto.getTorrentFile().isEmpty()) {
+            result.rejectValue("torrentFile", null, "Нужно загрузить торрент файл");
         }
+        if (postDto.getTorrentFile().getOriginalFilename() == null
+                || !postDto.getTorrentFile().getOriginalFilename().contains(".torrent")) {
+            result.rejectValue("torrentFile", null, "Принимаются только файлы .torrent");
+        }
+            if (result.hasErrors()) {
+                model.addAttribute("post", postDto);
+                return "forms/add-post-page";
+            }
 
 
-        long postId = postService.savePost(torrentFile, postDto, threadId, forumId);
-        messageService.saveMessage(new MessageDto(postDto.getMessageBody()), postId, images);
+        long postId = postService.savePost(postDto.getTorrentFile(), postDto, threadId, forumId);
+        messageService.saveMessage(new MessageDto(postDto.getMessageBody()), postId, postDto.getImages());
         //Описание раздачи становится первым сообщением в теме
         //model.addAttribute("msg", "Uploaded torrent file hash: " + hash);
 

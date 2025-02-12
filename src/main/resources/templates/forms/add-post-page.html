@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
@@ -22,10 +23,6 @@
                 aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <form method="get" th:action="@{/search}" th:object="${search}">
-            <input class="ima" th:placeholder="Поиск" th:field="*{keyword}">
-            <button type="submit">Поиск</button>
-        </form>
 
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0 flex-right">
@@ -47,21 +44,27 @@
     <h3>Новая тема</h3>
     <hr/>
     <form th:action="@{'/forum/' + ${forumId} + '/thread/' + ${threadId} + '/savePost'}" enctype="multipart/form-data" th:object="${post}" method="POST">
+        <p th:errors="*{title}" class="text-danger"
+           th:if="${#fields.hasErrors('title')}"></p>
         <input type="text" th:field="*{title}" class="form-control col-4 mb-4"
                placeholder="Введите название темы"/>
+        <p th:errors="*{messageBody}" class="text-danger"
+           th:if="${#fields.hasErrors('messageBody')}"></p>
         <input type="text" th:field="*{messageBody}" class="form-control col-4 mb-4"
                placeholder="Опишите раздачу"/>
+        <p th:errors="*{torrentFile}" class="text-danger"
+              th:if="${#fields.hasErrors('torrentFile')}"></p>
         <label>
-            <input type="file" name="torrentFile" accept="torrent" class="form-control-file">
+
+            <input th:field="*{torrentFile}" type="file" name="torrentFile" accept=".torrent" class="form-control-file">
             Торрент-файл</label>
 
         <button type="submit" class="btn btn-primary col-2">Создать</button>
-        <input type="hidden" th:field="*{createBy}" th:value="${name}"/>
         <div>
             <p>Изображения</p>
-            <input type="file" name="image" accept="image/jpeg" class="form-control-file">
-            <input type="file" name="image" accept="image/jpeg" class="form-control-file">
-            <input type="file" name="image" accept="image/jpeg" class="form-control-file">
+            <input th:field="*{images}" type="file" name="image" accept="image/jpeg" class="form-control-file">
+            <input th:field="*{images}" type="file" name="image" accept="image/jpeg" class="form-control-file">
+            <input th:field="*{images}" type="file" name="image" accept="image/jpeg" class="form-control-file">
         </div>
     </form>
 </div>
