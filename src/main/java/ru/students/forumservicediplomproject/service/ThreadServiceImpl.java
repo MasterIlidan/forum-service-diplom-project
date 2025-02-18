@@ -1,6 +1,8 @@
 package ru.students.forumservicediplomproject.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import ru.students.forumservicediplomproject.dto.ThreadDto;
 import ru.students.forumservicediplomproject.entity.Forum;
 import ru.students.forumservicediplomproject.entity.Thread;
@@ -15,38 +17,47 @@ import java.util.Optional;
 public class ThreadServiceImpl implements ThreadService {
 
     private final ThreadRepository threadRepository;
-    private final ForumServiceImpl forumServiceImpl;
     private final UserService userService;
+    private final PostService postService;
+    private final LastMessageService lastMessageService;
 
-    public ThreadServiceImpl(ThreadRepository threadRepository, ForumServiceImpl forumServiceImpl, UserService userService) {
+    public ThreadServiceImpl(ThreadRepository threadRepository, UserService userService, PostService postService, LastMessageService lastMessageService) {
         this.threadRepository = threadRepository;
-        this.forumServiceImpl = forumServiceImpl;
         this.userService = userService;
+        this.postService = postService;
+        this.lastMessageService = lastMessageService;
     }
 
     @Override
-    public void saveThread(ThreadDto threadDto, long forumId) {
+    public void saveThread(ThreadDto threadDto, Forum forum) {
         Thread thread = new Thread();
         thread.setThreadName(threadDto.getThreadName());
         thread.setCreatedBy(userService.getCurrentUserCredentials());
         thread.setCreationDate(new Timestamp(new Date().getTime()));
-        Optional<Forum> forum = forumServiceImpl.getForum(forumId);
-        if (forum.isPresent()) {
-            thread.setForumId(forum.get());
-        } else {
-            throw new RuntimeException(("При создании ветки произошла ошибка:" +
-                    " не найден форум, на котором создается ветка. ForumId %s").formatted(threadDto.getForumId()));
-        }
+        thread.setForumId(forum);
+
         threadRepository.save(thread);
     }
 
     @Override
     public Optional<Thread> getThreadById(long id) {
-        return threadRepository.findById(id);
+        return threadRepository.findByThreadId(id);
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED, noRollbackFor = Exception.class)
+    public void deleteAllThreadsByForum(Forum forum) {
+        List<Thread> threads = getAllThreadsByForum(forum);
+        threads.forEach(this::deleteThread);
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, noRollbackFor = Exception.class)
     public void deleteThread(Thread thread) {
+
+        lastMessageService.deleteByThread(thread);
+        postService.deleteAllByThread(thread);
+
         threadRepository.delete(thread);
     }
 
@@ -61,12 +72,8 @@ public class ThreadServiceImpl implements ThreadService {
     }
 
     @Override
-    public List<Thread> getAllThreadsByForum(Long forumId) {
-        Optional<Forum> forum = forumServiceImpl.getForum(forumId);
-        if (forum.isPresent()) {
-            return threadRepository.findByForumId(forum.get());
-        }
-        return List.of();
+    public List<Thread> getAllThreadsByForum(Forum forum) {
+        return threadRepository.findByForumId(forum);
     }
 
     @Override

@@ -13,6 +13,7 @@ import ru.students.forumservicediplomproject.dto.MessageDto;
 import ru.students.forumservicediplomproject.entity.Message;
 import ru.students.forumservicediplomproject.entity.Peers;
 import ru.students.forumservicediplomproject.entity.Post;
+import ru.students.forumservicediplomproject.exeption.ResourceNotFoundException;
 import ru.students.forumservicediplomproject.service.MessageService;
 import ru.students.forumservicediplomproject.service.PeersService;
 import ru.students.forumservicediplomproject.service.PostService;
@@ -73,8 +74,11 @@ public class MessageController {
                               @Valid @ModelAttribute("newMessage") MessageDto messageDto,
                               @RequestParam("image") MultipartFile[] files,
                               BindingResult result) {
-
-        messageService.saveMessage(messageDto, postId, files);
+        Optional<Post> postById = postService.getPostById(postId);
+        if (postById.isEmpty()) {
+            throw new ResourceNotFoundException("Пост не найден! Id %d".formatted(postId));
+        }
+        messageService.saveMessage(messageDto, postById.get(), files);
         return "redirect:/forum/%s/thread/%s/post/%s".formatted(forumId, threadId, postId);
     }
 }

@@ -7,6 +7,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClientException;
@@ -14,9 +16,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 import ru.students.forumservicediplomproject.dto.MessageDto;
-import ru.students.forumservicediplomproject.entity.Thread;
 import ru.students.forumservicediplomproject.entity.*;
-import ru.students.forumservicediplomproject.repository.LastMessageRepository;
 import ru.students.forumservicediplomproject.repository.MessageRepository;
 
 import java.net.URI;
@@ -28,34 +28,25 @@ import java.util.*;
 public class MessageServiceImpl implements MessageService {
 
     private final MessageRepository messageRepository;
-    private final PostService postService;
     private final UserService userService;
-    private final LastMessageRepository lastMessageRepository;
-    private final ForumService forumService;
-    private final ThreadService threadService;
     private final ResourceService resourceService;
+    private final LastMessageService lastMessageService;
 
 
-    public MessageServiceImpl(MessageRepository messageRepository, PostService postService, UserService userService, LastMessageRepository lastMessageRepository, ForumService forumService, ThreadService threadService, ResourceService resourceService) {
+    public MessageServiceImpl(MessageRepository messageRepository, UserService userService,
+                              ResourceService resourceService, LastMessageService lastMessageService) {
         this.messageRepository = messageRepository;
-        this.postService = postService;
         this.userService = userService;
-        this.lastMessageRepository = lastMessageRepository;
-        this.forumService = forumService;
-        this.threadService = threadService;
         this.resourceService = resourceService;
+        this.lastMessageService = lastMessageService;
     }
 
     @Override
     //@Transactional(propagation = Propagation.REQUIRED, noRollbackFor = Exception.class)
-    public void saveMessage(MessageDto messageDto, long postId, @Nullable MultipartFile[] files) {
-        Optional<Post> post = postService.getPostById(postId);
+    public void saveMessage(MessageDto messageDto, Post post, @Nullable MultipartFile[] files) {
         Message message = new Message();
-        if (post.isPresent()) {
-            message.setPostId(post.get());
-        } else {
-            throw new RuntimeException("Пост не найден! PostId %s".formatted(postId));
-        }
+
+        message.setPostId(post);
         message.setMessageBody(messageDto.getMessageBody());
         message.setMessageBy(userService.getCurrentUserCredentials());
         message.setCreationDate(new Timestamp(new Date().getTime()));
@@ -78,7 +69,7 @@ public class MessageServiceImpl implements MessageService {
             }
         }
         messageRepository.save(message);
-        saveLastMessage(message);
+        lastMessageService.saveLastMessage(message);
 
     }
 
@@ -152,116 +143,15 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED, noRollbackFor = Exception.class)
+    public void deleteAllMessagesByPost(Post post) {
+        messageRepository.deleteAllByPostId(post);
+    }
+
+    @Override
     public List<Object[]> countMessagesByPost(Post post) {
         return messageRepository.countTotalMessagesByPostId(post);
     }
 
-    /** Сохранить последнее отправленное сообщение в таблице последних сообщений для отображения
-     * активности в разных разделах сайта
-     * @param message Только что созданное сообщение, которое отправил пользователь.
-     */
-    @Override
-    public void saveLastMessage(Message message) {
-        //cохраняем последнее сообщение в посте
-            saveLastMessageInPost(message);
-        //сохраняем последнее сообщение в ветке
-            saveLastMessageInThread(message);
-        //сохраняем последнее сообщение в форуме
-            saveLastMessageInForum(message);
-    }
 
-    /**Последнее сообщение в посту. Время создания сообщения будет
-     *  отображаться как последнее созданное сообщение по теме.
-     * @param message Только что созданное сообщение, которое отправил пользователь.
-     */
-    private void saveLastMessageInPost(Message message) {
-        LastMessage lastPostMessage = new LastMessage();
-        lastPostMessage.setPost(message.getPostId());
-        lastPostMessage.setLastMessage(message);
-        LastMessage oldMessage = lastMessageRepository.findByPost(message.getPostId());
-        if (oldMessage != null) lastMessageRepository.delete(oldMessage);
-        lastMessageRepository.save(lastPostMessage);
-    }
-
-    /**Последнее сообщение в ветке. Время создания сообщения будет
-     *  отображаться как последнее созданное сообщение по ветке.
-     * @param message Только что созданное сообщение, которое отправил пользователь.
-     */
-    private void saveLastMessageInThread(Message message) {
-        LastMessage lastThreadMessage = new LastMessage();
-        lastThreadMessage.setThread(message.getPostId().getThread());
-        lastThreadMessage.setLastMessage(message);
-        LastMessage oldMessage = lastMessageRepository.findByThread(message.getPostId().getThread());
-        if (oldMessage != null) lastMessageRepository.delete(oldMessage);
-        lastMessageRepository.save(lastThreadMessage);
-    }
-    /**Последнее сообщение в форуме. Время создания сообщения будет
-     *  отображаться как последнее созданное сообщение на форуме.
-     * @param message Только что созданное сообщение, которое отправил пользователь.
-     */
-    private void saveLastMessageInForum(Message message) {
-        LastMessage lastForumMessage = new LastMessage();
-        lastForumMessage.setForum(message.getPostId().getThread().getForumId());
-        lastForumMessage.setLastMessage(message);
-        LastMessage oldMessage = lastMessageRepository.findByForum(message.getPostId().getThread().getForumId());
-        if (oldMessage != null) lastMessageRepository.delete(oldMessage);
-        lastMessageRepository.save(lastForumMessage);
-    }
-
-    @Override
-    public LastMessage getLastMessageByPost(Forum forum) {
-        return lastMessageRepository.findByForum(forum);
-    }
-
-    @Override
-    public HashMap<Forum, LastMessage> getAllLastMessagesByForum() {
-        List<Forum> allForums = forumService.getAllForums();
-
-        HashMap<Forum, LastMessage> lastMessageHashMap = new HashMap<>(allForums.size());
-
-        for (Forum forum : allForums) {
-            LastMessage lastMessage = getLastMessageByPost(forum);
-            lastMessageHashMap.put(forum, lastMessage);
-        }
-
-        return lastMessageHashMap;
-    }
-
-    @Override
-    public LastMessage getLastMessageByThread(Thread thread) {
-        return lastMessageRepository.findByThread(thread);
-    }
-
-    @Override
-    public HashMap<Thread, LastMessage> getAllLastMessagesByThread() {
-        List<Thread> allThreads = threadService.getAllThreads();
-
-        HashMap<Thread, LastMessage> lastMessageHashMap = new HashMap<>(allThreads.size());
-
-        for (Thread thread : allThreads) {
-            LastMessage lastMessage = getLastMessageByThread(thread);
-            lastMessageHashMap.put(thread, lastMessage);
-        }
-
-        return lastMessageHashMap;
-    }
-
-    @Override
-    public LastMessage getLastMessageByPost(Post post) {
-        return lastMessageRepository.findByPost(post);
-    }
-
-    @Override
-    public HashMap<Post, LastMessage> getAllLastMessagesByPost() {
-        List<Post> allPosts = postService.getAllPosts();
-
-        HashMap<Post, LastMessage> lastMessageHashMap = new HashMap<>(allPosts.size());
-
-        for (Post post : allPosts) {
-            LastMessage lastMessage = getLastMessageByPost(post);
-            lastMessageHashMap.put(post, lastMessage);
-        }
-
-        return lastMessageHashMap;
-    }
 }

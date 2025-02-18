@@ -29,7 +29,7 @@ public class Message {
     @ManyToOne
     @NotNull
     private Post postId;
-    @OneToMany
+    @OneToMany(orphanRemoval = true)
     private List<Resource> content = new ArrayList<>();
     @NotNull
     private Timestamp creationDate;

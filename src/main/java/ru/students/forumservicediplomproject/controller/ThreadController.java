@@ -24,22 +24,22 @@ public class ThreadController {
     private final ForumService forumServiceImpl;
     private final PostService postService;
     private final MessageService messageService;
+    private final LastMessageService lastMessageService;
 
     public ThreadController(ForumService forumService,
                             ThreadService threadService,
-                            PostService postService, MessageService messageService) {
+                            PostService postService, MessageService messageService, LastMessageService lastMessageService) {
         this.forumServiceImpl = forumService;
         this.threadService = threadService;
         this.postService = postService;
         this.messageService = messageService;
+        this.lastMessageService = lastMessageService;
     }
 
     @GetMapping({"/forum{forumId}"})
     public ModelAndView forumPage(@PathVariable @RequestParam long forumId,
                                   Model model) {
         ModelAndView modelAndView = new ModelAndView("forum-page");
-        List<Thread> threadList = threadService.getAllThreadsByForum(forumId);
-        modelAndView.addObject("threadList", threadList);
 
         Optional<Forum> forum = forumServiceImpl.getForum(forumId);
         if (forum.isPresent()) {
@@ -47,10 +47,12 @@ public class ThreadController {
         } else {
             throw new RuntimeException("У ветки не найден форум! ForumId %s".formatted(forumId));
         }
+        List<Thread> threadList = threadService.getAllThreadsByForum(forum.get());
+        modelAndView.addObject("threadList", threadList);
 
         HashMap<Long, Long> totalPostsInThread = new HashMap<>();
         HashMap<Long, Long> totalMessagesInThread = new HashMap<>();
-        HashMap<Thread, LastMessage> lastMessageOnThreadHashMap = messageService.getAllLastMessagesByThread();
+        HashMap<Thread, LastMessage> lastMessageOnThreadHashMap = lastMessageService.getAllLastMessagesByThreads(threadList);
         //TODO: когда было последнее сообщение
 
         //считаем количество веток, тем и сообщений для каждого форума
@@ -100,8 +102,12 @@ public class ThreadController {
         if (bindingResult.hasErrors()) {
             return "forms/add-thread-page";
         }
-
-        threadService.saveThread(threadDto, forumId);
+        Optional<Forum> forum = forumServiceImpl.getForum(forumId);
+        if (forum.isEmpty()) {
+            throw new RuntimeException(("При создании ветки произошла ошибка:" +
+                    " не найден форум, на котором создается ветка. ForumId %s").formatted(threadDto.getForumId()));
+        }
+        threadService.saveThread(threadDto, forum.get());
         return "redirect:/forum?forumId={forumId}";
 
     }

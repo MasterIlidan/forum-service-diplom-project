@@ -14,7 +14,7 @@ import java.util.Optional;
 public interface PostService {
 
 
-    long savePost(MultipartFile torrentFile, PostDto postDto, long threadId, long forumId);
+    long savePost(MultipartFile torrentFile, PostDto postDto, Thread threadId, long forumId);
 
     void changePost(Post post);
 
@@ -23,6 +23,9 @@ public interface PostService {
     Optional<Post> getPostById(long id);
 
     Post getPostByHashInfo(String hash);
+
+    void deleteAllByThread(Thread thread);
+
     void deletePost(Post post);
     void updatePost(Post post);
     List<Post> getAllPosts();

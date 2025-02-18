@@ -1,6 +1,8 @@
 package ru.students.forumservicediplomproject.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import ru.students.forumservicediplomproject.dto.ForumDto;
 import ru.students.forumservicediplomproject.entity.Forum;
 import ru.students.forumservicediplomproject.repository.ForumRepository;
@@ -15,10 +17,14 @@ public class ForumServiceImpl implements ForumService {
 
     private final ForumRepository forumRepository;
     private final UserService userService;
+    private final ThreadService threadService;
+    private final LastMessageService lastMessageService;
 
-    public ForumServiceImpl(ForumRepository forumRepository, UserService userService) {
+    public ForumServiceImpl(ForumRepository forumRepository, UserService userService, ThreadService threadService, LastMessageService lastMessageService) {
         this.forumRepository = forumRepository;
         this.userService = userService;
+        this.threadService = threadService;
+        this.lastMessageService = lastMessageService;
     }
 
     @Override
@@ -34,7 +40,7 @@ public class ForumServiceImpl implements ForumService {
 
     @Override
     public Optional<Forum> getForum(long id) {
-        return forumRepository.findById(id);
+        return forumRepository.findByForumId(id);
     }
 
     @Override
@@ -43,7 +49,11 @@ public class ForumServiceImpl implements ForumService {
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED, noRollbackFor = Exception.class)
     public void deleteForum(long id) {
+        Optional<Forum> forum = getForum(id);
+        lastMessageService.deleteByForum(forum.get());
+        threadService.deleteAllThreadsByForum(forum.get());
         forumRepository.deleteById(id);
     }
 

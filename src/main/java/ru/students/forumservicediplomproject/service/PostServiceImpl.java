@@ -7,8 +7,11 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -21,37 +24,36 @@ import ru.students.forumservicediplomproject.repository.PostRepository;
 
 import java.net.URI;
 import java.sql.Timestamp;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Service
 public class PostServiceImpl implements PostService {
     private final PostRepository postRepository;
     private final UserService userService;
-    private final ThreadService threadService;
     private final PeersRepository peersRepository;
+    private final MessageService messageService;
+    private final LastMessageService lastMessageService;
 
     public PostServiceImpl(PostRepository postRepository, UserService userService,
-                           ThreadService threadService, PeersRepository peersRepository) {
+                           PeersRepository peersRepository, MessageService messageService, LastMessageService lastMessageService) {
         this.postRepository = postRepository;
         this.userService = userService;
-        this.threadService = threadService;
         this.peersRepository = peersRepository;
+        this.messageService = messageService;
+        this.lastMessageService = lastMessageService;
     }
 
     /**
      * @param torrentFile Загруженный пользователем торрент файл
      * @param postDto     Заполненная пользователем форма создания темы
-     * @param threadId    Идентификатор ветки
+     * @param thread    Идентификатор ветки
      * @param forumId     Идентификатор форума
      * @return Хеш сумма раздачи
      */
     @Override
     public long savePost(MultipartFile torrentFile,
-                         PostDto postDto, long threadId, long forumId) {
+                         PostDto postDto, Thread thread, long forumId) {
 
         String hash = getHash(torrentFile);
         if (postRepository.existsByHashInfo(hash)) {
@@ -63,19 +65,18 @@ public class PostServiceImpl implements PostService {
         post.setCreatedBy(userService.getCurrentUserCredentials());
         post.setHashInfo(hash);
         post.setCreationDate(new Timestamp(new Date().getTime()));
-        //TODO: создание начинается с NEW
         post.setPostStatus(Post.Status.NEW);
-        Optional<Thread> thread = threadService.getThreadById(threadId);
-
-        if (thread.isPresent()) {
-            post.setThread(thread.get());
-        } else {
-            throw new RuntimeException("Ветка поста не найдена! PostId %s ForumId %s".formatted(threadId, forumId));
-        }
+        post.setThread(thread);
 
         postRepository.save(post);
 
-        registerNewTorrent(torrentFile, post);
+        try {
+            registerNewTorrent(torrentFile, post);
+        } catch (Exception e) {
+            log.error("при регистрации раздачи на трекере произошла ошибка. Откат сохранения поста");
+            postRepository.delete(post);
+            throw new RuntimeException(e);
+        }
 
         return post.getPostId();
     }
@@ -140,7 +141,28 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED, noRollbackFor = Exception.class)
+    public void deleteAllByThread(Thread thread) {
+        List<Post> posts = getAllPostsByThread(thread);
+        posts.forEach(this::deletePost);
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, noRollbackFor = Exception.class)
     public void deletePost(Post post) {
+
+        RestTemplate restTemplate = new RestTemplate();
+        URI uri = UriComponentsBuilder.fromUriString("http://localhost:8081/deleteTorrent/{hash}")
+                .build(Collections.singletonMap("hash", post.getHashInfo()));
+        try {
+            restTemplate.delete(uri);
+        } catch (HttpClientErrorException.NotFound e) {
+            log.warn("При удалении темы трекер не смог найти раздачу с хешем {}. Тема удалена", post.getHashInfo());
+        }
+
+        lastMessageService.deleteByPost(post);
+        messageService.deleteAllMessagesByPost(post);
+
         postRepository.delete(post);
     }
 

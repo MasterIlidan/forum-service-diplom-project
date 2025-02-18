@@ -15,4 +15,6 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
     List<Message> findAllByPostId(@NotNull Post postId);
     @Query("SELECT t.postId, COUNT(t.postId) FROM Message AS t where t.postId=:#{#postId}")
     List<Object[]> countTotalMessagesByPostId(@NotNull Post postId);
+
+    void deleteAllByPostId(@NotNull Post postId);
 }

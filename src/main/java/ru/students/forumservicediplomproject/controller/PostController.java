@@ -17,10 +17,8 @@ import ru.students.forumservicediplomproject.entity.LastMessage;
 import ru.students.forumservicediplomproject.entity.Peers;
 import ru.students.forumservicediplomproject.entity.Post;
 import ru.students.forumservicediplomproject.entity.Thread;
-import ru.students.forumservicediplomproject.service.MessageService;
-import ru.students.forumservicediplomproject.service.PeersService;
-import ru.students.forumservicediplomproject.service.PostService;
-import ru.students.forumservicediplomproject.service.ThreadService;
+import ru.students.forumservicediplomproject.exeption.ResourceNotFoundException;
+import ru.students.forumservicediplomproject.service.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -35,13 +33,15 @@ public class PostController {
     private final PostService postService;
     private final MessageService messageService;
     private final PeersService peersService;
+    private final LastMessageService lastMessageService;
 
     public PostController(ThreadService threadService,
-                          PostService postService, MessageService messageService, PeersService peersService) {
+                          PostService postService, MessageService messageService, PeersService peersService, LastMessageService lastMessageService) {
         this.threadService = threadService;
         this.postService = postService;
         this.messageService = messageService;
         this.peersService = peersService;
+        this.lastMessageService = lastMessageService;
     }
 
 
@@ -58,7 +58,7 @@ public class PostController {
         }
 
         HashMap<Long, Long> totalMessagesInPost = new HashMap<>();
-        HashMap<Post, LastMessage> lastMessageOnPostHashMap = messageService.getAllLastMessagesByPost();
+        HashMap<Post, LastMessage> lastMessageOnPostHashMap = lastMessageService.getAllLastMessagesByPosts(postList);
         HashMap<Post, Peers> peersHashMap = new HashMap<>(postList.size());
 
         for (Post post : postList) {
@@ -101,8 +101,6 @@ public class PostController {
     public String savePost(@PathVariable long forumId,
                            @PathVariable long threadId,
                            @Valid @ModelAttribute("post") PostDto postDto,
-                           //@RequestParam("torrentFile") MultipartFile torrentFile,
-                           //@RequestParam("image") MultipartFile[] images,
                            BindingResult result,
                            Model model) {
         if (postDto.getTorrentFile().isEmpty()) {
@@ -117,9 +115,25 @@ public class PostController {
                 return "forms/add-post-page";
             }
 
+        Optional<Thread> thread = threadService.getThreadById(threadId);;
+        if (thread.isEmpty()) {
+            throw new ResourceNotFoundException("Ветка не найдена! Id %d".formatted(threadId));
+        }
 
-        long postId = postService.savePost(postDto.getTorrentFile(), postDto, threadId, forumId);
-        messageService.saveMessage(new MessageDto(postDto.getMessageBody()), postId, postDto.getImages());
+        long postId = 0;
+        try {
+            postId = postService.savePost(postDto.getTorrentFile(), postDto, thread.get(), forumId);
+        } catch (Exception e) {
+            result.rejectValue("torrentFile", null, "Раздача с таким хешем уже зарегистрирована. " +
+                    "Попробуйте немного изменить содержимое раздачи (например, добавить/удалить файлы или изменить их имя");
+            model.addAttribute("post", postDto);
+            return "forms/add-post-page";
+        }
+        Optional<Post> post = postService.getPostById(postId);
+        if (post.isEmpty()) {
+            throw new ResourceNotFoundException("Пост не найден! Id %d".formatted(postId));
+        }
+        messageService.saveMessage(new MessageDto(postDto.getMessageBody()), post.get(), postDto.getImages());
         //Описание раздачи становится первым сообщением в теме
         //model.addAttribute("msg", "Uploaded torrent file hash: " + hash);
 
