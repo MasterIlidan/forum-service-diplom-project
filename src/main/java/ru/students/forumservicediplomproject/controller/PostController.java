@@ -8,15 +8,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import ru.students.forumservicediplomproject.Search;
 import ru.students.forumservicediplomproject.dto.MessageDto;
 import ru.students.forumservicediplomproject.dto.PostDto;
-import ru.students.forumservicediplomproject.entity.LastMessage;
-import ru.students.forumservicediplomproject.entity.Peers;
-import ru.students.forumservicediplomproject.entity.Post;
 import ru.students.forumservicediplomproject.entity.Thread;
+import ru.students.forumservicediplomproject.entity.*;
 import ru.students.forumservicediplomproject.exeption.ResourceNotFoundException;
 import ru.students.forumservicediplomproject.service.*;
 
@@ -34,14 +31,16 @@ public class PostController {
     private final MessageService messageService;
     private final PeersService peersService;
     private final LastMessageService lastMessageService;
+    private final ResourceService resourceService;
 
     public PostController(ThreadService threadService,
-                          PostService postService, MessageService messageService, PeersService peersService, LastMessageService lastMessageService) {
+                          PostService postService, MessageService messageService, PeersService peersService, LastMessageService lastMessageService, ResourceService resourceService) {
         this.threadService = threadService;
         this.postService = postService;
         this.messageService = messageService;
         this.peersService = peersService;
         this.lastMessageService = lastMessageService;
+        this.resourceService = resourceService;
     }
 
 
@@ -158,5 +157,43 @@ public class PostController {
         );
     }
 
+    @GetMapping({"/forum/{forumId}/thread/{threadId}/post/{postId}"})
+    public ModelAndView postPage(@PathVariable long forumId,
+                                 @PathVariable long threadId,
+                                 @PathVariable long postId, Model model) {
+        ModelAndView modelAndView = new ModelAndView("post");
+        Optional<Post> post = postService.getPostById(postId);
+        List<Message> messageList;
+
+        if (post.isPresent()) {
+            messageList = messageService.getAllMessagesByPost(post.get());
+            resourceService.getAllResources(messageList);
+        } else {
+            throw new RuntimeException("Пост не найден! PostId %s".formatted(postId));
+        }
+        Peers peers = peersService.getPeers(post.get());
+
+        modelAndView.addObject("search", new Search());
+
+        modelAndView.addObject("peers", peers);
+        modelAndView.addObject("messages", messageList);
+        modelAndView.addObject("post", post.get());
+
+        modelAndView.addObject("newMessage", new Message());
+
+
+        return modelAndView;
+    }
+    //TODO: DeleteMapping
+    @DeleteMapping("/forum/{forumId}/thread/{threadId}/post/{postId}")
+    public String deletePost(@PathVariable long forumId, @PathVariable long postId, @PathVariable long threadId) {
+        Optional<Post> post = postService.getPostById(postId);
+        if (post.isEmpty()) {
+            log.error("Пост для удаления не найден! Id {}", postId);
+            throw new ResourceNotFoundException("Пост для удаления не найден! Id %d".formatted(postId));
+        }
+        postService.deletePost(post.get());
+        return "redirect:/forum/{forumId}/thread/{threadId}/posts";
+    }
 
 }

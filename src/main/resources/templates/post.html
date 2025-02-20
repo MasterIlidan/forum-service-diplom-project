@@ -55,6 +55,12 @@
             <button type="submit" class="btn btn-primary col-2">approve</button>
         </form>
         <h2 class="header" th:text="${post.getPostStatus()}"></h2>
+        <form th:action="@{/forum/{forumId}/thread/{threadId}/post/{postId}(forumId=${forumId},threadId=${threadId},postId=${postId})}"
+              th:method="delete">
+            <a class="me-auto mb-2 mb-lg-0" type="submit">Удалить</a>
+            <button type="submit" class="btn btn-primary col-2">Удалить</button>
+        </form>
+
         <div id="post-info">
             <span id="torrent-size" th:text="'Размер: '"></span>
             <span id="torrent-create-time" th:text="' | Создана: ' + ${post.getCreationDate()}"></span>
