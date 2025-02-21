@@ -30,15 +30,12 @@ public class MessageServiceImpl implements MessageService {
     private final MessageRepository messageRepository;
     private final UserService userService;
     private final ResourceService resourceService;
-    private final LastMessageService lastMessageService;
-
 
     public MessageServiceImpl(MessageRepository messageRepository, UserService userService,
-                              ResourceService resourceService, LastMessageService lastMessageService) {
+                              ResourceService resourceService) {
         this.messageRepository = messageRepository;
         this.userService = userService;
         this.resourceService = resourceService;
-        this.lastMessageService = lastMessageService;
     }
 
     @Override
@@ -69,8 +66,6 @@ public class MessageServiceImpl implements MessageService {
             }
         }
         messageRepository.save(message);
-        lastMessageService.saveLastMessage(message);
-
     }
 
     private List<String> registerNewResources(Message message, MultipartFile[] files) throws RestClientException {

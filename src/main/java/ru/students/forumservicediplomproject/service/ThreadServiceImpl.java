@@ -19,13 +19,11 @@ public class ThreadServiceImpl implements ThreadService {
     private final ThreadRepository threadRepository;
     private final UserService userService;
     private final PostService postService;
-    private final LastMessageService lastMessageService;
 
-    public ThreadServiceImpl(ThreadRepository threadRepository, UserService userService, PostService postService, LastMessageService lastMessageService) {
+    public ThreadServiceImpl(ThreadRepository threadRepository, UserService userService, PostService postService) {
         this.threadRepository = threadRepository;
         this.userService = userService;
         this.postService = postService;
-        this.lastMessageService = lastMessageService;
     }
 
     @Override
@@ -55,7 +53,6 @@ public class ThreadServiceImpl implements ThreadService {
     @Transactional(propagation = Propagation.REQUIRED, noRollbackFor = Exception.class)
     public void deleteThread(Thread thread) {
 
-        lastMessageService.deleteByThread(thread);
         postService.deleteAllByThread(thread);
 
         threadRepository.delete(thread);

@@ -24,16 +24,14 @@ public class ThreadController {
     private final ForumService forumServiceImpl;
     private final PostService postService;
     private final MessageService messageService;
-    private final LastMessageService lastMessageService;
 
     public ThreadController(ForumService forumService,
                             ThreadService threadService,
-                            PostService postService, MessageService messageService, LastMessageService lastMessageService) {
+                            PostService postService, MessageService messageService) {
         this.forumServiceImpl = forumService;
         this.threadService = threadService;
         this.postService = postService;
         this.messageService = messageService;
-        this.lastMessageService = lastMessageService;
     }
 
     @GetMapping({"/forum{forumId}"})
@@ -52,7 +50,6 @@ public class ThreadController {
 
         HashMap<Long, Long> totalPostsInThread = new HashMap<>();
         HashMap<Long, Long> totalMessagesInThread = new HashMap<>();
-        HashMap<Thread, LastMessage> lastMessageOnThreadHashMap = lastMessageService.getAllLastMessagesByThreads(threadList);
         //TODO: когда было последнее сообщение
 
         //считаем количество веток, тем и сообщений для каждого форума
@@ -72,8 +69,6 @@ public class ThreadController {
             totalPostsInThread.put(thread.getThreadId(), postCount);
             totalMessagesInThread.put(thread.getThreadId(), messageCount);
         }
-
-        modelAndView.addObject("lastMessageOnThread", lastMessageOnThreadHashMap);
 
         modelAndView.addObject("search", new Search());
 

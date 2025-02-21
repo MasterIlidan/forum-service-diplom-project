@@ -75,8 +75,8 @@
                 </td>
                 <td th:text="${thread.getCreationDate()}"></td>
                 <td >
-                    <div th:if="${lastMessageOnThread.get(thread) != null}">
-                        <p th:text="${lastMessageOnThread.get(thread).getLastMessage().getCreationDate()}"></p>
+                    <div th:if="${thread.getLastMessage() != null}">
+                        <p th:text="${thread.getLastMessage().getCreationDate()}"></p>
                     </div>
                 </td>
             </tr>

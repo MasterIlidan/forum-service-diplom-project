@@ -30,16 +30,14 @@ public class PostController {
     private final PostService postService;
     private final MessageService messageService;
     private final PeersService peersService;
-    private final LastMessageService lastMessageService;
     private final ResourceService resourceService;
 
     public PostController(ThreadService threadService,
-                          PostService postService, MessageService messageService, PeersService peersService, LastMessageService lastMessageService, ResourceService resourceService) {
+                          PostService postService, MessageService messageService, PeersService peersService, ResourceService resourceService) {
         this.threadService = threadService;
         this.postService = postService;
         this.messageService = messageService;
         this.peersService = peersService;
-        this.lastMessageService = lastMessageService;
         this.resourceService = resourceService;
     }
 
@@ -57,7 +55,6 @@ public class PostController {
         }
 
         HashMap<Long, Long> totalMessagesInPost = new HashMap<>();
-        HashMap<Post, LastMessage> lastMessageOnPostHashMap = lastMessageService.getAllLastMessagesByPosts(postList);
         HashMap<Post, Peers> peersHashMap = new HashMap<>(postList.size());
 
         for (Post post : postList) {
@@ -69,7 +66,6 @@ public class PostController {
             peersHashMap.put(post, peersService.getPeers(post));
         }
 
-        modelAndView.addObject("lastMessageOnPost", lastMessageOnPostHashMap);
         modelAndView.addObject("peersHashMap", peersHashMap);
 
         modelAndView.addObject("search", new Search());

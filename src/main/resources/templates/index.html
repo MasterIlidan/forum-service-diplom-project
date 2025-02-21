@@ -77,8 +77,8 @@
                 </td>
                 <td th:text="${forum.getCreationDate()}"></td>
                 <td >
-                    <div th:if="${lastMessageOnForum.get(forum) != null}">
-                        <p th:text="${lastMessageOnForum.get(forum).getLastMessage().getCreationDate()}"></p>
+                    <div th:if="${forum.getLastMessage() != null}">
+                        <p th:text="${forum.getLastMessage().getCreationDate()}"></p>
                     </div>
                 </td>
             </tr>

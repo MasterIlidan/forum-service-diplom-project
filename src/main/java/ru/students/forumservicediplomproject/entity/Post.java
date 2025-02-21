@@ -32,6 +32,8 @@ public class Post {
     private Status postStatus;
     @NotNull
     private Timestamp creationDate;
+    @OneToOne
+    private Message lastMessage;
 
     public enum Status {
         NEW, APPROVED, ACTIVE, INACTIVE, ARCHIVE

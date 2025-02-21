@@ -30,4 +30,6 @@ public class Forum{
     private List<Thread> threads;
     @NotNull
     private Timestamp creationDate;
+    @OneToOne
+    private Message lastMessage;
 }

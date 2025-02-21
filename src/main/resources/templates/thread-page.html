@@ -90,8 +90,8 @@
                 <td th:text="${peersHashMap.get(post).getSeeders()}"></td>
                 <td th:text="${peersHashMap.get(post).getLeechers()}"></td>
                 <td >
-                    <div th:if="${lastMessageOnPost.get(post) != null}">
-                        <p th:text="${lastMessageOnPost.get(post).getLastMessage().getCreationDate()}"></p>
+                    <div th:if="${post.getLastMessage() != null}">
+                        <p th:text="${post.getLastMessage().getCreationDate()}"></p>
                     </div>
                 </td>
             </tr>

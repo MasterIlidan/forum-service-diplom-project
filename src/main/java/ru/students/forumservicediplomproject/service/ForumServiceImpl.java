@@ -18,13 +18,11 @@ public class ForumServiceImpl implements ForumService {
     private final ForumRepository forumRepository;
     private final UserService userService;
     private final ThreadService threadService;
-    private final LastMessageService lastMessageService;
 
-    public ForumServiceImpl(ForumRepository forumRepository, UserService userService, ThreadService threadService, LastMessageService lastMessageService) {
+    public ForumServiceImpl(ForumRepository forumRepository, UserService userService, ThreadService threadService) {
         this.forumRepository = forumRepository;
         this.userService = userService;
         this.threadService = threadService;
-        this.lastMessageService = lastMessageService;
     }
 
     @Override
@@ -52,7 +50,6 @@ public class ForumServiceImpl implements ForumService {
     @Transactional(propagation = Propagation.REQUIRED, noRollbackFor = Exception.class)
     public void deleteForum(long id) {
         Optional<Forum> forum = getForum(id);
-        lastMessageService.deleteByForum(forum.get());
         threadService.deleteAllThreadsByForum(forum.get());
         forumRepository.deleteById(id);
     }

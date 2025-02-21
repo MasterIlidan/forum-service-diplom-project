@@ -26,4 +26,6 @@ public class Thread {
     private User createdBy;
     @NotNull
     private Timestamp creationDate;
+    @OneToOne
+    private Message lastMessage;
 }

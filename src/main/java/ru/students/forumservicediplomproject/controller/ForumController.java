@@ -27,15 +27,13 @@ public class ForumController {
     private final PostService postService;
     private final MessageService messageService;
     private final StatisticService statisticService;
-    private final LastMessageService lastMessageService;
 
-    public ForumController(ForumServiceImpl forumServiceImpl, ThreadService threadService, PostService postService, MessageService messageService, StatisticService statisticService, LastMessageService lastMessageService) {
+    public ForumController(ForumServiceImpl forumServiceImpl, ThreadService threadService, PostService postService, MessageService messageService, StatisticService statisticService) {
         this.forumServiceImpl = forumServiceImpl;
         this.threadService = threadService;
         this.postService = postService;
         this.messageService = messageService;
         this.statisticService = statisticService;
-        this.lastMessageService = lastMessageService;
     }
 
     @GetMapping({"/"})
@@ -46,7 +44,6 @@ public class ForumController {
         HashMap<Long, Long> totalThreadsInForum = new HashMap<>();
         HashMap<Long, Long> totalPostsInForum = new HashMap<>();
         HashMap<Long, Long> totalMessagesInForum = new HashMap<>();
-        HashMap<Forum, LastMessage> lastMessageOnForumHashMap = lastMessageService.getAllLastMessagesByForums(forumsList);
 
         //считаем количество веток, тем и сообщений для каждого форума
         for (Forum forum : forumsList) {
@@ -71,7 +68,6 @@ public class ForumController {
         }
 
         modelAndView.addObject("lastPost", postService.getLastCreatedPost());
-        modelAndView.addObject("lastMessageOnForum", lastMessageOnForumHashMap);
         modelAndView.addObject("statistics", statisticService.getTrackerStatistics());
 
         modelAndView.addObject("search", new Search());

@@ -33,15 +33,13 @@ public class PostServiceImpl implements PostService {
     private final UserService userService;
     private final PeersRepository peersRepository;
     private final MessageService messageService;
-    private final LastMessageService lastMessageService;
 
     public PostServiceImpl(PostRepository postRepository, UserService userService,
-                           PeersRepository peersRepository, MessageService messageService, LastMessageService lastMessageService) {
+                           PeersRepository peersRepository, MessageService messageService) {
         this.postRepository = postRepository;
         this.userService = userService;
         this.peersRepository = peersRepository;
         this.messageService = messageService;
-        this.lastMessageService = lastMessageService;
     }
 
     /**
@@ -160,7 +158,6 @@ public class PostServiceImpl implements PostService {
             log.warn("При удалении темы трекер не смог найти раздачу с хешем {}. Тема удалена", post.getHashInfo());
         }
 
-        lastMessageService.deleteByPost(post);
         messageService.deleteAllMessagesByPost(post);
 
         postRepository.delete(post);
