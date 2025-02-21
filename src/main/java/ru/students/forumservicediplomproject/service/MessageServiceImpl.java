@@ -16,7 +16,9 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 import ru.students.forumservicediplomproject.dto.MessageDto;
+import ru.students.forumservicediplomproject.entity.Thread;
 import ru.students.forumservicediplomproject.entity.*;
+import ru.students.forumservicediplomproject.exeption.ResourceNotFoundException;
 import ru.students.forumservicediplomproject.repository.MessageRepository;
 
 import java.net.URI;
@@ -39,7 +41,7 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    //@Transactional(propagation = Propagation.REQUIRED, noRollbackFor = Exception.class)
+    @Transactional(propagation = Propagation.REQUIRED, noRollbackFor = Exception.class)
     public void saveMessage(MessageDto messageDto, Post post, @Nullable MultipartFile[] files) {
         Message message = new Message();
 
@@ -66,6 +68,7 @@ public class MessageServiceImpl implements MessageService {
             }
         }
         messageRepository.save(message);
+
     }
 
     private List<String> registerNewResources(Message message, MultipartFile[] files) throws RestClientException {
@@ -74,7 +77,7 @@ public class MessageServiceImpl implements MessageService {
         log.debug("Регистрация новых ресурсов для сообщения {} количество {}", message.getMessageId(), files.length);
 
         RestTemplate restTemplate = new RestTemplate();
-        String url = "http://localhost:8082/registerNewResource";
+        String url = "http://localhost:8082/resource";
         URI uri1 = UriComponentsBuilder.fromUriString(url)
                 .build().toUri();
 
@@ -113,13 +116,22 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public Optional<Message> getMessageById(long messageId) {
-        return messageRepository.findById(messageId);
+    public Message getMessageById(long messageId) {
+        Optional<Message> message = messageRepository.findById(messageId);
+        if (message.isEmpty()) {
+            log.error("Сообщение с id {} не найдено!", messageId);
+            throw new ResourceNotFoundException("Сообщение с id %d не найдено!".formatted(messageId));
+        }
+        return message.get();
     }
 
     @Override
-    public void deleteMessage(Long messageId) {
-        messageRepository.deleteById(messageId);
+    @Transactional(propagation = Propagation.REQUIRED, noRollbackFor = Exception.class)
+    public void deleteMessage(Message message) {
+        if (!message.getContent().isEmpty()) {
+            resourceService.removeMessageResources(message);
+        }
+        messageRepository.deleteById(message.getMessageId());
     }
 
     @Override
@@ -140,7 +152,26 @@ public class MessageServiceImpl implements MessageService {
     @Override
     @Transactional(propagation = Propagation.REQUIRED, noRollbackFor = Exception.class)
     public void deleteAllMessagesByPost(Post post) {
-        messageRepository.deleteAllByPostId(post);
+        List<Message> messageList = getAllMessagesByPost(post);
+        for (Message message:messageList){
+            deleteMessage(message);
+        }
+    }
+
+    @Nullable
+    @Override
+    public Message getLastMessageByForum(Forum forum) {
+        return messageRepository.findLatestPostByForum(forum.getForumId());
+    }
+    @Nullable
+    @Override
+    public Message getLastMessageByThread(Thread thread) {
+        return messageRepository.findLatestPostByThread(thread.getThreadId());
+    }
+    @Nullable
+    @Override
+    public Message getLastMessageByPost(Post post) {
+        return messageRepository.findLatestPostByPost(post.getPostId());
     }
 
     @Override

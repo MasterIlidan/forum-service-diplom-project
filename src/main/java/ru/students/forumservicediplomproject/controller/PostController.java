@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -12,8 +14,10 @@ import org.springframework.web.servlet.ModelAndView;
 import ru.students.forumservicediplomproject.Search;
 import ru.students.forumservicediplomproject.dto.MessageDto;
 import ru.students.forumservicediplomproject.dto.PostDto;
+import ru.students.forumservicediplomproject.entity.Message;
+import ru.students.forumservicediplomproject.entity.Peers;
+import ru.students.forumservicediplomproject.entity.Post;
 import ru.students.forumservicediplomproject.entity.Thread;
-import ru.students.forumservicediplomproject.entity.*;
 import ru.students.forumservicediplomproject.exeption.ResourceNotFoundException;
 import ru.students.forumservicediplomproject.service.*;
 
@@ -54,15 +58,17 @@ public class PostController {
             throw new RuntimeException("Ветка поста не найдена! ThreadId %s".formatted(threadId));
         }
 
-        HashMap<Long, Long> totalMessagesInPost = new HashMap<>();
+        HashMap<Post, Long> totalMessagesInPost = new HashMap<>();
         HashMap<Post, Peers> peersHashMap = new HashMap<>(postList.size());
+        HashMap<Post, Message> lastMessageInPost = new HashMap<>(postList.size());
 
         for (Post post : postList) {
             long messageCount = 0;
             List<Object[]> totalMessages = messageService.countMessagesByPost(post);
             messageCount += (long) totalMessages.get(0)[1];
-            totalMessagesInPost.put(post.getPostId(), messageCount);
+            totalMessagesInPost.put(post, messageCount);
 
+            lastMessageInPost.put(post, messageService.getLastMessageByPost(post));
             peersHashMap.put(post, peersService.getPeers(post));
         }
 
@@ -70,6 +76,7 @@ public class PostController {
 
         modelAndView.addObject("search", new Search());
 
+        modelAndView.addObject("lastMessageInPost", lastMessageInPost);
         modelAndView.addObject("postList", postList);
         modelAndView.addObject("messagesCountMap", totalMessagesInPost);
         modelAndView.addObject("forumId", forumId);
@@ -93,6 +100,7 @@ public class PostController {
     }
 
     @PostMapping({"/forum/{forumId}/thread/{threadId}/savePost"})
+    @Transactional(propagation = Propagation.REQUIRED, noRollbackFor = Exception.class)
     public String savePost(@PathVariable long forumId,
                            @PathVariable long threadId,
                            @Valid @ModelAttribute("post") PostDto postDto,
@@ -167,6 +175,7 @@ public class PostController {
         } else {
             throw new RuntimeException("Пост не найден! PostId %s".formatted(postId));
         }
+
         Peers peers = peersService.getPeers(post.get());
 
         modelAndView.addObject("search", new Search());

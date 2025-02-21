@@ -45,7 +45,7 @@ public class PostServiceImpl implements PostService {
     /**
      * @param torrentFile Загруженный пользователем торрент файл
      * @param postDto     Заполненная пользователем форма создания темы
-     * @param thread    Идентификатор ветки
+     * @param thread      Идентификатор ветки
      * @param forumId     Идентификатор форума
      * @return Хеш сумма раздачи
      */
@@ -148,7 +148,6 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional(propagation = Propagation.REQUIRED, noRollbackFor = Exception.class)
     public void deletePost(Post post) {
-
         RestTemplate restTemplate = new RestTemplate();
         URI uri = UriComponentsBuilder.fromUriString("http://localhost:8081/deleteTorrent/{hash}")
                 .build(Collections.singletonMap("hash", post.getHashInfo()));
@@ -164,6 +163,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED, noRollbackFor = Exception.class)
     public void updatePost(Post post) {
         postRepository.save(post);
     }
@@ -238,6 +238,7 @@ public class PostServiceImpl implements PostService {
 
         response.getBody();
     }
+
     @Override
     public void approvePost(long postId) {
         Optional<Post> optionalPost = postRepository.findById(postId);

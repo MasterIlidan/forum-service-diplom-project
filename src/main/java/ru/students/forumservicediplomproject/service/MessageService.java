@@ -1,20 +1,22 @@
 package ru.students.forumservicediplomproject.service;
 
+import jakarta.annotation.Nullable;
 import org.springframework.web.multipart.MultipartFile;
 import ru.students.forumservicediplomproject.dto.MessageDto;
+import ru.students.forumservicediplomproject.entity.Forum;
 import ru.students.forumservicediplomproject.entity.Message;
 import ru.students.forumservicediplomproject.entity.Post;
+import ru.students.forumservicediplomproject.entity.Thread;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface MessageService {
 
     void saveMessage(MessageDto messageDto, Post post, MultipartFile[] files);
 
-    Optional<Message> getMessageById(long id);
+    Message getMessageById(long id);
 
-    void deleteMessage(Long messageId);
+    void deleteMessage(Message message);
 
     void updateMessage(Message message);
 
@@ -23,6 +25,15 @@ public interface MessageService {
     List<Message> getAllMessagesByPost(Post post);
 
     void deleteAllMessagesByPost(Post post);
+
+    @Nullable
+    Message getLastMessageByThread(Thread thread);
+
+    @Nullable
+    Message getLastMessageByForum(Forum forum);
+
+    @Nullable
+    Message getLastMessageByPost(Post post);
 
     List<Object[]> countMessagesByPost(Post post);
 

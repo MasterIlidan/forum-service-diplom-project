@@ -1,7 +1,5 @@
 package ru.students.forumservicediplomproject.service;
 
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import ru.students.forumservicediplomproject.dto.ThreadDto;
 import ru.students.forumservicediplomproject.entity.Forum;
 import ru.students.forumservicediplomproject.entity.Thread;
@@ -16,7 +14,6 @@ public interface ThreadService {
 
     Optional<Thread> getThreadById(long id);
 
-    @Transactional(propagation = Propagation.REQUIRED, noRollbackFor = Exception.class)
     void deleteAllThreadsByForum(Forum forum);
 
     void deleteThread(Thread thread);

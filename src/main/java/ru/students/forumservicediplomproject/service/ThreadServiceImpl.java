@@ -52,13 +52,13 @@ public class ThreadServiceImpl implements ThreadService {
     @Override
     @Transactional(propagation = Propagation.REQUIRED, noRollbackFor = Exception.class)
     public void deleteThread(Thread thread) {
-
         postService.deleteAllByThread(thread);
 
         threadRepository.delete(thread);
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED, noRollbackFor = Exception.class)
     public void updateThread(Thread thread) {
         threadRepository.save(thread);
     }

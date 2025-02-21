@@ -3,6 +3,7 @@ package ru.students.forumservicediplomproject.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import ru.students.forumservicediplomproject.entity.Message;
 import ru.students.forumservicediplomproject.entity.Resource;
@@ -36,7 +37,7 @@ public class ResourceServiceImpl implements ResourceService {
             for (Resource resource:content) {
                 RestTemplate restTemplate = new RestTemplate();
                 //TODO: настраиваемая ссылка из конфигурации
-                String uri = "http://localhost:8082/getResource{uuid}";
+                String uri = "http://localhost:8082/resource{uuid}";
 
                 Map<String, String> params = Collections.singletonMap("uuid", resource.getUuid());
 
@@ -65,6 +66,28 @@ public class ResourceServiceImpl implements ResourceService {
                 resource.setBase64Image(response.getBody());
             }
         }
+    }
+
+    @Override
+    public void removeMessageResources(Message message) {
+        RestTemplate restTemplate = new RestTemplate();
+        //TODO: настраиваемая ссылка из конфигурации
+        String uri = "http://localhost:8082/resource{uuid}";
+
+        for (Resource resource: message.getContent()) {
+            Map<String, String> params = Collections.singletonMap("uuid", resource.getUuid());
+
+            for (int retry = 1; retry <= 3; retry++) {
+                try {
+                    restTemplate.delete(uri, params);
+                    break;
+                } catch (RestClientException e) {
+                    log.warn("Не удалось удалить ресурс {}. Попытка {}", resource.getUuid(),retry, e);
+                }
+                log.error("Ошибка при удалении ресурса {}", resource.getUuid());
+            }
+        }
+
     }
 
 }

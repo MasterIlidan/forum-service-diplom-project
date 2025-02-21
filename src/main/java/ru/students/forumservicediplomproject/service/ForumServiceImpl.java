@@ -5,6 +5,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import ru.students.forumservicediplomproject.dto.ForumDto;
 import ru.students.forumservicediplomproject.entity.Forum;
+import ru.students.forumservicediplomproject.exeption.ResourceNotFoundException;
 import ru.students.forumservicediplomproject.repository.ForumRepository;
 
 import java.sql.Timestamp;
@@ -49,12 +50,17 @@ public class ForumServiceImpl implements ForumService {
     @Override
     @Transactional(propagation = Propagation.REQUIRED, noRollbackFor = Exception.class)
     public void deleteForum(long id) {
-        Optional<Forum> forum = getForum(id);
-        threadService.deleteAllThreadsByForum(forum.get());
+        Optional<Forum> optionalForum = getForum(id);
+        if (optionalForum.isEmpty()) {
+            throw new ResourceNotFoundException();
+        }
+
+        threadService.deleteAllThreadsByForum(optionalForum.get());
         forumRepository.deleteById(id);
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED, noRollbackFor = Exception.class)
     public void updateForum(Forum forum) {
         forumRepository.save(forum);
     }

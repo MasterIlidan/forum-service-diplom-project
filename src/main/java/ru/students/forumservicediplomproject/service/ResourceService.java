@@ -9,4 +9,6 @@ public interface ResourceService {
     void saveResource(Resource resource);
 
     void getAllResources(List<Message> messageList);
+
+    void removeMessageResources(Message message);
 }

@@ -9,10 +9,13 @@ import org.springframework.web.servlet.ModelAndView;
 import ru.students.forumservicediplomproject.Search;
 import ru.students.forumservicediplomproject.dto.ThreadDto;
 import ru.students.forumservicediplomproject.entity.Forum;
-import ru.students.forumservicediplomproject.entity.LastMessage;
+import ru.students.forumservicediplomproject.entity.Message;
 import ru.students.forumservicediplomproject.entity.Post;
 import ru.students.forumservicediplomproject.entity.Thread;
-import ru.students.forumservicediplomproject.service.*;
+import ru.students.forumservicediplomproject.service.ForumService;
+import ru.students.forumservicediplomproject.service.MessageService;
+import ru.students.forumservicediplomproject.service.PostService;
+import ru.students.forumservicediplomproject.service.ThreadService;
 
 import java.util.HashMap;
 import java.util.List;
@@ -48,9 +51,9 @@ public class ThreadController {
         List<Thread> threadList = threadService.getAllThreadsByForum(forum.get());
         modelAndView.addObject("threadList", threadList);
 
-        HashMap<Long, Long> totalPostsInThread = new HashMap<>();
-        HashMap<Long, Long> totalMessagesInThread = new HashMap<>();
-        //TODO: когда было последнее сообщение
+        HashMap<Thread, Long> totalPostsInThread = new HashMap<>(threadList.size());
+        HashMap<Thread, Long> totalMessagesInThread = new HashMap<>(threadList.size());
+        HashMap<Thread, Message> lastMessageInThread  = new HashMap<>(threadList.size());
 
         //считаем количество веток, тем и сообщений для каждого форума
 
@@ -66,12 +69,14 @@ public class ThreadController {
                 List<Object[]> totalMessages = messageService.countMessagesByPost(post);
                 messageCount += (long) totalMessages.get(0)[1];
             }
-            totalPostsInThread.put(thread.getThreadId(), postCount);
-            totalMessagesInThread.put(thread.getThreadId(), messageCount);
+            totalPostsInThread.put(thread, postCount);
+            totalMessagesInThread.put(thread, messageCount);
+            lastMessageInThread.put(thread, messageService.getLastMessageByThread(thread));
         }
 
         modelAndView.addObject("search", new Search());
 
+        modelAndView.addObject("threadLastMessage", lastMessageInThread);
         modelAndView.addObject("postCountMap", totalPostsInThread);
         modelAndView.addObject("messagesCountMap", totalMessagesInThread);
 
