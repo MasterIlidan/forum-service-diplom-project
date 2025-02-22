@@ -28,6 +28,12 @@ public class WebSecurityConfig {
                         .requestMatchers("/images/**").permitAll()
                         .requestMatchers("/css/**").permitAll()
                         .requestMatchers("/inactivePosts").permitAll() //убрать
+                        .requestMatchers("/forum/*/deleteForum").hasAnyAuthority("ADMIN", "MODERATOR")
+                        .requestMatchers("/forum/createForum").hasAnyAuthority("ADMIN", "MODERATOR")
+                        .requestMatchers("/forum/saveForum").hasAnyAuthority("ADMIN", "MODERATOR")
+                        .requestMatchers("/forum/*/createThread").hasAnyAuthority("ADMIN", "MODERATOR")
+                        .requestMatchers("/forum/*/saveThread").hasAnyAuthority("ADMIN", "MODERATOR")
+                        .requestMatchers("/approvePost/").hasAnyAuthority("ADMIN", "MODERATOR")
                         //.requestMatchers("/forum").permitAll()
                         .anyRequest().authenticated())).formLogin(form ->
                         form.loginPage("/login")

@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -70,7 +71,11 @@ public class PostServiceImpl implements PostService {
 
         try {
             registerNewTorrent(torrentFile, post);
-        } catch (Exception e) {
+        }  catch (HttpClientErrorException.Conflict e) {
+            log.error("На трекере уже есть такой торрент. Откат сохранения поста");
+            postRepository.delete(post);
+            throw new RuntimeException(e);
+        } catch (RestClientException e) {
             log.error("при регистрации раздачи на трекере произошла ошибка. Откат сохранения поста");
             postRepository.delete(post);
             throw new RuntimeException(e);
@@ -159,6 +164,8 @@ public class PostServiceImpl implements PostService {
 
         messageService.deleteAllMessagesByPost(post);
 
+        peersRepository.deleteAllByPost(post);
+
         postRepository.delete(post);
     }
 
@@ -234,7 +241,12 @@ public class PostServiceImpl implements PostService {
         String uri = "http://localhost:8081/register";
         URI uri1 = UriComponentsBuilder.fromUriString(uri)
                 .build().toUri();
-        ResponseEntity<String> response = restTemplate.postForEntity(uri1, requestEntity, String.class);
+        ResponseEntity<String> response = null;
+        try {
+            response = restTemplate.postForEntity(uri1, requestEntity, String.class);
+        } catch (HttpClientErrorException.Conflict e) {
+            throw new RuntimeException(e);
+        }
 
         response.getBody();
     }

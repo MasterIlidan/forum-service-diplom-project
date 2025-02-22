@@ -55,7 +55,7 @@ public class SecurityController {
             model.addAttribute("user", userDto);
             return "/register";
         }
-        userService.saveUser(userDto);
+        userService.saveNewUser(userDto);
         return "redirect:/register?success";
     }
 

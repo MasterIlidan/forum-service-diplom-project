@@ -51,13 +51,20 @@
             <span>Вернуться в ветку</span>
         </a>
         <h1 class="header" th:text="${post.getTitle()}"></h1>
-        <form th:if="${post.getPostStatus().name().equalsIgnoreCase('NEW')}" th:action="@{/approvePost{postId}(postId=${postId})}" method="post">
+        <form sec:authorize="${hasAnyAuthority('ADMIN', 'MODERATOR')}"
+              th:if="${post.getPostStatus().name().equalsIgnoreCase('NEW')}"
+              th:action="@{/forum/{forumId}/thread/{threadId}/post/{postId}/approvePost(forumId=${forumId},threadId=${threadId},postId=${postId})}" method="post">
             <button type="submit" class="btn btn-primary col-2">approve</button>
         </form>
         <h2 class="header" th:text="${post.getPostStatus()}"></h2>
-        <form th:action="@{/forum/{forumId}/thread/{threadId}/post/{postId}(forumId=${forumId},threadId=${threadId},postId=${postId})}"
+        <form sec:authorize="${hasAnyAuthority('ADMIN', 'MODERATOR')}"
+              th:action="@{/forum/{forumId}/thread/{threadId}/post/{postId}(forumId=${forumId},threadId=${threadId},postId=${postId})}"
               th:method="delete">
-            <a class="me-auto mb-2 mb-lg-0" type="submit">Удалить</a>
+            <button type="submit" class="btn btn-primary col-2">Удалить</button>
+        </form>
+        <form th:if="${canDelete}"
+              th:action="@{/forum/{forumId}/thread/{threadId}/post/{postId}(forumId=${forumId},threadId=${threadId},postId=${postId})}"
+              th:method="delete">
             <button type="submit" class="btn btn-primary col-2">Удалить</button>
         </form>
 

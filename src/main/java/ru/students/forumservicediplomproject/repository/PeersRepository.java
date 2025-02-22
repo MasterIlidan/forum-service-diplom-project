@@ -7,4 +7,6 @@ import ru.students.forumservicediplomproject.entity.Post;
 
 public interface PeersRepository extends JpaRepository<Peers, Post> {
     Peers findByPost(@NotNull Post post);
+
+    void deleteAllByPost(@NotNull Post post);
 }

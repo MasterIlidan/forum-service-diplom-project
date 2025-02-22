@@ -9,7 +9,7 @@ import java.util.Optional;
 
 public interface UserService {
 
-    void saveUser(UserDto userDto);
+    void saveNewUser(UserDto userDto);
 
     void saveUser(User user);
 
@@ -19,4 +19,6 @@ public interface UserService {
 
     List<UserDto> findAllUsers();
     User getCurrentUserCredentials();
+
+    boolean isUserPrivileged(User currentUserCredentials);
 }

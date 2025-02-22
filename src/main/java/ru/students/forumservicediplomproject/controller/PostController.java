@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,10 +15,8 @@ import org.springframework.web.servlet.ModelAndView;
 import ru.students.forumservicediplomproject.Search;
 import ru.students.forumservicediplomproject.dto.MessageDto;
 import ru.students.forumservicediplomproject.dto.PostDto;
-import ru.students.forumservicediplomproject.entity.Message;
-import ru.students.forumservicediplomproject.entity.Peers;
-import ru.students.forumservicediplomproject.entity.Post;
 import ru.students.forumservicediplomproject.entity.Thread;
+import ru.students.forumservicediplomproject.entity.*;
 import ru.students.forumservicediplomproject.exeption.ResourceNotFoundException;
 import ru.students.forumservicediplomproject.service.*;
 
@@ -35,14 +34,16 @@ public class PostController {
     private final MessageService messageService;
     private final PeersService peersService;
     private final ResourceService resourceService;
+    private final UserService userService;
 
     public PostController(ThreadService threadService,
-                          PostService postService, MessageService messageService, PeersService peersService, ResourceService resourceService) {
+                          PostService postService, MessageService messageService, PeersService peersService, ResourceService resourceService, UserService userService) {
         this.threadService = threadService;
         this.postService = postService;
         this.messageService = messageService;
         this.peersService = peersService;
         this.resourceService = resourceService;
+        this.userService = userService;
     }
 
 
@@ -150,14 +151,14 @@ public class PostController {
         return new ResponseEntity(HttpStatus.OK);
     }
 
-    @PostMapping("/approvePost{postId}")
-    public String approvePost(@PathVariable long postId) {
+    @PostMapping("/forum/{forumId}/thread/{threadId}/post/{postId}/approvePost")
+    public String approvePost(@PathVariable long postId, @PathVariable String forumId,
+                              @PathVariable String threadId) {
         postService.approvePost(postId);
-        Post postById = postService.getPostById(postId).get();
         return "redirect:/forum/%s/thread/%s/post/%s".formatted(
-                postById.getThread().getForumId().getForumId(),
-                postById.getThread().getThreadId(),
-                postById.getPostId()
+                forumId,
+                threadId,
+                postId
         );
     }
 
@@ -184,6 +185,7 @@ public class PostController {
         modelAndView.addObject("messages", messageList);
         modelAndView.addObject("post", post.get());
 
+        modelAndView.addObject("canDelete", userService.getCurrentUserCredentials().getUserId() == post.get().getPostId());
         modelAndView.addObject("newMessage", new Message());
 
 
@@ -196,6 +198,12 @@ public class PostController {
         if (post.isEmpty()) {
             log.error("Пост для удаления не найден! Id {}", postId);
             throw new ResourceNotFoundException("Пост для удаления не найден! Id %d".formatted(postId));
+        }
+        User currentUserCredentials = userService.getCurrentUserCredentials();
+        if (post.get().getCreatedBy().getUserId() != currentUserCredentials.getUserId()) {
+            if (!userService.isUserPrivileged(currentUserCredentials)) {
+                throw new AccessDeniedException("Недостаточно прав");
+            }
         }
         postService.deletePost(post.get());
         return "redirect:/forum/{forumId}/thread/{threadId}/posts";
