@@ -15,6 +15,7 @@ import org.springframework.web.servlet.ModelAndView;
 import ru.students.forumservicediplomproject.Search;
 import ru.students.forumservicediplomproject.dto.MessageDto;
 import ru.students.forumservicediplomproject.dto.PostDto;
+import ru.students.forumservicediplomproject.dto.UserDto;
 import ru.students.forumservicediplomproject.entity.Thread;
 import ru.students.forumservicediplomproject.entity.*;
 import ru.students.forumservicediplomproject.exeption.ResourceNotFoundException;
@@ -178,12 +179,14 @@ public class PostController {
         }
 
         Peers peers = peersService.getPeers(post.get());
+        UserDto userDto = new UserDto(userService.getCurrentUserCredentials());
 
         modelAndView.addObject("search", new Search());
 
         modelAndView.addObject("peers", peers);
         modelAndView.addObject("messages", messageList);
         modelAndView.addObject("post", post.get());
+        modelAndView.addObject("currentUser", userDto);
 
         modelAndView.addObject("canDelete", userService.getCurrentUserCredentials().getUserId() == post.get().getPostId());
         modelAndView.addObject("newMessage", new Message());

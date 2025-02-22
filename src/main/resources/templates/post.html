@@ -53,7 +53,8 @@
         <h1 class="header" th:text="${post.getTitle()}"></h1>
         <form sec:authorize="${hasAnyAuthority('ADMIN', 'MODERATOR')}"
               th:if="${post.getPostStatus().name().equalsIgnoreCase('NEW')}"
-              th:action="@{/forum/{forumId}/thread/{threadId}/post/{postId}/approvePost(forumId=${forumId},threadId=${threadId},postId=${postId})}" method="post">
+              th:action="@{/forum/{forumId}/thread/{threadId}/post/{postId}/approvePost(forumId=${forumId},threadId=${threadId},postId=${postId})}"
+              method="post">
             <button type="submit" class="btn btn-primary col-2">approve</button>
         </form>
         <h2 class="header" th:text="${post.getPostStatus()}"></h2>
@@ -94,16 +95,26 @@
                     <a class="me-auto mb-2 mb-lg-0" th:text="${message.getMessageBy().getUserName()}"
                        th:href="@{'/user?userId=' + ${message.getMessageBy().getUserId()}}"></a>
                     <span th:text="${message.getCreationDate()}"></span>
+                    <form th:if="${message.getMessageBy().getUserId() == currentUser.getId()}"
+                            th:action="@{/forum/{forumId}/thread/{threadId}/post/{postId}/{messageId}(forumId=${forumId},threadId=${threadId},postId=${postId},messageId=${message.getMessageId()})}"
+                          th:method="delete">
+                        <button type="submit">Удалить</button>
+                    </form>
+                    <form sec:authorize="hasAnyAuthority('ADMIN', 'MODERATOR')"
+                          th:action="@{/forum/{forumId}/thread/{threadId}/post/{postId}/{messageId}(forumId=${forumId},threadId=${threadId},postId=${postId},messageId=${message.getMessageId()})}"
+                          th:method="delete">
+                        <button type="submit">Удалить</button>
+                    </form>
                 </td>
 
-                <td th:class="table-post" >
+                <td th:class="table-post">
                     <p th:text="${message.getMessageBody()}"></p>
                     <div>
 
-                        <div class="responsive-image" >
-                            <img th:each="image : ${message.getContent()}" th:class="responsive-image" th:src="@{'data:image/jpeg;base64,' + ${image.getBase64Image()}}" alt="image">
+                        <div class="responsive-image">
+                            <img th:each="image : ${message.getContent()}" th:class="responsive-image"
+                                 th:src="@{'data:image/jpeg;base64,' + ${image.getBase64Image()}}" alt="image">
                         </div>
-
                     </div>
                 </td>
             </tr>

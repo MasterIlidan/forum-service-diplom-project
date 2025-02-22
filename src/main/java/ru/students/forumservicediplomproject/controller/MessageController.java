@@ -4,12 +4,10 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.students.forumservicediplomproject.dto.MessageDto;
+import ru.students.forumservicediplomproject.entity.Message;
 import ru.students.forumservicediplomproject.entity.Post;
 import ru.students.forumservicediplomproject.exeption.ResourceNotFoundException;
 import ru.students.forumservicediplomproject.service.MessageService;
@@ -44,6 +42,19 @@ public class MessageController {
         }
         messageService.saveMessage(messageDto, postById.get(), files);
         return "redirect:/forum/%s/thread/%s/post/%s".formatted(forumId, threadId, postId);
+    }
+    @DeleteMapping("/forum/{forumId}/thread/{threadId}/post/{postId}/{messageId}")
+    public String deleteMessage (@PathVariable long forumId,
+                                 @PathVariable long threadId,
+                                 @PathVariable long postId,
+                                 @PathVariable long messageId) {
+        Message message = messageService.getMessageById(messageId);
+        if (message == null) {
+            log.error("Сообщение для удаления не найдено! Id {}", messageId);
+            throw new ResourceNotFoundException("Сообщение для удаления не найдено! Id %d".formatted(messageId));
+        }
+        messageService.deleteMessage(message);
+        return "redirect:/forum/{forumId}/thread/{threadId}/post/{postId}";
     }
 }
 

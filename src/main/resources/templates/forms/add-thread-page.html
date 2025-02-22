@@ -42,7 +42,7 @@
     <hr/>
     <h3>Создание ветки</h3>
     <hr/>
-    <form th:action="@{'/forum/' + ${forumId} + '/saveThread'}" th:object="${thread}" method="POST">
+    <form th:action="@{/forum/{forumId}(forumId=${forumId})}" th:object="${thread}" method="POST">
         <p th:errors="*{threadName}" class="text-danger"
            th:if="${#fields.hasErrors('threadName')}"></p>
         <input id="threadName" type="text" th:field="*{threadName}" class="form-control col-4 mb-4"
