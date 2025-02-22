@@ -66,7 +66,7 @@
             <tbody>
             <tr th:each="forum : ${forumsList}">
                 <td >
-                    <a th:href="@{/forum(forumId=${forum.getForumId()})}" th:text="${forum.forumName}"></a>
+                    <a th:href="@{/forum/{forumId}(forumId=${forum.getForumId()})}" th:text="${forum.forumName}"></a>
                     <a th:href="@{/forum/{forumId}/deleteForum(forumId=${forum.getForumId()})}">Удалить</a>
                 </td>
                 <td th:text="${threadCountMap.get(forum)}">

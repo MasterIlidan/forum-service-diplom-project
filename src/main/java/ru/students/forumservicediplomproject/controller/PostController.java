@@ -191,7 +191,6 @@ public class PostController {
 
         return modelAndView;
     }
-    //TODO: DeleteMapping
     @DeleteMapping("/forum/{forumId}/thread/{threadId}/post/{postId}")
     public String deletePost(@PathVariable long forumId, @PathVariable long postId, @PathVariable long threadId) {
         Optional<Post> post = postService.getPostById(postId);

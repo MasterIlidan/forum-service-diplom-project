@@ -1,6 +1,7 @@
 package ru.students.forumservicediplomproject.controller;
 
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -12,6 +13,7 @@ import ru.students.forumservicediplomproject.entity.Forum;
 import ru.students.forumservicediplomproject.entity.Message;
 import ru.students.forumservicediplomproject.entity.Post;
 import ru.students.forumservicediplomproject.entity.Thread;
+import ru.students.forumservicediplomproject.exeption.ResourceNotFoundException;
 import ru.students.forumservicediplomproject.service.ForumService;
 import ru.students.forumservicediplomproject.service.MessageService;
 import ru.students.forumservicediplomproject.service.PostService;
@@ -21,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Controller
 public class ThreadController {
     private final ThreadService threadService;
@@ -37,8 +40,8 @@ public class ThreadController {
         this.messageService = messageService;
     }
 
-    @GetMapping({"/forum{forumId}"})
-    public ModelAndView forumPage(@PathVariable @RequestParam long forumId,
+    @GetMapping({"/forum/{forumId}"})
+    public ModelAndView forumPage(@PathVariable long forumId,
                                   Model model) {
         ModelAndView modelAndView = new ModelAndView("forum-page");
 
@@ -95,7 +98,7 @@ public class ThreadController {
         return modelAndView;
     }
 
-    @PostMapping({"/forum/{forumId}/saveThread"})
+    @PostMapping({"/forum/{forumId}"})
     public String saveThread(@PathVariable long forumId,
                              @Valid @ModelAttribute("thread") ThreadDto threadDto,
                              BindingResult bindingResult, Model model) {
@@ -108,7 +111,18 @@ public class ThreadController {
                     " не найден форум, на котором создается ветка. ForumId %s").formatted(threadDto.getForumId()));
         }
         threadService.saveThread(threadDto, forum.get());
-        return "redirect:/forum?forumId={forumId}";
+        return "redirect:/forum/{forumId}";
 
+    }
+
+    @DeleteMapping("/forum/{forumId}/thread/{threadId}")
+    public String deleteThread(@PathVariable long forumId, @PathVariable  long threadId) {
+        Optional<Thread> thread = threadService.getThreadById(threadId);
+        if (thread.isEmpty()) {
+            log.error("Ветка для удаления не найдена! Id {}", threadId);
+            throw new ResourceNotFoundException("Ветка для удаления не найдена! Id %d".formatted(threadId));
+        }
+        threadService.deleteThread(thread.get());
+        return "redirect:/forum/{forumId}";
     }
 }
