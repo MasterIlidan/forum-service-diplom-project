@@ -21,6 +21,7 @@ import ru.students.forumservicediplomproject.entity.*;
 import ru.students.forumservicediplomproject.exeption.ResourceNotFoundException;
 import ru.students.forumservicediplomproject.service.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -209,6 +210,23 @@ public class PostController {
         }
         postService.deletePost(post.get());
         return "redirect:/forum/{forumId}/thread/{threadId}/posts";
+    }
+
+    @GetMapping("/newPosts")
+    public ModelAndView unapprovedPostList() {
+        ModelAndView modelAndView = new ModelAndView("unapproved-post-list");
+
+        HashMap<Forum,List<Post>> postList = new HashMap<>(1000);
+        for (Post post : postService.getPostsWithNewStatus()) {
+            if (!postList.containsKey(post.getThread().getForumId())) {
+                postList.put(post.getThread().getForumId(), new ArrayList<>());
+            }
+            postList.get(post.getThread().getForumId()).add(post);
+        }
+
+        modelAndView.addObject("unapprovedPostMap",postList);
+
+        return modelAndView;
     }
 
 }

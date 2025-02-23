@@ -35,6 +35,7 @@ public class WebSecurityConfig {
                         .requestMatchers("/forum/*/saveThread").hasAnyAuthority("ADMIN", "MODERATOR")
                         .requestMatchers("/approvePost/").hasAnyAuthority("ADMIN", "MODERATOR")
                         .requestMatchers("/users").hasAnyAuthority("ADMIN", "MODERATOR")
+                        .requestMatchers("/newPosts").hasAnyAuthority("ADMIN", "MODERATOR")
                         //.requestMatchers("/forum").permitAll()
                         .anyRequest().authenticated())).formLogin(form ->
                         form.loginPage("/login")

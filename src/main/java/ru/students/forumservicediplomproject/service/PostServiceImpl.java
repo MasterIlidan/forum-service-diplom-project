@@ -278,4 +278,9 @@ public class PostServiceImpl implements PostService {
 
         postRepository.save(post);
     }
+
+    @Override
+    public List<Post> getPostsWithNewStatus() {
+        return postRepository.findAllByPostStatus(Post.Status.NEW);
+    }
 }

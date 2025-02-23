@@ -44,4 +44,6 @@ public interface PostService {
     void registerNewTorrent(MultipartFile torrentFile, Post post);
 
     void approvePost(long postId);
+
+    List<Post> getPostsWithNewStatus();
 }

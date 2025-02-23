@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Темы в статусе NEW - BitTorrent Share</title>
+    <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+            crossorigin="anonymous">
+    <link th:href="@{/css/styles.css}" rel="stylesheet"/>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a th:href="@{/}" th:class="image-container">
+            <img  th:src="@{/images/logo.png}" alt="BitTorrent OpenShare" class="responsive-image"/>
+        </a>
+        <button class="navbar-toggler" type="button" data-bstoggle="collapse" data-bs-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false"
+                aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0 flex-right">
+                <li class="nav-item flex-right">
+                    <a sec:authorize="not isAuthenticated()" class="nav-link active" aria-current="page"
+                       th:href="@{/login}">Войти</a>
+                    <a sec:authorize="not isAnonymous()" th:href="@{'/user'}" sec:authentication="name" th:class="nav-link"></a>
+                </li>
+                <li class="nav-item right-align">
+                    <a class="nav-link active" aria-current="page"
+                       th:href="@{/register}">Зарегистрироваться</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="forum-container">
+    <div class="forum-block">
+        <a class="back-button" th:href="@{/}">
+            <img th:src="@{/images/back_button.png}" alt="Назад">
+            <span>На главную</span>
+        </a>
+        <h1 class="header"></h1>
+        <table class="table table-bordered table-striped" th:each="forum : ${unapprovedPostMap.keySet()}">
+            <thead>
+            <tr>
+                <th th:text="${forum.getForumName()}"></th>
+            </tr>
+            <tr>
+                <th>Название</th>
+                <th>Создал</th>
+                <th>Дата создания</th>
+            </tr>
+            </thead>
+            <tbody >
+            <tr th:each="post : ${unapprovedPostMap.get(forum)}">
+                <td>
+                    <a th:href="@{'/forum/' + ${post.getThread().getForumId().getForumId()} + '/thread/' + ${post.getThread().getThreadId()} + '/post/' + ${post.getPostId()}}"
+                       th:text="${post.getThread().getThreadName()} + ' - ' + ${post.getTitle()}"></a>
+                </td>
+                <td>
+                    <a th:text="${post.getCreatedBy().getUserName()}" th:href="@{'/user?userId=' + ${post.getCreatedBy().getUserId()}}"></a>
+                </td>
+                <td th:text="${post.getCreationDate()}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+</body>
+</html>
