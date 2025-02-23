@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Список пользователей - BitTorrent Share</title>
+    <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+            crossorigin="anonymous">
+    <link th:href="@{/css/styles.css}" rel="stylesheet"/>
+</head>
+
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a th:href="@{/}" th:class="image-container">
+            <img  th:src="@{/images/logo.png}" alt="BitTorrent OpenShare" class="responsive-image"/>
+        </a>
+        <button class="navbar-toggler" type="button" data-bstoggle="collapse" data-bs-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false"
+                aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0 flex-right">
+                <li class="nav-item flex-right">
+                    <a sec:authorize="not isAuthenticated()" class="nav-link active" aria-current="page"
+                       th:href="@{/login}">Войти</a>
+                    <a sec:authorize="not isAnonymous()" th:href="@{'/user'}" sec:authentication="name" th:class="nav-link"></a>
+                </li>
+                <li class="nav-item right-align">
+                    <a class="nav-link active" aria-current="page"
+                       th:href="@{/register}">Зарегистрироваться</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="forum-container">
+    <div class="forum-block">
+        <div class="forum-container">
+            <h1 class="header header-forum">Форyм</h1>
+            <a class="btn btn-primary new-forum-button" th:href="@{/forum/createForum}">+ Создать форум</a>
+        </div>
+
+        <table class="table table-bordered table-striped" id="forums">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Email</th>
+                <th>Username</th>
+                <th>Дата регистрации</th>
+                <th>Роль</th>
+                <th>Управление</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="user : ${users}">
+                <td>
+                    <a th:text="${user.getId()}"
+                       th:href="@{/user/{userId}(userId=${user.getId()})}"></a>
+                </td>
+                <td >
+                    <a th:href="@{/user/{userId}(userId=${user.getEmail()})}"
+                       th:text="${user.getEmail()}"></a>
+                </td>
+                <td >
+                    <a th:text="${user.getUsername()}"></a>
+                </td>
+                <td th:text="${user.getRegistrationDate()}"></td>
+                <td th:text="${user.getRoles()}"></td>
+                <td>
+                    <form th:action="@{/user/{userId}/ban(userId=${user.getId()})}" method="post">
+                        <button type="submit">Забанить</button>
+                    </form>
+                    <form th:action="@{/user/{userId}(userId=${user.getId()})}" method="post">
+                        <button type="submit">Изменить</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>
