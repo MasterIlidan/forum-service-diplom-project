@@ -179,7 +179,7 @@ public class PostController {
         }
 
         Peers peers = peersService.getPeers(post.get());
-        UserDto userDto = new UserDto(userService.getCurrentUserCredentials());
+        UserDto userDto = userService.mapToUserDto(userService.getCurrentUserCredentials());
 
         modelAndView.addObject("search", new Search());
 

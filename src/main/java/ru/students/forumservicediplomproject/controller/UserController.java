@@ -1,21 +1,30 @@
 package ru.students.forumservicediplomproject.controller;
 
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 import ru.students.forumservicediplomproject.Search;
 import ru.students.forumservicediplomproject.dto.UserDto;
 import ru.students.forumservicediplomproject.entity.Role;
 import ru.students.forumservicediplomproject.entity.User;
+import ru.students.forumservicediplomproject.exeption.ResourceNotFoundException;
 import ru.students.forumservicediplomproject.service.UserService;
 import ru.students.forumservicediplomproject.service.UserServiceImpl;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Controller
 public class UserController {
 
@@ -73,27 +82,6 @@ public class UserController {
         return "redirect:/user?userId=%s".formatted(user.getUserId());
     }
 
-    @PostMapping("/user/")
-    public String changeUserRole(@ModelAttribute UserDto userUpdate) {
-        if (userUpdate == null) return "redirect:/users";
-        Optional<User> optionalUser = userService.findUserById(userUpdate.getId());
-        User existingUser;
-        if (optionalUser.isPresent()) {
-            existingUser = optionalUser.get();
-        } else {
-            return "redirect:/users";
-        }
-        List<Role> roles = existingUser.getRoles();
-        //roles.set(0, new Role(userUpdate.getRole()));
-        existingUser.setRoles(existingUser.getRoles());
-        //List<Role> roles = new ArrayList<>();
-
-        //Role role = new Role(requestRoles);
-        //roles.add(role);
-        //user.setRoles(roles);
-        userService.saveUser(existingUser);
-        return "redirect:/users";
-    }
 
     @GetMapping("/register")
     public String registrationForm(Model model) {
@@ -121,25 +109,62 @@ public class UserController {
         return "redirect:/register?success";
     }
 
-    @GetMapping("/user/{id}/editForm")
-    public ModelAndView updateUser(@PathVariable Long id) {
-        ModelAndView mav = new ModelAndView("user-edit-form");
-        Optional<User> optionalUser = userService.findUserById(id);
-        User user = new User();
-        if (optionalUser.isPresent()) {
-            user = optionalUser.get();
+    @GetMapping("/user/{userId}/editForm")
+    public ModelAndView updateUserForm(@PathVariable Long userId) {
+        User currentUser = userService.getCurrentUserCredentials();
+        Optional<User> optionalUser = userService.findUserById(userId);
+        if (optionalUser.isEmpty()) {
+            log.error("Пользователь с id {} не найден!", userId);
+            throw new ResourceNotFoundException("Пользователь с id %d не найден!".formatted(userId));
         }
+
+        if(!userService.isUserAdmin(currentUser) & currentUser.getUserId() != optionalUser.get().getUserId()) {
+            log.warn("Пользователь не является администратором, чтобы редактировать данные другого пользователя");
+            throw new AccessDeniedException("Недостаточно прав для изменения данных");
+        }
+
+        if(!userService.isUserAdmin(currentUser) & currentUser.getRoles() != optionalUser.get().getRoles()) {
+            log.warn("Пользователь не является администратором, чтобы редактировать роли другого пользователя");
+            throw new AccessDeniedException("Недостаточно прав для изменения роли");
+        }
+
+
+        return getModelAndView(optionalUser.get());
+    }
+
+    private ModelAndView getModelAndView(User user) {
+
+        ModelAndView mav = new ModelAndView("forms/user-edit-form");
+
         UserDto userUpdate = new UserDto();
 
         userUpdate.setId(user.getUserId());
         userUpdate.setUsername(user.getUserName());
         userUpdate.setEmail(user.getEmail());
-        //userUpdate.setRoles(user.getRoles().get(0).getRoleName());
-        //String[] roleNames = {"ADMIN", "USER", "READ_ONLY"};
-        List<String> roleNames = List.of(new String[]{"ADMIN", "USER", "READ_ONLY"});
+
+        List<String> roles = new ArrayList<>();
+        for (Role role:user.getRoles()) {
+            roles.add(role.getRoleName());
+        }
+
+        userUpdate.setRoles(roles);
+        List<String> roleNames = Arrays.stream(UserServiceImpl.UserRoles.values()).map(Enum::name).toList();
 
         mav.addObject("roleNames", roleNames);
         mav.addObject("user", userUpdate);
         return mav;
     }
+
+    @PostMapping("/user/{userId}")
+    public String updateUser(@PathVariable long userId, UserDto userDto) {
+        try {
+            userService.updateUser(userDto);
+        }
+        catch (ResourceNotFoundException e) {
+            log.error("Пользователь с id {} не найден!", userId);
+            throw new ResourceNotFoundException("Пользователь с id %d не найден!".formatted(userId));
+        }
+        return "redirect:/users";
+    }
+
 }

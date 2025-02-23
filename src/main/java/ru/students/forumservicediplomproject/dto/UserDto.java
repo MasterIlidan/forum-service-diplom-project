@@ -8,7 +8,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ru.students.forumservicediplomproject.entity.User;
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -29,11 +28,4 @@ public class UserDto {
     private String password;
     private List<String> roles;
     private Timestamp registrationDate;
-
-    public UserDto(User user) {
-        id = user.getUserId();
-        username = user.getUserName();
-        email = user.getEmail();
-        registrationDate = user.getRegistrationDate();
-    }
 }

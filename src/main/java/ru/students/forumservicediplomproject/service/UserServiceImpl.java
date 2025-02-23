@@ -4,9 +4,12 @@ package ru.students.forumservicediplomproject.service;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import ru.students.forumservicediplomproject.dto.UserDto;
 import ru.students.forumservicediplomproject.entity.Role;
 import ru.students.forumservicediplomproject.entity.User;
+import ru.students.forumservicediplomproject.exeption.ResourceNotFoundException;
 import ru.students.forumservicediplomproject.repository.RoleRepository;
 import ru.students.forumservicediplomproject.repository.UserRepository;
 
@@ -38,6 +41,7 @@ public class UserServiceImpl implements UserService {
             user.setEmail("admin@admin.com");
             user.setPassword(passwordEncoder.encode("$$99adminOfThisThing99$$"));
             user.setRegistrationDate(new Timestamp(new Date().getTime()));
+            user.setRoles(List.of(roleRepository.findByRoleName("ADMIN")));
             userRepository.save(user);
         }
     }
@@ -64,16 +68,37 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(user);
     }
-
-    private Role getUserRole() {
+    @Override
+    public Role getUserRole() {
         return roleRepository.findByRoleName(UserRoles.USER.name());
     }
-    private Role getRoleByEnum(UserRoles role) {
+    @Override
+    public Role getRoleByEnum(UserRoles role) {
         return roleRepository.findByRoleName(role.name());
     }
 
     @Override
-    public void saveUser(User user) {
+    public Role getRoleByName(String roleName) {
+        return roleRepository.findByRoleName(roleName);
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, noRollbackFor = Exception.class)
+    public void updateUser(UserDto userDto) {
+        Optional<User> optionalUser = findUserById(userDto.getId());
+        if (optionalUser.isEmpty()) {
+            throw new ResourceNotFoundException();
+        }
+        User user = optionalUser.get();
+        User currentUserCredentials = getCurrentUserCredentials();
+
+        user.setUserName(userDto.getUsername());
+        if (isUserAdmin(currentUserCredentials)) {
+            user.setEmail(user.getEmail());
+
+            List<Role> roles = new ArrayList<>(userDto.getRoles().stream().map(this::getRoleByName).toList());
+            user.setRoles(roles);
+        }
         userRepository.save(user);
     }
 
@@ -95,11 +120,13 @@ public class UserServiceImpl implements UserService {
                 .collect(Collectors.toList());
     }
 
-    private UserDto mapToUserDto(User user) {
+    @Override
+    public UserDto mapToUserDto(User user) {
         UserDto userDto = new UserDto();
         userDto.setUsername(user.getUserName());
         userDto.setEmail(user.getEmail());
         userDto.setId(user.getUserId());
+        userDto.setRegistrationDate(user.getRegistrationDate());
         List<String> roles = new ArrayList<>();
         for (Role role : user.getRoles()) {
             roles.add(role.getRoleName());
@@ -122,6 +149,16 @@ public class UserServiceImpl implements UserService {
         for (Role role:currentUserCredentials.getRoles()) {
             if (role.getRoleName().equals(UserRoles.ADMIN.name()) ||
                     role.getRoleName().equals(UserRoles.MODERATOR.name())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean isUserAdmin(User currentUserCredentials) {
+        for (Role role:currentUserCredentials.getRoles()) {
+            if (role.getRoleName().equals(UserRoles.ADMIN.name())) {
                 return true;
             }
         }
