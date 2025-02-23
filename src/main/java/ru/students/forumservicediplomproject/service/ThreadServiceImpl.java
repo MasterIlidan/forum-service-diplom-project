@@ -74,7 +74,7 @@ public class ThreadServiceImpl implements ThreadService {
     }
 
     @Override
-    public List<Object[]> countTotalThreadsByForum(Forum forumId) {
-        return threadRepository.countTotalThreadsByForumId(forumId);
+    public Long countTotalThreadsByForum(Forum forumId) {
+        return threadRepository.countAllByForumId(forumId);
     }
 }

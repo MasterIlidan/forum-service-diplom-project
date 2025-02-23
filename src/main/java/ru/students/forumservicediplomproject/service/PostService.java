@@ -37,7 +37,7 @@ public interface PostService {
 
     List<Post> getAllPostsByThread(Thread thread);
 
-    List<Object[]> countPostsByThread(Thread threadId);
+    Long countPostsByThread(Thread threadId);
 
     long getCountOfAllPosts();
 

@@ -64,13 +64,13 @@ public class ThreadController {
             long postCount = 0;
             long messageCount = 0;
 
-            List<Object[]> totalPost = postService.countPostsByThread(thread);
-            postCount += (long) totalPost.get(0)[1];
+            Long totalPost = postService.countPostsByThread(thread);
+            postCount += totalPost;
 
             List<Post> postList = postService.getAllPostsByThread(thread);
             for (Post post : postList) {
-                List<Object[]> totalMessages = messageService.countMessagesByPost(post);
-                messageCount += (long) totalMessages.get(0)[1];
+                Long totalMessages = messageService.countMessagesByPost(post);
+                messageCount += totalMessages;
             }
             totalPostsInThread.put(thread, postCount);
             totalMessagesInThread.put(thread, messageCount);

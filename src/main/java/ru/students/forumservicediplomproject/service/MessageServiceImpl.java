@@ -175,8 +175,8 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public List<Object[]> countMessagesByPost(Post post) {
-        return messageRepository.countTotalMessagesByPostId(post);
+    public Long countMessagesByPost(Post post) {
+        return messageRepository.countAllByPostId(post);
     }
 
 

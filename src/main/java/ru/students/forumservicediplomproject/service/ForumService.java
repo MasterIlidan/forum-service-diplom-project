@@ -18,5 +18,5 @@ public interface ForumService {
 
     void updateForum(Forum forum);
 
-    List<Object[]> countTotalForums(Long forumId);
+    Long countTotalForums(Long forumId);
 }

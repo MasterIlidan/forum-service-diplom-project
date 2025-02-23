@@ -35,6 +35,6 @@ public interface MessageService {
     @Nullable
     Message getLastMessageByPost(Post post);
 
-    List<Object[]> countMessagesByPost(Post post);
+    Long countMessagesByPost(Post post);
 
 }

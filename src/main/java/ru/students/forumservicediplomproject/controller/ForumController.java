@@ -48,20 +48,20 @@ public class ForumController {
 
         //считаем количество веток, тем и сообщений для каждого форума
         for (Forum forum : forumsList) {
-            List<Object[]> totalThread = threadService.countTotalThreadsByForum(forum);
-            totalThreadsInForum.put(forum, (long) totalThread.get(0)[1]);
+            Long totalThread = threadService.countTotalThreadsByForum(forum);
+            totalThreadsInForum.put(forum, totalThread);
 
             List<Thread> threadList = threadService.getAllThreadsByForum(forum);
             long postCount = 0;
             long messageCount = 0;
             for (Thread thread : threadList) {
-                List<Object[]> totalPost = postService.countPostsByThread(thread);
-                postCount += (long) totalPost.get(0)[1];
+                Long totalPost = postService.countPostsByThread(thread);
+                postCount +=  totalPost;
 
                 List<Post> postList = postService.getAllPostsByThread(thread);
                 for (Post post : postList) {
-                    List<Object[]> totalMessages = messageService.countMessagesByPost(post);
-                    messageCount += (long) totalMessages.get(0)[1];
+                    Long totalMessages = messageService.countMessagesByPost(post);
+                    messageCount += totalMessages;
                 }
             }
             lastMessageInForum.put(forum, messageService.getLastMessageByForum(forum));

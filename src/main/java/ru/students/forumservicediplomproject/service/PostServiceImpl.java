@@ -214,13 +214,13 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<Object[]> countPostsByThread(Thread threadId) {
-        return postRepository.countTotalPostsByThread(threadId);
+    public Long countPostsByThread(Thread threadId) {
+        return postRepository.countAllByThread(threadId);
     }
 
     @Override
     public long getCountOfAllPosts() {
-        return (long) postRepository.countTotalPosts().get(0)[0];
+        return postRepository.count();
     }
 
     /**

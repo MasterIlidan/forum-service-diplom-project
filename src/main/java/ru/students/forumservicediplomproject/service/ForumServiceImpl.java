@@ -66,7 +66,7 @@ public class ForumServiceImpl implements ForumService {
     }
 
     @Override
-    public List<Object[]> countTotalForums(Long forumId) {
-        return forumRepository.countTotalForums();
+    public Long countTotalForums(Long forumId) {
+        return forumRepository.count();
     }
 }

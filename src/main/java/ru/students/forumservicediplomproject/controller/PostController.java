@@ -67,8 +67,8 @@ public class PostController {
 
         for (Post post : postList) {
             long messageCount = 0;
-            List<Object[]> totalMessages = messageService.countMessagesByPost(post);
-            messageCount += (long) totalMessages.get(0)[1];
+            Long totalMessages = messageService.countMessagesByPost(post);
+            messageCount += totalMessages;
             totalMessagesInPost.put(post, messageCount);
 
             lastMessageInPost.put(post, messageService.getLastMessageByPost(post));

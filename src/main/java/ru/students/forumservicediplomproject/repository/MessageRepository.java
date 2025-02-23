@@ -1,6 +1,7 @@
 package ru.students.forumservicediplomproject.repository;
 
 import jakarta.validation.constraints.NotNull;
+import org.springframework.data.domain.Limit;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -14,8 +15,8 @@ import java.util.List;
 public interface MessageRepository extends JpaRepository<Message, Long> {
 
     List<Message> findAllByPostId(@NotNull Post postId);
-    @Query("SELECT t.postId, COUNT(t.postId) FROM Message AS t where t.postId=:#{#postId}")
-    List<Object[]> countTotalMessagesByPostId(@NotNull Post postId);
+
+    Long countAllByPostId(@NotNull Post postId);
 
     @Query("SELECT p FROM Message p WHERE p.messageId = :postId ORDER BY p.creationDate DESC LIMIT 1")
     Message findLatestPostByPost(@Param("postId") Long postId);
