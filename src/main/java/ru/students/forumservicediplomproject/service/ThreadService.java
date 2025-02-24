@@ -22,6 +22,8 @@ public interface ThreadService {
 
     Long countTotalThreadsByForum(Forum forumId);
 
+    Long countTotalMessagesInThread(Thread thread);
+
     Long countTotalPostsInThreadsByForum(Forum forumId);
 
     Long countTotalMessagesInThreadsByForum(Forum forum);

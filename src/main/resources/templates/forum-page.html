@@ -76,15 +76,15 @@
                 <td >
                     <a th:href="@{'/forum/' + ${forum.getForumId()} + '/thread/' + ${thread.getThreadId()} + '/posts'}" th:text="${thread.threadName}"></a>
                 </td>
-                <td th:text="${postCountMap.get(thread)}">
-                <td th:text="${messagesCountMap.get(thread)}">
+                <td th:text="${thread.getTotalPostsInThread()}">
+                <td th:text="${thread.getTotalMessagesInThread()}">
                 <td>
                     <a th:text="${thread.getCreatedBy().getUserName()}" th:href="@{'/user?userId=' + ${thread.getCreatedBy().getUserId()}}"></a>
                 </td>
                 <td th:text="${thread.getCreationDate()}"></td>
                 <td >
-                    <div th:if="${threadLastMessage.get(thread) != null}">
-                        <p th:text="${threadLastMessage.get(thread).getCreationDate()}"></p>
+                    <div th:if="${thread.getLastMessageInThread() != null}">
+                        <p th:text="${thread.getLastMessageInThread().getCreationDate()}"></p>
                     </div>
                 </td>
             </tr>

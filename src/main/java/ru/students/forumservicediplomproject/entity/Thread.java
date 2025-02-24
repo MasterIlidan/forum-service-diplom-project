@@ -26,4 +26,10 @@ public class Thread {
     private User createdBy;
     @NotNull
     private Timestamp creationDate;
+    @Transient
+    private long totalPostsInThread;
+    @Transient
+    private long totalMessagesInThread;
+    @Transient
+    private Message lastMessageInThread;
 }

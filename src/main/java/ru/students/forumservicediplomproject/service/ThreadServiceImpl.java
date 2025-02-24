@@ -20,11 +20,13 @@ public class ThreadServiceImpl implements ThreadService {
     private final ThreadRepository threadRepository;
     private final UserService userService;
     private final PostService postService;
+    private final MessageService messageService;
 
-    public ThreadServiceImpl(ThreadRepository threadRepository, UserService userService, PostService postService) {
+    public ThreadServiceImpl(ThreadRepository threadRepository, UserService userService, PostService postService, MessageService messageService) {
         this.threadRepository = threadRepository;
         this.userService = userService;
         this.postService = postService;
+        this.messageService = messageService;
     }
 
     @Override
@@ -44,7 +46,11 @@ public class ThreadServiceImpl implements ThreadService {
         if (optionalThread.isEmpty()) {
             throw  new ResourceNotFoundException("Ветка не найдена! Id %d".formatted(id));
         }
-        return optionalThread.get();
+        Thread thread = optionalThread.get();
+        thread.setTotalMessagesInThread(countTotalMessagesInThread(thread));
+        thread.setTotalPostsInThread(postService.countPostsByThread(thread));
+        thread.setLastMessageInThread(messageService.getLastMessageByThread(thread));
+        return thread;
     }
 
     @Override
@@ -75,12 +81,23 @@ public class ThreadServiceImpl implements ThreadService {
 
     @Override
     public List<Thread> getAllThreadsByForum(Forum forum) {
-        return threadRepository.findByForumId(forum);
+        List<Thread> threadList = threadRepository.findByForumId(forum);
+        for (Thread thread:threadList) {
+            thread.setTotalMessagesInThread(countTotalMessagesInThread(thread));
+            thread.setTotalPostsInThread(postService.countPostsByThread(thread));
+            thread.setLastMessageInThread(messageService.getLastMessageByThread(thread));
+        }
+        return threadList;
     }
 
     @Override
     public Long countTotalThreadsByForum(Forum forumId) {
         return threadRepository.countAllByForumId(forumId);
+    }
+
+    @Override
+    public Long countTotalMessagesInThread(Thread thread) {
+        return postService.countTotalMessagesInPostsByThread(thread);
     }
 
     @Override
