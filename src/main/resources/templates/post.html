@@ -76,8 +76,8 @@
         </div>
         <br>
         <div id="peers-count">
-            <span id="seeders" th:text="'Сиды: ' + ${peers.getSeeders()}"></span>
-            <span id="leechers" th:text="'| Личи: ' + ${peers.getLeechers()}"></span>
+            <span id="seeders" th:text="'Сиды: ' + ${post.getPeers().getSeeders()}"></span>
+            <span id="leechers" th:text="'| Личи: ' + ${post.getPeers().getLeechers()}"></span>
         </div>
         <br>
         <table class="table table-bordered table-striped" id="messages">

@@ -87,8 +87,8 @@
                     <a th:text="${post.getCreatedBy().getUserName()}" th:href="@{'/user?userId=' + ${post.getCreatedBy().getUserId()}}"></a>
                 </td>
                 <td th:text="${post.getCreationDate()}"></td>
-                <td th:text="${peersHashMap.get(post).getSeeders()}"></td>
-                <td th:text="${peersHashMap.get(post).getLeechers()}"></td>
+                <td th:text="${post.getPeers().getSeeders()}"></td>
+                <td th:text="${post.getPeers().getLeechers()}"></td>
                 <td >
                     <div th:if="${lastMessageInPost.get(post) != null}">
                         <p th:text="${lastMessageInPost.get(post).getCreationDate()}"></p>

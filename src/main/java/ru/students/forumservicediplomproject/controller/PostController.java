@@ -62,7 +62,6 @@ public class PostController {
         }
 
         HashMap<Post, Long> totalMessagesInPost = new HashMap<>();
-        HashMap<Post, Peers> peersHashMap = new HashMap<>(postList.size());
         HashMap<Post, Message> lastMessageInPost = new HashMap<>(postList.size());
 
         for (Post post : postList) {
@@ -72,10 +71,7 @@ public class PostController {
             totalMessagesInPost.put(post, messageCount);
 
             lastMessageInPost.put(post, messageService.getLastMessageByPost(post));
-            peersHashMap.put(post, peersService.getPeers(post));
         }
-
-        modelAndView.addObject("peersHashMap", peersHashMap);
 
         modelAndView.addObject("search", new Search());
 
@@ -179,12 +175,10 @@ public class PostController {
             throw new RuntimeException("Пост не найден! PostId %s".formatted(postId));
         }
 
-        Peers peers = peersService.getPeers(post.get());
         UserDto userDto = userService.mapToUserDto(userService.getCurrentUserCredentials());
 
         modelAndView.addObject("search", new Search());
 
-        modelAndView.addObject("peers", peers);
         modelAndView.addObject("messages", messageList);
         modelAndView.addObject("post", post.get());
         modelAndView.addObject("currentUser", userDto);

@@ -108,6 +108,11 @@
                     + '/post/' + ${lastPost.getPostId()}}">К теме -></a>
                 </td>
             </tr>
+            <tr sec:authorize="hasAnyAuthority('ADMIN', 'MODERATOR')">
+                <td>
+                    <a th:href="@{/newPosts}">Просмотреть все новые темы</a>
+                </td>
+            </tr>
             <tr>
                 <td>
                     <p>Статистика</p>

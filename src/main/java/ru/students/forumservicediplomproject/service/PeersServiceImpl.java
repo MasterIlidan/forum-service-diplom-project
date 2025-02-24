@@ -33,7 +33,7 @@ public class PeersServiceImpl implements PeersService {
      */
     @Override
     @Async
-    @Scheduled(cron = "*/59 * * * * *")
+    @Scheduled(cron = "* */5 * * * *")
     public void updatePeers() {
         //TODO: нужна ли возможность отключения "кеша" и постоянного запроса по каждой раздаче?
         log.info("Обновление таблицы раздач и пиров");
@@ -53,26 +53,12 @@ public class PeersServiceImpl implements PeersService {
             if (peersMap.containsKey(peers.getPost().getHashInfo())) {
                 peers.setLeechers(peersMap.get(peers.getPost().getHashInfo()).get("leechers"));
                 peers.setSeeders(peersMap.get(peers.getPost().getHashInfo()).get("seeders"));
-                peersMap.remove(peers.getPost().getHashInfo());
             } else {
                 peers.setLeechers(0);
                 peers.setSeeders(0);
             }
             peersRepository.save(peers);
             log.debug("Сидеров {} личеров {} хеш раздачи {}", peers.getSeeders(), peers.getLeechers(), peers.getPost().getHashInfo());
-        }
-        for (String hash : peersMap.keySet()) {
-            Post post = postService.getPostByHashInfo(hash);
-            if (post == null) {
-                log.warn("При обновлении таблицы пиров найден хеш {} у которого нет темы", hash);
-                continue;
-            }
-            Peers peers = new Peers();
-            peers.setSeeders(peersMap.get(hash).get("seeders"));
-            peers.setLeechers(peersMap.get(hash).get("leechers"));
-            peers.setPost(post);
-            peersRepository.save(peers);
-            log.debug("(NEW) Сидеров {} личеров {} хеш раздачи {}", peers.getSeeders(), peers.getLeechers(), peers.getPost().getHashInfo());
         }
 
         log.info("Обновлено записей {}. Пиры отсутствуют у {} раздач", peersMap.size(), peersList.size() - peersMap.size());

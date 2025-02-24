@@ -32,6 +32,16 @@ public class Post {
     private Status postStatus;
     @NotNull
     private Timestamp creationDate;
+    @OneToOne(orphanRemoval = true, mappedBy = "post", cascade = CascadeType.PERSIST)
+    private Peers peers;
+
+    @PrePersist
+    public void prePersist() {
+        if (peers == null) {
+            this.peers = new Peers();
+            peers.setPost(this);
+        }
+    }
 
     public enum Status {
         NEW, APPROVED, ACTIVE, INACTIVE, ARCHIVE
