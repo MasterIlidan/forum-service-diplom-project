@@ -20,6 +20,9 @@ import ru.students.forumservicediplomproject.dto.PostDto;
 import ru.students.forumservicediplomproject.entity.Peers;
 import ru.students.forumservicediplomproject.entity.Post;
 import ru.students.forumservicediplomproject.entity.Thread;
+import ru.students.forumservicediplomproject.exeption.HashAlreadyRegisteredExeption;
+import ru.students.forumservicediplomproject.exeption.ResourceNotFoundException;
+import ru.students.forumservicediplomproject.exeption.TrackerServiceException;
 import ru.students.forumservicediplomproject.repository.PeersRepository;
 import ru.students.forumservicediplomproject.repository.PostRepository;
 
@@ -57,7 +60,7 @@ public class PostServiceImpl implements PostService {
         String hash = getHash(torrentFile);
         if (postRepository.existsByHashInfo(hash)) {
             log.error("Тема с таким хешем {} уже существует", hash);
-            throw new RuntimeException("Тема с таким хешем %s уже существует".formatted(hash));
+            throw new HashAlreadyRegisteredExeption("Тема с таким хешем %s уже существует".formatted(hash));
         }
         Post post = new Post();
         post.setTitle(postDto.getTitle());
@@ -71,14 +74,14 @@ public class PostServiceImpl implements PostService {
 
         try {
             registerNewTorrent(torrentFile, post);
-        }  catch (HttpClientErrorException.Conflict e) {
+        } catch (HttpClientErrorException.Conflict e) {
             log.error("На трекере уже есть такой торрент. Откат сохранения поста");
             postRepository.delete(post);
-            throw new RuntimeException(e);
+            throw new HashAlreadyRegisteredExeption("На трекере уже есть такой торрент", e);
         } catch (RestClientException e) {
-            log.error("при регистрации раздачи на трекере произошла ошибка. Откат сохранения поста");
+            log.error("При регистрации раздачи на трекере произошла ошибка. Откат сохранения поста");
             postRepository.delete(post);
-            throw new RuntimeException(e);
+            throw new TrackerServiceException("При регистрации раздачи на трекере произошла ошибка", e);
         }
 
         return post.getPostId();
@@ -134,8 +137,13 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public Optional<Post> getPostById(long postId) {
-        return postRepository.findById(postId);
+    public Post getPostById(long postId) {
+        Optional<Post> optionalPost = postRepository.findById(postId);
+        if (optionalPost.isEmpty()) {
+            log.error("Пост с id {} не найден", postId);
+            throw new ResourceNotFoundException("Пост не найден! Id %d".formatted(postId));
+        }
+        return optionalPost.get();
     }
 
     @Override

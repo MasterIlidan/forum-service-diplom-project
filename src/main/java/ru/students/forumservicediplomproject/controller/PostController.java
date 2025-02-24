@@ -18,7 +18,9 @@ import ru.students.forumservicediplomproject.dto.PostDto;
 import ru.students.forumservicediplomproject.dto.UserDto;
 import ru.students.forumservicediplomproject.entity.Thread;
 import ru.students.forumservicediplomproject.entity.*;
+import ru.students.forumservicediplomproject.exeption.HashAlreadyRegisteredExeption;
 import ru.students.forumservicediplomproject.exeption.ResourceNotFoundException;
+import ru.students.forumservicediplomproject.exeption.TrackerServiceException;
 import ru.students.forumservicediplomproject.service.*;
 
 import java.util.ArrayList;
@@ -34,16 +36,15 @@ public class PostController {
 
     private final PostService postService;
     private final MessageService messageService;
-    private final PeersService peersService;
     private final ResourceService resourceService;
     private final UserService userService;
 
-    public PostController(ThreadService threadService,
-                          PostService postService, MessageService messageService, PeersService peersService, ResourceService resourceService, UserService userService) {
+    public PostController(ThreadService threadService, PostService postService,
+                          MessageService messageService, ResourceService resourceService,
+                          UserService userService) {
         this.threadService = threadService;
         this.postService = postService;
         this.messageService = messageService;
-        this.peersService = peersService;
         this.resourceService = resourceService;
         this.userService = userService;
     }
@@ -122,23 +123,27 @@ public class PostController {
             throw new ResourceNotFoundException("Ветка не найдена! Id %d".formatted(threadId));
         }
 
-        long postId = 0;
+        long postId;
         try {
             postId = postService.savePost(postDto.getTorrentFile(), postDto, thread.get(), forumId);
-        } catch (Exception e) {
+        } catch (TrackerServiceException e) {
+            result.rejectValue("torrentFile", null, "При регистрации торрента произошла ошибка. Попробуйте позже");
+            model.addAttribute("post", postDto);
+            return "forms/add-post-page";
+        } catch (HashAlreadyRegisteredExeption e) {
             result.rejectValue("torrentFile", null, "Раздача с таким хешем уже зарегистрирована. " +
                     "Попробуйте немного изменить содержимое раздачи (например, добавить/удалить файлы или изменить их имя");
             model.addAttribute("post", postDto);
             return "forms/add-post-page";
         }
-        Optional<Post> post = postService.getPostById(postId);
-        if (post.isEmpty()) {
-            throw new ResourceNotFoundException("Пост не найден! Id %d".formatted(postId));
+        Post post;
+        try {
+            post = postService.getPostById(postId);
+        } catch (ResourceNotFoundException e) {
+            throw new ResourceNotFoundException(e);
         }
-        messageService.saveMessage(new MessageDto(postDto.getMessageBody()), post.get(), postDto.getImages());
-        //Описание раздачи становится первым сообщением в теме
-        //model.addAttribute("msg", "Uploaded torrent file hash: " + hash);
 
+        messageService.saveMessage(new MessageDto(postDto.getMessageBody()), post, postDto.getImages());
 
         return "redirect:/forum/%s/thread/%s/post/%s".formatted(forumId, threadId, postId);
     }
@@ -165,25 +170,24 @@ public class PostController {
                                  @PathVariable long threadId,
                                  @PathVariable long postId, Model model) {
         ModelAndView modelAndView = new ModelAndView("post");
-        Optional<Post> post = postService.getPostById(postId);
-        List<Message> messageList;
-
-        if (post.isPresent()) {
-            messageList = messageService.getAllMessagesByPost(post.get());
-            resourceService.getAllResources(messageList);
-        } else {
-            throw new RuntimeException("Пост не найден! PostId %s".formatted(postId));
+        Post post;
+        try {
+            post = postService.getPostById(postId);
+        } catch (ResourceNotFoundException e) {
+            throw new ResourceNotFoundException(e.getMessage());
         }
+        List<Message> messageList = messageService.getAllMessagesByPost(post);
+        resourceService.getAllResources(messageList);
 
         UserDto userDto = userService.mapToUserDto(userService.getCurrentUserCredentials());
 
         modelAndView.addObject("search", new Search());
 
         modelAndView.addObject("messages", messageList);
-        modelAndView.addObject("post", post.get());
+        modelAndView.addObject("post", post);
         modelAndView.addObject("currentUser", userDto);
 
-        modelAndView.addObject("canDelete", userService.getCurrentUserCredentials().getUserId() == post.get().getPostId());
+        modelAndView.addObject("canDelete", userService.getCurrentUserCredentials().getUserId() == post.getPostId());
         modelAndView.addObject("newMessage", new Message());
 
 
@@ -191,18 +195,21 @@ public class PostController {
     }
     @DeleteMapping("/forum/{forumId}/thread/{threadId}/post/{postId}")
     public String deletePost(@PathVariable long forumId, @PathVariable long postId, @PathVariable long threadId) {
-        Optional<Post> post = postService.getPostById(postId);
-        if (post.isEmpty()) {
+        Post post;
+        try {
+            post = postService.getPostById(postId);
+        } catch (ResourceNotFoundException e) {
             log.error("Пост для удаления не найден! Id {}", postId);
-            throw new ResourceNotFoundException("Пост для удаления не найден! Id %d".formatted(postId));
+            throw new ResourceNotFoundException(e.getMessage());
         }
+
         User currentUserCredentials = userService.getCurrentUserCredentials();
-        if (post.get().getCreatedBy().getUserId() != currentUserCredentials.getUserId()) {
+        if (post.getCreatedBy().getUserId() != currentUserCredentials.getUserId()) {
             if (!userService.isUserPrivileged(currentUserCredentials)) {
                 throw new AccessDeniedException("Недостаточно прав");
             }
         }
-        postService.deletePost(post.get());
+        postService.deletePost(post);
         return "redirect:/forum/{forumId}/thread/{threadId}/posts";
     }
 

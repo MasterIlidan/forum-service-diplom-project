@@ -9,7 +9,6 @@ import ru.students.forumservicediplomproject.entity.Thread;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 
 public interface PostService {
 
@@ -20,7 +19,7 @@ public interface PostService {
 
     void changePostStatus(String hash, String status);
 
-    Optional<Post> getPostById(long id);
+    Post getPostById(long id);
 
     Post getPostByHashInfo(String hash);
 

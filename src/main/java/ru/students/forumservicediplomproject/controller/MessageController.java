@@ -36,11 +36,13 @@ public class MessageController {
                               @Valid @ModelAttribute("newMessage") MessageDto messageDto,
                               @RequestParam("image") MultipartFile[] files,
                               BindingResult result) {
-        Optional<Post> postById = postService.getPostById(postId);
-        if (postById.isEmpty()) {
-            throw new ResourceNotFoundException("Пост не найден! Id %d".formatted(postId));
+        Post postById;
+        try {
+            postById = postService.getPostById(postId);
+        } catch (ResourceNotFoundException e) {
+            throw new ResourceNotFoundException(e.getMessage());
         }
-        messageService.saveMessage(messageDto, postById.get(), files);
+        messageService.saveMessage(messageDto, postById, files);
         return "redirect:/forum/%s/thread/%s/post/%s".formatted(forumId, threadId, postId);
     }
     @DeleteMapping("/forum/{forumId}/thread/{threadId}/post/{postId}/{messageId}")
