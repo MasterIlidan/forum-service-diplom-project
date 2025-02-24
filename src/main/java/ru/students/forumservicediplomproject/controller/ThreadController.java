@@ -45,13 +45,16 @@ public class ThreadController {
                                   Model model) {
         ModelAndView modelAndView = new ModelAndView("forum-page");
 
-        Optional<Forum> forum = forumServiceImpl.getForum(forumId);
-        if (forum.isPresent()) {
-            modelAndView.addObject("forum", forum.get());
-        } else {
-            throw new RuntimeException("У ветки не найден форум! ForumId %s".formatted(forumId));
+        Forum forum;
+        try {
+            forum = forumServiceImpl.getForum(forumId);
+        } catch (ResourceNotFoundException e) {
+            throw new ResourceNotFoundException(e.getMessage());
         }
-        List<Thread> threadList = threadService.getAllThreadsByForum(forum.get());
+
+        List<Thread> threadList = threadService.getAllThreadsByForum(forum);
+
+        modelAndView.addObject("forum", forum);
         modelAndView.addObject("threadList", threadList);
 
         HashMap<Thread, Long> totalPostsInThread = new HashMap<>(threadList.size());
@@ -105,12 +108,14 @@ public class ThreadController {
         if (bindingResult.hasErrors()) {
             return "forms/add-thread-page";
         }
-        Optional<Forum> forum = forumServiceImpl.getForum(forumId);
-        if (forum.isEmpty()) {
-            throw new RuntimeException(("При создании ветки произошла ошибка:" +
-                    " не найден форум, на котором создается ветка. ForumId %s").formatted(threadDto.getForumId()));
+        Forum forum;
+        try {
+            forum = forumServiceImpl.getForum(forumId);
+        } catch (ResourceNotFoundException e) {
+            throw new ResourceNotFoundException("При создании ветки произошла ошибка:" +
+                    " не найден форум, на котором создается ветка. ForumId %s".formatted(threadDto.getForumId()));
         }
-        threadService.saveThread(threadDto, forum.get());
+        threadService.saveThread(threadDto, forum);
         return "redirect:/forum/{forumId}";
 
     }

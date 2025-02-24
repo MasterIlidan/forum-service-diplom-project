@@ -38,8 +38,13 @@ public class ForumServiceImpl implements ForumService {
     }
 
     @Override
-    public Optional<Forum> getForum(long id) {
-        return forumRepository.findByForumId(id);
+    public Forum getForum(long forumId) {
+        Optional<Forum> optionalForum = forumRepository.findByForumId(forumId);
+        if (optionalForum.isEmpty()) {
+            throw new ResourceNotFoundException("Форум не найден! Id %d".formatted(forumId));
+        }
+
+        return optionalForum.get();
     }
 
     @Override
@@ -50,12 +55,9 @@ public class ForumServiceImpl implements ForumService {
     @Override
     @Transactional(propagation = Propagation.REQUIRED, noRollbackFor = Exception.class)
     public void deleteForum(long id) {
-        Optional<Forum> optionalForum = getForum(id);
-        if (optionalForum.isEmpty()) {
-            throw new ResourceNotFoundException();
-        }
+        Forum forum = getForum(id);
 
-        threadService.deleteAllThreadsByForum(optionalForum.get());
+        threadService.deleteAllThreadsByForum(forum);
         forumRepository.deleteById(id);
     }
 

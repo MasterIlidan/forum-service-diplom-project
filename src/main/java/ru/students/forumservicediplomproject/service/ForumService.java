@@ -4,13 +4,12 @@ import ru.students.forumservicediplomproject.dto.ForumDto;
 import ru.students.forumservicediplomproject.entity.Forum;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface ForumService {
 
     void saveForum(ForumDto forumDto);
 
-    Optional<Forum> getForum(long id);
+    Forum getForum(long id);
 
     List<Forum> getAllForums();
 
