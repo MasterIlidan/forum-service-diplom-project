@@ -50,10 +50,12 @@ public class MessageController {
                                  @PathVariable long threadId,
                                  @PathVariable long postId,
                                  @PathVariable long messageId) {
-        Message message = messageService.getMessageById(messageId);
-        if (message == null) {
+        Message message;
+        try {
+            message = messageService.getMessageById(messageId);
+        } catch (ResourceNotFoundException e) {
             log.error("Сообщение для удаления не найдено! Id {}", messageId);
-            throw new ResourceNotFoundException("Сообщение для удаления не найдено! Id %d".formatted(messageId));
+            throw new ResourceNotFoundException(e.getMessage());
         }
         messageService.deleteMessage(message);
         return "redirect:/forum/{forumId}/thread/{threadId}/post/{postId}";
