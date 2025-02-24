@@ -45,7 +45,7 @@
 </nav>
 <div class="forum-container">
     <div class="forum-block">
-        <a class="back-button" th:href="@{'/forum?forumId=' + ${forumId}}">
+        <a class="back-button" th:href="@{/forum/{forumId}(forumId=${forumId})}">
             <img th:src="@{/images/back_button.png}" alt="Назад">
             <span>Вернуться в ветку</span>
         </a>
