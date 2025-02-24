@@ -26,7 +26,6 @@ import ru.students.forumservicediplomproject.service.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Controller
@@ -54,13 +53,9 @@ public class PostController {
     public ModelAndView getAllPosts(@PathVariable long forumId,
                                     @PathVariable long threadId, Model model) {
         ModelAndView modelAndView = new ModelAndView("thread-page");
-        Optional<Thread> thread = threadService.getThreadById(threadId);
-        List<Post> postList;
-        if (thread.isPresent()) {
-            postList = postService.getAllPostsByThread(thread.get());
-        } else {
-            throw new RuntimeException("Ветка поста не найдена! ThreadId %s".formatted(threadId));
-        }
+        Thread thread = threadService.getThreadById(threadId);
+
+        List<Post> postList = postService.getAllPostsByThread(thread);
 
         HashMap<Post, Long> totalMessagesInPost = new HashMap<>();
         HashMap<Post, Message> lastMessageInPost = new HashMap<>(postList.size());
@@ -80,7 +75,7 @@ public class PostController {
         modelAndView.addObject("postList", postList);
         modelAndView.addObject("messagesCountMap", totalMessagesInPost);
         modelAndView.addObject("forumId", forumId);
-        modelAndView.addObject("thread", thread.get());
+        modelAndView.addObject("thread", thread);
         modelAndView.addObject("threadId", threadId);
         return modelAndView;
     }
@@ -118,14 +113,11 @@ public class PostController {
                 return "forms/add-post-page";
             }
 
-        Optional<Thread> thread = threadService.getThreadById(threadId);;
-        if (thread.isEmpty()) {
-            throw new ResourceNotFoundException("Ветка не найдена! Id %d".formatted(threadId));
-        }
+        Thread thread = threadService.getThreadById(threadId);;
 
         long postId;
         try {
-            postId = postService.savePost(postDto.getTorrentFile(), postDto, thread.get(), forumId);
+            postId = postService.savePost(postDto.getTorrentFile(), postDto, thread, forumId);
         } catch (TrackerServiceException e) {
             result.rejectValue("torrentFile", null, "При регистрации торрента произошла ошибка. Попробуйте позже");
             model.addAttribute("post", postDto);

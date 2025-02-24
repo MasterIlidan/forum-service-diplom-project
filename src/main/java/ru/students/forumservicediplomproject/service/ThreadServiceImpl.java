@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.students.forumservicediplomproject.dto.ThreadDto;
 import ru.students.forumservicediplomproject.entity.Forum;
 import ru.students.forumservicediplomproject.entity.Thread;
+import ru.students.forumservicediplomproject.exeption.ResourceNotFoundException;
 import ru.students.forumservicediplomproject.repository.ThreadRepository;
 
 import java.sql.Timestamp;
@@ -38,8 +39,12 @@ public class ThreadServiceImpl implements ThreadService {
     }
 
     @Override
-    public Optional<Thread> getThreadById(long id) {
-        return threadRepository.findByThreadId(id);
+    public Thread getThreadById(long id) {
+        Optional<Thread> optionalThread = threadRepository.findByThreadId(id);
+        if (optionalThread.isEmpty()) {
+            throw  new ResourceNotFoundException("Ветка не найдена! Id %d".formatted(id));
+        }
+        return optionalThread.get();
     }
 
     @Override

@@ -21,7 +21,6 @@ import ru.students.forumservicediplomproject.service.ThreadService;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Controller
@@ -122,12 +121,14 @@ public class ThreadController {
 
     @DeleteMapping("/forum/{forumId}/thread/{threadId}")
     public String deleteThread(@PathVariable long forumId, @PathVariable  long threadId) {
-        Optional<Thread> thread = threadService.getThreadById(threadId);
-        if (thread.isEmpty()) {
-            log.error("Ветка для удаления не найдена! Id {}", threadId);
-            throw new ResourceNotFoundException("Ветка для удаления не найдена! Id %d".formatted(threadId));
+        Thread thread;
+        try {
+            thread = threadService.getThreadById(threadId);
+        } catch (ResourceNotFoundException e) {
+            log.error("Ветка для удаления не найдена! Id {}", threadId, e);
+            throw new ResourceNotFoundException(e.getMessage());
         }
-        threadService.deleteThread(thread.get());
+        threadService.deleteThread(thread);
         return "redirect:/forum/{forumId}";
     }
 }

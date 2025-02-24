@@ -5,14 +5,13 @@ import ru.students.forumservicediplomproject.entity.Forum;
 import ru.students.forumservicediplomproject.entity.Thread;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface ThreadService {
 
 
     void saveThread(ThreadDto threadDto, Forum forumId);
 
-    Optional<Thread> getThreadById(long id);
+    Thread getThreadById(long id);
 
     void deleteAllThreadsByForum(Forum forum);
 
