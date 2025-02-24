@@ -42,7 +42,7 @@ public class WebSecurityConfig {
                                 .loginProcessingUrl("/login")
                                 .defaultSuccessUrl("/")
                                 .permitAll())
-                .logout(logout -> logout.logoutUrl("logout").permitAll()).csrf().disable();
+                .logout(logout -> logout.logoutUrl("/logout").permitAll()).csrf().disable();
         return httpSecurity.build();
     }
 }

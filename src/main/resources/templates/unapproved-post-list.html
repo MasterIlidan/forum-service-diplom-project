@@ -31,9 +31,14 @@
                        th:href="@{/login}">Войти</a>
                     <a sec:authorize="not isAnonymous()" th:href="@{'/user'}" sec:authentication="name" th:class="nav-link"></a>
                 </li>
-                <li class="nav-item right-align">
+                <li sec:authorize="isAnonymous()" class="nav-item right-align">
                     <a class="nav-link active" aria-current="page"
                        th:href="@{/register}">Зарегистрироваться</a>
+                </li>
+                <li sec:authorize="!isAnonymous()">
+                    <form th:action="@{/logout}" method="post">
+                        <button type="submit">Выйти</button>
+                    </form>
                 </li>
             </ul>
         </div>
