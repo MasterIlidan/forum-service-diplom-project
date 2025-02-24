@@ -69,16 +69,16 @@
                     <a th:href="@{/forum/{forumId}(forumId=${forum.getForumId()})}" th:text="${forum.forumName}"></a>
                     <a th:href="@{/forum/{forumId}/deleteForum(forumId=${forum.getForumId()})}">Удалить</a>
                 </td>
-                <td th:text="${threadCountMap.get(forum)}">
-                <td th:text="${postCountMap.get(forum)}"></td>
-                <td th:text="${messagesCountMap.get(forum)}"></td>
+                <td th:text="${forum.getTotalThreadsInForum()}">
+                <td th:text="${forum.getTotalPostsInForum()}"></td>
+                <td th:text="${forum.getTotalMessagesInForum()}"></td>
                 <td>
                     <a th:text="${forum.getCreatedBy().getUserName()}" th:href="@{'/user?userId=' + ${forum.getCreatedBy().getUserId()}}"></a>
                 </td>
                 <td th:text="${forum.getCreationDate()}"></td>
                 <td >
-                    <div th:if="${lastMessageInForumMap.get(forum) != null}">
-                        <p th:text="${lastMessageInForumMap.get(forum).getCreationDate()}"></p>
+                    <div th:if="${forum.getLastMessageInForum() != null}">
+                        <p th:text="${forum.getLastMessageInForum().getCreationDate()}"></p>
                     </div>
                 </td>
             </tr>

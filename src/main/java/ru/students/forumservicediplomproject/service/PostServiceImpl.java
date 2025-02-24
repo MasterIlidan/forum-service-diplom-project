@@ -227,6 +227,21 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    public Long countTotalMessagesInPostsByThread(Thread threadId) {
+        long total = 0;
+        List<Post> allPostsByThread = getAllPostsByThread(threadId);
+        for (Post post:allPostsByThread) {
+            total += messageService.countMessagesByPost(post);
+        }
+        return total;
+    }
+
+    @Override
+    public Long countTotalMessagesInPost(Post post) {
+        return messageService.countMessagesByPost(post);
+    }
+
+    @Override
     public long getCountOfAllPosts() {
         return postRepository.count();
     }

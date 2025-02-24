@@ -12,12 +12,8 @@ import org.springframework.web.servlet.ModelAndView;
 import ru.students.forumservicediplomproject.Search;
 import ru.students.forumservicediplomproject.dto.ForumDto;
 import ru.students.forumservicediplomproject.entity.Forum;
-import ru.students.forumservicediplomproject.entity.Message;
-import ru.students.forumservicediplomproject.entity.Post;
-import ru.students.forumservicediplomproject.entity.Thread;
 import ru.students.forumservicediplomproject.service.*;
 
-import java.util.HashMap;
 import java.util.List;
 
 @Controller
@@ -41,32 +37,12 @@ public class ForumController {
         ModelAndView modelAndView = new ModelAndView("index");
         List<Forum> forumsList = forumServiceImpl.getAllForums();
 
-        HashMap<Forum, Long> totalThreadsInForum = new HashMap<>();
-        HashMap<Forum, Long> totalPostsInForum = new HashMap<>();
-        HashMap<Forum, Long> totalMessagesInForum = new HashMap<>();
-        HashMap<Forum, Message> lastMessageInForum = new HashMap<>();
-
         //считаем количество веток, тем и сообщений для каждого форума
         for (Forum forum : forumsList) {
-            Long totalThread = threadService.countTotalThreadsByForum(forum);
-            totalThreadsInForum.put(forum, totalThread);
-
-            List<Thread> threadList = threadService.getAllThreadsByForum(forum);
-            long postCount = 0;
-            long messageCount = 0;
-            for (Thread thread : threadList) {
-                Long totalPost = postService.countPostsByThread(thread);
-                postCount +=  totalPost;
-
-                List<Post> postList = postService.getAllPostsByThread(thread);
-                for (Post post : postList) {
-                    Long totalMessages = messageService.countMessagesByPost(post);
-                    messageCount += totalMessages;
-                }
-            }
-            lastMessageInForum.put(forum, messageService.getLastMessageByForum(forum));
-            totalPostsInForum.put(forum, postCount);
-            totalMessagesInForum.put(forum, messageCount);
+            forum.setTotalThreadsInForum(threadService.countTotalThreadsByForum(forum));
+            forum.setTotalPostsInForum(threadService.countTotalPostsInThreadsByForum(forum));
+            forum.setTotalMessagesInForum(threadService.countTotalMessagesInThreadsByForum(forum));
+            forum.setLastMessageInForum(messageService.getLastMessageByForum(forum));
         }
 
         modelAndView.addObject("lastPost", postService.getLastCreatedPost());
@@ -74,11 +50,7 @@ public class ForumController {
 
         modelAndView.addObject("search", new Search());
 
-        modelAndView.addObject("lastMessageInForumMap", lastMessageInForum);
         modelAndView.addObject("forumsList", forumsList);
-        modelAndView.addObject("threadCountMap", totalThreadsInForum);
-        modelAndView.addObject("postCountMap", totalPostsInForum);
-        modelAndView.addObject("messagesCountMap", totalMessagesInForum);
         return modelAndView;
     }
 

@@ -82,4 +82,24 @@ public class ThreadServiceImpl implements ThreadService {
     public Long countTotalThreadsByForum(Forum forumId) {
         return threadRepository.countAllByForumId(forumId);
     }
+
+    @Override
+    public Long countTotalPostsInThreadsByForum(Forum forumId) {
+        long total = 0;
+        List<Thread> threadList = getAllThreadsByForum(forumId);
+        for (Thread thread: threadList) {
+            total += postService.countPostsByThread(thread);
+        }
+        return total;
+    }
+
+    @Override
+    public Long countTotalMessagesInThreadsByForum(Forum forumId) {
+        long total = 0;
+        List<Thread> threadList = getAllThreadsByForum(forumId);
+        for (Thread thread: threadList) {
+            total += postService.countTotalMessagesInPostsByThread(thread);
+        }
+        return total;
+    }
 }

@@ -30,4 +30,12 @@ public class Forum{
     private List<Thread> threads;
     @NotNull
     private Timestamp creationDate;
+    @Transient
+    private long totalThreadsInForum;
+    @Transient
+    private long totalPostsInForum;
+    @Transient
+    private long totalMessagesInForum;
+    @Transient
+    private Message lastMessageInForum;
 }

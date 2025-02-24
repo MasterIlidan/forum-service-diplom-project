@@ -38,6 +38,10 @@ public interface PostService {
 
     Long countPostsByThread(Thread threadId);
 
+    Long countTotalMessagesInPostsByThread(Thread threadId);
+
+    Long countTotalMessagesInPost(Post post);
+
     long getCountOfAllPosts();
 
     void registerNewTorrent(MultipartFile torrentFile, Post post);
