@@ -19,11 +19,13 @@ public class ForumServiceImpl implements ForumService {
     private final ForumRepository forumRepository;
     private final UserService userService;
     private final ThreadService threadService;
+    private final MessageService messageService;
 
-    public ForumServiceImpl(ForumRepository forumRepository, UserService userService, ThreadService threadService) {
+    public ForumServiceImpl(ForumRepository forumRepository, UserService userService, ThreadService threadService, MessageService messageService) {
         this.forumRepository = forumRepository;
         this.userService = userService;
         this.threadService = threadService;
+        this.messageService = messageService;
     }
 
     @Override
@@ -43,13 +45,25 @@ public class ForumServiceImpl implements ForumService {
         if (optionalForum.isEmpty()) {
             throw new ResourceNotFoundException("Форум не найден! Id %d".formatted(forumId));
         }
+        Forum forum = optionalForum.get();
+        forum.setTotalThreadsInForum(threadService.countTotalThreadsByForum(forum));
+        forum.setTotalPostsInForum(threadService.countTotalPostsInThreadsByForum(forum));
+        forum.setTotalMessagesInForum(threadService.countTotalMessagesInThreadsByForum(forum));
+        forum.setLastMessageInForum(messageService.getLastMessageByForum(forum));
 
-        return optionalForum.get();
+        return forum;
     }
 
     @Override
     public List<Forum> getAllForums() {
-        return forumRepository.findAll();
+        List<Forum> forumList = forumRepository.findAll();
+        for (Forum forum:forumList) {
+            forum.setTotalThreadsInForum(threadService.countTotalThreadsByForum(forum));
+            forum.setTotalPostsInForum(threadService.countTotalPostsInThreadsByForum(forum));
+            forum.setTotalMessagesInForum(threadService.countTotalMessagesInThreadsByForum(forum));
+            forum.setLastMessageInForum(messageService.getLastMessageByForum(forum));
+        }
+        return forumList;
     }
 
     @Override

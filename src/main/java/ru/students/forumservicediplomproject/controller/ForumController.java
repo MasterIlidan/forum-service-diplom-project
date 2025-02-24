@@ -19,16 +19,12 @@ import java.util.List;
 @Controller
 public class ForumController {
     private final ForumServiceImpl forumServiceImpl;
-    private final ThreadService threadService;
     private final PostService postService;
-    private final MessageService messageService;
     private final StatisticService statisticService;
 
-    public ForumController(ForumServiceImpl forumServiceImpl, ThreadService threadService, PostService postService, MessageService messageService, StatisticService statisticService) {
+    public ForumController(ForumServiceImpl forumServiceImpl, PostService postService, StatisticService statisticService) {
         this.forumServiceImpl = forumServiceImpl;
-        this.threadService = threadService;
         this.postService = postService;
-        this.messageService = messageService;
         this.statisticService = statisticService;
     }
 
@@ -36,14 +32,6 @@ public class ForumController {
     public ModelAndView indexPage() {
         ModelAndView modelAndView = new ModelAndView("index");
         List<Forum> forumsList = forumServiceImpl.getAllForums();
-
-        //считаем количество веток, тем и сообщений для каждого форума
-        for (Forum forum : forumsList) {
-            forum.setTotalThreadsInForum(threadService.countTotalThreadsByForum(forum));
-            forum.setTotalPostsInForum(threadService.countTotalPostsInThreadsByForum(forum));
-            forum.setTotalMessagesInForum(threadService.countTotalMessagesInThreadsByForum(forum));
-            forum.setLastMessageInForum(messageService.getLastMessageByForum(forum));
-        }
 
         modelAndView.addObject("lastPost", postService.getLastCreatedPost());
         modelAndView.addObject("statistics", statisticService.getTrackerStatistics());
