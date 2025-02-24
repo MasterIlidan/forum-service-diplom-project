@@ -35,6 +35,11 @@ public class Post {
     @OneToOne(orphanRemoval = true, mappedBy = "post", cascade = CascadeType.PERSIST)
     private Peers peers;
 
+    @Transient
+    private long totalMessagesInPost;
+    @Transient
+    private Message lastMessageInPost;
+
     @PrePersist
     public void prePersist() {
         if (peers == null) {

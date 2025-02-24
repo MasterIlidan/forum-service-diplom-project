@@ -51,32 +51,16 @@ public class PostController {
 
     @GetMapping({"/forum/{forumId}/thread/{threadId}/posts"})
     public ModelAndView getAllPosts(@PathVariable long forumId,
-                                    @PathVariable long threadId, Model model) {
+                                    @PathVariable long threadId) {
         ModelAndView modelAndView = new ModelAndView("thread-page");
         Thread thread = threadService.getThreadById(threadId);
 
         List<Post> postList = postService.getAllPostsByThread(thread);
 
-        HashMap<Post, Long> totalMessagesInPost = new HashMap<>();
-        HashMap<Post, Message> lastMessageInPost = new HashMap<>(postList.size());
-
-        for (Post post : postList) {
-            long messageCount = 0;
-            Long totalMessages = messageService.countMessagesByPost(post);
-            messageCount += totalMessages;
-            totalMessagesInPost.put(post, messageCount);
-
-            lastMessageInPost.put(post, messageService.getLastMessageByPost(post));
-        }
-
         modelAndView.addObject("search", new Search());
 
-        modelAndView.addObject("lastMessageInPost", lastMessageInPost);
         modelAndView.addObject("postList", postList);
-        modelAndView.addObject("messagesCountMap", totalMessagesInPost);
-        modelAndView.addObject("forumId", forumId);
         modelAndView.addObject("thread", thread);
-        modelAndView.addObject("threadId", threadId);
         return modelAndView;
     }
 
@@ -113,7 +97,7 @@ public class PostController {
                 return "forms/add-post-page";
             }
 
-        Thread thread = threadService.getThreadById(threadId);;
+        Thread thread = threadService.getThreadById(threadId);
 
         long postId;
         try {
@@ -141,9 +125,9 @@ public class PostController {
     }
 
     @PostMapping("/inactivePosts")
-    public ResponseEntity inactivePosts(@RequestParam String hash, @RequestParam String status) {
+    public ResponseEntity<String> inactivePosts(@RequestParam String hash, @RequestParam String status) {
         postService.changePostStatus(hash, status);
-        return new ResponseEntity(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/forum/{forumId}/thread/{threadId}/post/{postId}/approvePost")
@@ -160,7 +144,7 @@ public class PostController {
     @GetMapping({"/forum/{forumId}/thread/{threadId}/post/{postId}"})
     public ModelAndView postPage(@PathVariable long forumId,
                                  @PathVariable long threadId,
-                                 @PathVariable long postId, Model model) {
+                                 @PathVariable long postId) {
         ModelAndView modelAndView = new ModelAndView("post");
         Post post;
         try {

@@ -17,7 +17,6 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 import ru.students.forumservicediplomproject.dto.PostDto;
-import ru.students.forumservicediplomproject.entity.Peers;
 import ru.students.forumservicediplomproject.entity.Post;
 import ru.students.forumservicediplomproject.entity.Thread;
 import ru.students.forumservicediplomproject.exeption.HashAlreadyRegisteredExeption;
@@ -28,7 +27,10 @@ import ru.students.forumservicediplomproject.repository.PostRepository;
 
 import java.net.URI;
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -143,7 +145,10 @@ public class PostServiceImpl implements PostService {
             log.error("Пост с id {} не найден", postId);
             throw new ResourceNotFoundException("Пост не найден! Id %d".formatted(postId));
         }
-        return optionalPost.get();
+        Post post = optionalPost.get();
+        post.setTotalMessagesInPost(countTotalMessagesInPost(post));
+        post.setLastMessageInPost(messageService.getLastMessageByPost(post));
+        return post;
     }
 
     @Override
@@ -185,32 +190,19 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public List<Post> getAllPosts() {
-
-        return postRepository.findAll();
-    }
-
-    @Override
-    public HashMap<Post, Peers> getPeers(List<Post> postList) {
-
-        HashMap<Post, Peers> peersHashMap = new HashMap<>(postList.size());
-
-        for (Post post : postList) {
-            Optional<Peers> peers = peersRepository.findById(post);
-            if (peers.isPresent()) {
-                peersHashMap.put(post, peers.get());
-                continue;
-            }
-            log.warn("Пост с id {} Не имеет анонсированного торрента. Хеш {}", post.getPostId(), post.getHashInfo());
+        List<Post> postList = postRepository.findAll();
+        for (Post post:postList) {
+            post.setTotalMessagesInPost(countTotalMessagesInPost(post));
+            post.setLastMessageInPost(messageService.getLastMessageByPost(post));
         }
-
-        return peersHashMap;
+        return postList;
     }
 
     @Nullable
     @Override
     public Post getLastCreatedPost() {
         List<Post> postList = postRepository.findAllByCreationDateBeforeOrderByCreationDateDesc(new Timestamp(new Date().getTime() + 1000));
-        if (postList.size() == 0) {
+        if (postList.isEmpty()) {
             return null;
         }
         return postList.get(0);
@@ -264,7 +256,7 @@ public class PostServiceImpl implements PostService {
         String uri = "http://localhost:8081/register";
         URI uri1 = UriComponentsBuilder.fromUriString(uri)
                 .build().toUri();
-        ResponseEntity<String> response = null;
+        ResponseEntity<String> response;
         try {
             response = restTemplate.postForEntity(uri1, requestEntity, String.class);
         } catch (HttpClientErrorException.Conflict e) {
@@ -294,7 +286,7 @@ public class PostServiceImpl implements PostService {
         String uri = "http://localhost:8081/announce";
         URI uri1 = UriComponentsBuilder.fromUriString(uri)
                 .build().toUri();
-        ResponseEntity responseEntity = restTemplate.postForEntity(uri1, requestEntity, String.class);
+        restTemplate.postForEntity(uri1, requestEntity, String.class);
 
 
         post.setPostStatus(Post.Status.APPROVED);

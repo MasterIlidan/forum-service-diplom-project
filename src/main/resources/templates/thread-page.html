@@ -82,7 +82,7 @@
                        th:href="@{'/forum/' + ${forumId} + '/thread/' + ${threadId} + '/post/' + ${post.getPostId()}}"
                        th:text="${post.getTitle()  + ' N'}"></a>
                 </td>
-                <td th:text="${messagesCountMap.get(post)}">
+                <td th:text="${thread.getTotalMessagesInThread()}">
                 <td>
                     <a th:text="${post.getCreatedBy().getUserName()}" th:href="@{'/user?userId=' + ${post.getCreatedBy().getUserId()}}"></a>
                 </td>
@@ -90,8 +90,8 @@
                 <td th:text="${post.getPeers().getSeeders()}"></td>
                 <td th:text="${post.getPeers().getLeechers()}"></td>
                 <td >
-                    <div th:if="${lastMessageInPost.get(post) != null}">
-                        <p th:text="${lastMessageInPost.get(post).getCreationDate()}"></p>
+                    <div th:if="${thread.getLastMessageInThread() != null}">
+                        <p th:text="${thread.getLastMessageInThread().getCreationDate()}"></p>
                     </div>
                 </td>
             </tr>
