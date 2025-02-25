@@ -2,6 +2,7 @@ package ru.students.forumservicediplomproject.service;
 
 
 import ru.students.forumservicediplomproject.dto.UserDto;
+import ru.students.forumservicediplomproject.entity.Resource;
 import ru.students.forumservicediplomproject.entity.Role;
 import ru.students.forumservicediplomproject.entity.User;
 
@@ -18,6 +19,8 @@ public interface UserService {
 
     Role getRoleByName(String roleName);
 
+    Resource loadUserAvatar(User user);
+
     void updateUser(UserDto userDto);
 
     User findUserByEmail(String email);
@@ -33,4 +36,6 @@ public interface UserService {
     boolean isUserPrivileged(User currentUserCredentials);
 
     boolean isUserAdmin(User currentUserCredentials);
+
+    User getUserById(Long userId);
 }

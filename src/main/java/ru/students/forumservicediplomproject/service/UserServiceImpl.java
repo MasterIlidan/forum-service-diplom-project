@@ -1,12 +1,14 @@
 package ru.students.forumservicediplomproject.service;
 
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import ru.students.forumservicediplomproject.dto.UserDto;
+import ru.students.forumservicediplomproject.entity.Resource;
 import ru.students.forumservicediplomproject.entity.Role;
 import ru.students.forumservicediplomproject.entity.User;
 import ru.students.forumservicediplomproject.exeption.ResourceNotFoundException;
@@ -17,21 +19,24 @@ import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ResourceService resourceService;
 
     public UserServiceImpl(UserRepository userRepository,
                            RoleRepository roleRepository,
-                           PasswordEncoder passwordEncoder) {
+                           PasswordEncoder passwordEncoder, ResourceService resourceService) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
 
         checkRolesExist();
         checkAdminUserExist();
+        this.resourceService = resourceService;
     }
 
     private void checkAdminUserExist() {
@@ -83,6 +88,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Resource loadUserAvatar(User user) {
+        if (user.getAvatar() != null) {
+            resourceService.getResource(user.getAvatar());
+        }
+        return user.getAvatar();
+    }
+
+    @Override
     @Transactional(propagation = Propagation.REQUIRED, noRollbackFor = Exception.class)
     public void updateUser(UserDto userDto) {
         Optional<User> optionalUser = findUserById(userDto.getId());
@@ -99,6 +112,17 @@ public class UserServiceImpl implements UserService {
             List<Role> roles = new ArrayList<>(userDto.getRoles().stream().map(this::getRoleByName).toList());
             user.setRoles(roles);
         }
+
+        if (!userDto.getAvatar().isEmpty()) {
+            Resource resource = resourceService.registerNewResource(userDto.getAvatar());
+            if (resource != null) {
+                //resourceService.saveResource(resource);
+                user.setAvatar(resource);
+            } else {
+                log.error("При сохранении аватара произошла ошибка");
+            }
+        }
+
         userRepository.save(user);
     }
 
@@ -122,11 +146,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto mapToUserDto(User user) {
+        Resource avatar = loadUserAvatar(user);
         UserDto userDto = new UserDto();
         userDto.setUsername(user.getUserName());
         userDto.setEmail(user.getEmail());
         userDto.setId(user.getUserId());
         userDto.setRegistrationDate(user.getRegistrationDate());
+        if (user.getAvatar() != null) {
+            userDto.setBase64Avatar(avatar.getBase64Image());
+        }
         List<String> roles = new ArrayList<>();
         for (Role role : user.getRoles()) {
             roles.add(role.getRoleName());
@@ -134,7 +162,7 @@ public class UserServiceImpl implements UserService {
         userDto.setRoles(roles);
         return userDto;
     }
-
+    @Override
     public User getCurrentUserCredentials() {
         org.springframework.security.core.userdetails.User currentUser =
                 (org.springframework.security.core.userdetails.User) SecurityContextHolder
@@ -163,6 +191,16 @@ public class UserServiceImpl implements UserService {
             }
         }
         return false;
+    }
+
+    @Override
+    public User getUserById(Long userId) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (optionalUser.isEmpty()) {
+            throw new ResourceNotFoundException("Пользователь не найден! Id %d".formatted(userId));
+        }
+        loadUserAvatar(optionalUser.get());
+        return optionalUser.get();
     }
 
     public enum UserRoles {

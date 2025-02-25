@@ -1,5 +1,6 @@
 package ru.students.forumservicediplomproject.entity;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -36,4 +37,7 @@ public class User {
     private List<Role> roles;
     @NotNull
     private Timestamp registrationDate;
+    @OneToOne(cascade = CascadeType.PERSIST, orphanRemoval = true)
+    @Nullable
+    private Resource avatar;
 }

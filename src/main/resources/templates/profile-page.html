@@ -19,6 +19,7 @@
         <a th:href="@{/}" th:class="image-container">
             <img  th:src="@{/images/logo.png}" alt="BitTorrent OpenShare" class="responsive-image"/>
         </a>
+
         <button class="navbar-toggler" type="button" data-bstoggle="collapse" data-bs-target="#navbarSupportedContent"
                 aria-controls="navbarSupportedContent" aria-expanded="false"
                 aria-label="Toggle navigation">
@@ -52,7 +53,19 @@
 
 <div class="profile_container">
     <div class="image-container">
-        <img class="responsive-image" th:src="@{/images/default_avatar.jpg}" alt="img user_avatar">
+        <img th:if="${user.getBase64Avatar() == null}" class="responsive-image" th:src="@{/images/default_avatar.jpg}" alt="img default_user_avatar">
+        <img th:if="${user.getBase64Avatar() != null}" class="responsive-image" th:src="@{'data:image/jpeg;base64,' + ${user.getBase64Avatar()}}" alt="img user_avatar">
+        <form th:if="${isEditAllowed}"  th:action="@{/user/{userId}(userId=${user.getId()})}" enctype="multipart/form-data" th:object="${user}" method="POST">
+
+            <input hidden="hidden" type="text" th:field="*{username}"/>
+            <input hidden="hidden" type="text" th:field="*{email}"/>
+            <input hidden="hidden" type="text" th:field="*{id}"/>
+            <input hidden="hidden" type="text" th:field="*{roles}"/>
+            <label >
+                <input th:field="*{avatar}" type="file" name="avatar" th:accept="images" class="form-control-file">
+                Новый аватар</label>
+            <button type="submit" class="btn btn-primary col-2">Загрузить</button>
+        </form>
     </div>
     <div>
         <p th:text="${user.getUsername()}"></p>

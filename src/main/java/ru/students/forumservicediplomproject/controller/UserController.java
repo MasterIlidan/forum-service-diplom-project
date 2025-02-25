@@ -35,51 +35,40 @@ public class UserController {
     }
 
     @GetMapping("/users")
-    public ModelAndView users(Model model) {
+    public ModelAndView users() {
         ModelAndView modelAndView = new ModelAndView("users-list");
         List<UserDto> users = userService.findAllUsers();
-        //List<Role> roles = roleRepository.findAll();
 
         UserServiceImpl.UserRoles[] roleNames = UserServiceImpl.UserRoles.values();
 
         modelAndView.addObject("roleNames", roleNames);
         modelAndView.addObject("users", users);
-        //modelAndView.addObject("roles", roles);
         return modelAndView;
     }
 
     @GetMapping("/user/{userId}")
-    public ModelAndView userProfile(@PathVariable Long userId, Model model) {
+    public ModelAndView userProfile(@PathVariable Long userId) {
         ModelAndView modelAndView = new ModelAndView("profile-page");
-        Optional<User> user;
-        if (userId == null) {
-            user = Optional.of(userService.getCurrentUserCredentials());
-        } else {
-            user = userService.findUserById(userId);
-        }
-        UserDto userDto;
-        if (user.isPresent()) {
-            User userObj = user.get();
-            userDto = new UserDto();
+        User currentUserCredentials = userService.getCurrentUserCredentials();
+        User userById = userService.getUserById(userId);
 
-            userDto.setId(userObj.getUserId());
-            userDto.setUsername(userObj.getUserName());
-            userDto.setEmail(userObj.getEmail());
-            userDto.setRegistrationDate(userObj.getRegistrationDate());
-        } else {
-            throw new RuntimeException("Пользователь не найден");
-        }
+        UserDto user = userService.mapToUserDto(userById);
+
+        boolean isThisUserPage = currentUserCredentials.getUserId() == user.getId();
 
         modelAndView.addObject("search", new Search());
+        modelAndView.addObject("isEditAllowed", isThisUserPage);
 
-        modelAndView.addObject("user", userDto);
+        modelAndView.addObject("user", user);
 
         return modelAndView;
     }
-    @GetMapping("/user/{email}")
-    public String userProfile(@PathVariable String email) {
-        User user = userService.findUserByEmail(email);
-        return "redirect:/user?userId=%s".formatted(user.getUserId());
+
+    @GetMapping("/user")
+    public String userProfile() {
+        User user = userService.getCurrentUserCredentials();
+
+        return "redirect:/user/%d".formatted(user.getUserId());
     }
 
 
@@ -118,12 +107,12 @@ public class UserController {
             throw new ResourceNotFoundException("Пользователь с id %d не найден!".formatted(userId));
         }
 
-        if(!userService.isUserAdmin(currentUser) & currentUser.getUserId() != optionalUser.get().getUserId()) {
+        if (!userService.isUserAdmin(currentUser) & currentUser.getUserId() != optionalUser.get().getUserId()) {
             log.warn("Пользователь не является администратором, чтобы редактировать данные другого пользователя");
             throw new AccessDeniedException("Недостаточно прав для изменения данных");
         }
 
-        if(!userService.isUserAdmin(currentUser) & currentUser.getRoles() != optionalUser.get().getRoles()) {
+        if (!userService.isUserAdmin(currentUser) & currentUser.getRoles() != optionalUser.get().getRoles()) {
             log.warn("Пользователь не является администратором, чтобы редактировать роли другого пользователя");
             throw new AccessDeniedException("Недостаточно прав для изменения роли");
         }
@@ -143,7 +132,7 @@ public class UserController {
         userUpdate.setEmail(user.getEmail());
 
         List<String> roles = new ArrayList<>();
-        for (Role role:user.getRoles()) {
+        for (Role role : user.getRoles()) {
             roles.add(role.getRoleName());
         }
 
@@ -159,8 +148,7 @@ public class UserController {
     public String updateUser(@PathVariable long userId, UserDto userDto) {
         try {
             userService.updateUser(userDto);
-        }
-        catch (ResourceNotFoundException e) {
+        } catch (ResourceNotFoundException e) {
             log.error("Пользователь с id {} не найден!", userId);
             throw new ResourceNotFoundException("Пользователь с id %d не найден!".formatted(userId));
         }

@@ -33,7 +33,8 @@
                 <li class="nav-item flex-right">
                     <a sec:authorize="not isAuthenticated()" class="nav-link active" aria-current="page"
                        th:href="@{/login}">Войти</a>
-                    <a sec:authorize="not isAnonymous()" th:href="@{'/user'}" sec:authentication="name" th:class="nav-link"></a>
+                    <a sec:authorize="not isAnonymous()" th:href="@{'/user'}" sec:authentication="name"
+                       th:class="nav-link"></a>
                 </li>
                 <li sec:authorize="isAnonymous()" class="nav-item right-align">
                     <a class="nav-link active" aria-current="page"
@@ -94,13 +95,16 @@
             <tr th:each="message : ${messages}">
                 <td th:class="table-post">
                     <div class="image-container">
-                        <img class="responsive-image" th:src="@{/images/default_avatar.jpg}" alt="user_profile">
+                        <img th:if="${message.getMessageBy().getAvatar() == null}" class="responsive-image"
+                             th:src="@{/images/default_avatar.jpg}" alt="img default_user_avatar">
+                        <img th:if="${message.getMessageBy().getAvatar() != null}" class="responsive-image"
+                             th:src="@{'data:image/jpeg;base64,'+${message.getMessageBy().getAvatar().getBase64Image()}}" alt="img user_avatar">
                     </div>
                     <a class="me-auto mb-2 mb-lg-0" th:text="${message.getMessageBy().getUserName()}"
-                       th:href="@{'/user?userId=' + ${message.getMessageBy().getUserId()}}"></a>
+                       th:href="@{/user/{userId}(userId=${message.getMessageBy().getUserId()})}"></a>
                     <span th:text="${message.getCreationDate()}"></span>
                     <form th:if="${message.getMessageBy().getUserId() == currentUser.getId()}"
-                            th:action="@{/forum/{forumId}/thread/{threadId}/post/{postId}/{messageId}(forumId=${forumId},threadId=${threadId},postId=${postId},messageId=${message.getMessageId()})}"
+                          th:action="@{/forum/{forumId}/thread/{threadId}/post/{postId}/{messageId}(forumId=${forumId},threadId=${threadId},postId=${postId},messageId=${message.getMessageId()})}"
                           th:method="delete">
                         <button type="submit">Удалить</button>
                     </form>

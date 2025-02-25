@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -28,4 +29,7 @@ public class UserDto {
     private String password;
     private List<String> roles;
     private Timestamp registrationDate;
+
+    private MultipartFile avatar;
+    private String base64Avatar;
 }
