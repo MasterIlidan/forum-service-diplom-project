@@ -23,9 +23,7 @@ import ru.students.forumservicediplomproject.exeption.ResourceNotFoundException;
 import ru.students.forumservicediplomproject.exeption.TrackerServiceException;
 import ru.students.forumservicediplomproject.service.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 @Slf4j
 @Controller
@@ -153,13 +151,23 @@ public class PostController {
             throw new ResourceNotFoundException(e.getMessage());
         }
         List<Message> messageList = messageService.getAllMessagesByPost(post);
-        resourceService.getAllResources(messageList);
+        resourceService.getAllMessageResources(messageList);
 
         UserDto userDto = userService.mapToUserDto(userService.getCurrentUserCredentials());
 
         modelAndView.addObject("search", new Search());
 
         modelAndView.addObject("messages", messageList);
+
+        //собрать всех уникальных пользователй и загрузить для них аватар
+        Set<User> users = new HashSet<>();
+        for (Message message:messageList) {
+            users.add(message.getMessageBy());
+        }
+        for (User user:users) {
+            userService.loadUserAvatar(user);
+        }
+
         modelAndView.addObject("post", post);
         modelAndView.addObject("currentUser", userDto);
 
