@@ -34,6 +34,8 @@ public class Post {
     private Timestamp creationDate;
     @OneToOne(orphanRemoval = true, mappedBy = "post", cascade = CascadeType.PERSIST)
     private Peers peers;
+    @NotNull
+    private long countOfDownloads;
 
     @Transient
     private long totalMessagesInPost;
