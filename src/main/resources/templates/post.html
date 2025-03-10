@@ -77,7 +77,7 @@
         <div id="post-info">
             <span id="torrent-size" th:text="'Размер: '"></span>
             <span id="torrent-create-time" th:text="' | Создана: ' + ${post.getCreationDate()}"></span>
-            <span id="torrent-download-count" th:text="' | Скачано: '"></span>
+            <span id="torrent-download-count" th:text="' | Скачано: '+ ${post.getCountOfDownloads()}"></span>
         </div>
         <br>
         <div id="peers-count">
