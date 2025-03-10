@@ -21,11 +21,9 @@ import java.util.Map;
 @Service
 public class PeersServiceImpl implements PeersService {
     private final PeersRepository peersRepository;
-    private final PostService postService;
 
     public PeersServiceImpl(PeersRepository peersRepository, PostService postService) {
         this.peersRepository = peersRepository;
-        this.postService = postService;
     }
 
     /**
@@ -33,7 +31,7 @@ public class PeersServiceImpl implements PeersService {
      */
     @Override
     @Async
-    @Scheduled(cron = "* */5 * * * *")
+    @Scheduled(cron = "0 */5 * * * *")
     public void updatePeers() {
         //TODO: нужна ли возможность отключения "кеша" и постоянного запроса по каждой раздаче?
         log.info("Обновление таблицы раздач и пиров");
