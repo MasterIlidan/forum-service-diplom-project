@@ -92,13 +92,19 @@
                 <th></th>
             </tr>
             </thead>
+            <tr>
+                <td>
+                    <a th:href="@{/forum/{forumId}/thread/{threadId}/post/{postId}/downloadTorrent(forumId=${forumId},threadId=${threadId},postId=${postId})}">Скачать</a>
+                </td>
+            </tr>
             <tr th:each="message : ${messages}">
                 <td th:class="table-post">
                     <div class="image-container">
                         <img th:if="${message.getMessageBy().getAvatar() == null}" class="responsive-image"
                              th:src="@{/images/default_avatar.jpg}" alt="img default_user_avatar">
                         <img th:if="${message.getMessageBy().getAvatar() != null}" class="responsive-image"
-                             th:src="@{'data:image/jpeg;base64,'+${message.getMessageBy().getAvatar().getBase64Image()}}" alt="img user_avatar">
+                             th:src="@{'data:image/jpeg;base64,'+${message.getMessageBy().getAvatar().getBase64Image()}}"
+                             alt="img user_avatar">
                     </div>
                     <a class="me-auto mb-2 mb-lg-0" th:text="${message.getMessageBy().getUserName()}"
                        th:href="@{/user/{userId}(userId=${message.getMessageBy().getUserId()})}"></a>

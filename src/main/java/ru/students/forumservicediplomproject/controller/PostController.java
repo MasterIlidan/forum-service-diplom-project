@@ -234,7 +234,7 @@ public class PostController {
         if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-            headers.setContentDisposition(ContentDisposition.attachment().filename(post.getHashInfo()+".torrent").build());
+            headers.setContentDisposition(ContentDisposition.attachment().filename(response.getHeaders().getContentDisposition().getFilename()).build());
 
             return new ResponseEntity<>(response.getBody(), headers, HttpStatus.OK);
         } else {
