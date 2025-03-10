@@ -2,8 +2,6 @@ package ru.students.forumservicediplomproject.controller;
 
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
 import org.springframework.http.*;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Controller;
@@ -12,8 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import ru.students.forumservicediplomproject.Search;
 import ru.students.forumservicediplomproject.dto.MessageDto;
@@ -26,7 +22,6 @@ import ru.students.forumservicediplomproject.exeption.ResourceNotFoundException;
 import ru.students.forumservicediplomproject.exeption.TrackerServiceException;
 import ru.students.forumservicediplomproject.service.*;
 
-import java.nio.file.FileSystem;
 import java.util.*;
 
 @Slf4j
@@ -223,23 +218,19 @@ public class PostController {
     public ResponseEntity<byte[]> torrentFileDownload(@PathVariable long forumId,
                                                       @PathVariable long threadId,
                                                       @PathVariable long postId) {
-        Post post = postService.getPostById(postId);
+        List torrentFileMap = postService.getTorrentFileForDownload(postId);
 
-        RestTemplate restTemplate = new RestTemplate();
-        String url = "http://localhost:8081/download/{hashInfo}";
-        Map<String, String> params = Collections.singletonMap("hashInfo", post.getHashInfo());
 
-        ResponseEntity<byte[]> response = restTemplate.getForEntity(url, byte[].class, params);
-
-        if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+        if (torrentFileMap != null) {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-            headers.setContentDisposition(ContentDisposition.attachment().filename(response.getHeaders().getContentDisposition().getFilename()).build());
+            headers.setContentDisposition(ContentDisposition.attachment().filename((String) torrentFileMap.get(0)).build());
 
-            return new ResponseEntity<>(response.getBody(), headers, HttpStatus.OK);
+            return new ResponseEntity<>((byte[])torrentFileMap.get(1), headers, HttpStatus.OK);
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
+
 
     }
 

@@ -27,10 +27,7 @@ import ru.students.forumservicediplomproject.repository.PostRepository;
 
 import java.net.URI;
 import java.sql.Timestamp;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -139,6 +136,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED, noRollbackFor = Exception.class)
     public Post getPostById(long postId) {
         Optional<Post> optionalPost = postRepository.findById(postId);
         if (optionalPost.isEmpty()) {
@@ -292,6 +290,37 @@ public class PostServiceImpl implements PostService {
         post.setPostStatus(Post.Status.APPROVED);
 
         postRepository.save(post);
+    }
+
+    /**
+     * @param postId id темы
+     * @return List, где 0 - имя файла, 1 - байты файла
+     */
+    @Transactional(propagation = Propagation.REQUIRED, noRollbackFor = Exception.class)
+    @Nullable
+    @Override
+    //TODO: тут надо бы не List, а что-то нормальное
+    public List getTorrentFileForDownload(long postId) {
+        Post post = getPostById(postId);
+
+        RestTemplate restTemplate = new RestTemplate();
+        String url = "http://localhost:8081/download/{hashInfo}";
+        Map<String, String> params = Collections.singletonMap("hashInfo", post.getHashInfo());
+
+        ResponseEntity response = restTemplate.getForEntity(url, byte[].class, params);
+
+        if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+            List o = new ArrayList<>(2);
+            o.add(response.getHeaders().getContentDisposition().getFilename());
+            o.add(response.getBody());
+
+            post.setCountOfDownloads(post.getCountOfDownloads() + 1);
+            updatePost(post);
+            return o;
+        } else {
+            return null;
+        }
+
     }
 
     @Override

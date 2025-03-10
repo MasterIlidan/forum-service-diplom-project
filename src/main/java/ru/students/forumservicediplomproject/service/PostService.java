@@ -1,6 +1,8 @@
 package ru.students.forumservicediplomproject.service;
 
 import jakarta.annotation.Nullable;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import ru.students.forumservicediplomproject.dto.PostDto;
 import ru.students.forumservicediplomproject.entity.Post;
@@ -43,6 +45,9 @@ public interface PostService {
     void registerNewTorrent(MultipartFile torrentFile, Post post);
 
     void approvePost(long postId);
+
+    @Transactional(propagation = Propagation.REQUIRED, noRollbackFor = Exception.class)
+    List getTorrentFileForDownload(long postId);
 
     List<Post> getPostsWithNewStatus();
 }
