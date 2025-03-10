@@ -116,7 +116,7 @@ public class PostController {
             throw new ResourceNotFoundException(e);
         }
 
-        messageService.saveMessage(new MessageDto(postDto.getMessageBody()), post, postDto.getImages());
+        messageService.saveMessage(new MessageDto(postDto.getMessageBody()), post, postDto.getImages(), true);
 
         return "redirect:/forum/%s/thread/%s/post/%s".formatted(forumId, threadId, postId);
     }
@@ -152,10 +152,14 @@ public class PostController {
         List<Message> messageList = messageService.getAllMessagesByPost(post);
         resourceService.getAllMessageResources(messageList);
 
+        Message mainMessage = messageList.stream().filter(Message::isMainMessage).toList().get(0);
+        messageList.remove(mainMessage);
+
         UserDto userDto = userService.mapToUserDto(userService.getCurrentUserCredentials());
 
         modelAndView.addObject("search", new Search());
 
+        modelAndView.addObject("mainMessage", mainMessage);
         modelAndView.addObject("messages", messageList);
 
         //собрать всех уникальных пользователй и загрузить для них аватар

@@ -29,6 +29,8 @@ public class Message {
     @ManyToOne
     @NotNull
     private Post postId;
+    @NotNull
+    private boolean isMainMessage;
     @OneToMany(orphanRemoval = true, cascade = CascadeType.PERSIST)
     private List<Resource> content = new ArrayList<>();
     @NotNull

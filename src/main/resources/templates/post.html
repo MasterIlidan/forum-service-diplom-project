@@ -88,15 +88,61 @@
         <table class="table table-bordered table-striped" id="messages">
             <thead>
             <tr>
-                <th></th>
-                <th></th>
+                <th> </th>
+                <th> </th>
             </tr>
             </thead>
             <tr>
-                <td>
-                    <a th:href="@{/forum/{forumId}/thread/{threadId}/post/{postId}/downloadTorrent(forumId=${forumId},threadId=${threadId},postId=${postId})}">Скачать</a>
+                <td th:class="table-post">
+                    <div class="image-container">
+                        <img th:if="${mainMessage.getMessageBy().getAvatar() == null}" class="responsive-image"
+                             th:src="@{/images/default_avatar.jpg}" alt="img default_user_avatar">
+                        <img th:if="${mainMessage.getMessageBy().getAvatar() != null}" class="responsive-image"
+                             th:src="@{'data:image/jpeg;base64,'+${mainMessage.getMessageBy().getAvatar().getBase64Image()}}"
+                             alt="img user_avatar">
+                    </div>
+                    <a class="me-auto mb-2 mb-lg-0" th:text="${mainMessage.getMessageBy().getUserName()}"
+                       th:href="@{/user/{userId}(userId=${mainMessage.getMessageBy().getUserId()})}"></a>
+                    <span th:text="${mainMessage.getCreationDate()}"></span>
+                </td>
+
+                <td th:class="table-post">
+                    <p th:text="${mainMessage.getMessageBody()}"></p>
+                    <div>
+                        <div class="responsive-image">
+                            <img th:each="image : ${mainMessage.getContent()}" th:class="responsive-image"
+                                 th:src="@{'data:image/jpeg;base64,' + ${image.getBase64Image()}}" alt="image">
+                        </div>
+                    </div>
+                    <table  class="table table-bordered table-striped" style="width: 50%">
+                        <thead>
+                        <tr>
+                            <td>
+
+                                <a></a>
+                            </td>
+                            <td>
+
+                                <a></a>
+                            </td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td style="width: 15%; text-align: left">
+                                <p th:text="'Размер: '"></p>
+                                <p th:text="' | Создана: ' + ${post.getCreationDate()}"></p>
+                                <p th:text="' | Скачано: '+ ${post.getCountOfDownloads()}"></p>
+                            </td>
+                            <td style="width: 30%">
+                                <a th:href="@{/forum/{forumId}/thread/{threadId}/post/{postId}/downloadTorrent(forumId=${forumId},threadId=${threadId},postId=${postId})}">Скачать</a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
                 </td>
             </tr>
+
             <tr th:each="message : ${messages}">
                 <td th:class="table-post">
                     <div class="image-container">

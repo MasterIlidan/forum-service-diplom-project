@@ -13,8 +13,6 @@ import ru.students.forumservicediplomproject.exeption.ResourceNotFoundException;
 import ru.students.forumservicediplomproject.service.MessageService;
 import ru.students.forumservicediplomproject.service.PostService;
 
-import java.util.Optional;
-
 @Slf4j
 @Controller
 public class MessageController {
@@ -42,7 +40,7 @@ public class MessageController {
         } catch (ResourceNotFoundException e) {
             throw new ResourceNotFoundException(e.getMessage());
         }
-        messageService.saveMessage(messageDto, postById, files);
+        messageService.saveMessage(messageDto, postById, files, false);
         return "redirect:/forum/%s/thread/%s/post/%s".formatted(forumId, threadId, postId);
     }
     @DeleteMapping("/forum/{forumId}/thread/{threadId}/post/{postId}/{messageId}")
@@ -57,7 +55,9 @@ public class MessageController {
             log.error("Сообщение для удаления не найдено! Id {}", messageId);
             throw new ResourceNotFoundException(e.getMessage());
         }
-        messageService.deleteMessage(message);
+        if (!message.isMainMessage()) {
+            messageService.deleteMessage(message);
+        }
         return "redirect:/forum/{forumId}/thread/{threadId}/post/{postId}";
     }
 }

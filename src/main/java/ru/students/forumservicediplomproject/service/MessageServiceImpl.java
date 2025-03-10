@@ -32,13 +32,14 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, noRollbackFor = Exception.class)
-    public void saveMessage(MessageDto messageDto, Post post, @Nullable MultipartFile[] files) {
+    public void saveMessage(MessageDto messageDto, Post post, @Nullable MultipartFile[] files, boolean isMainMessage) {
         Message message = new Message();
 
         message.setPostId(post);
         message.setMessageBody(messageDto.getMessageBody());
         message.setMessageBy(userService.getCurrentUserCredentials());
         message.setCreationDate(new Timestamp(new Date().getTime()));
+        message.setMainMessage(isMainMessage);
 
         if (files != null && !Arrays.stream(files).allMatch(MultipartFile::isEmpty)) {
             try {

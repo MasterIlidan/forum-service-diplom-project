@@ -12,7 +12,7 @@ import java.util.List;
 
 public interface MessageService {
 
-    void saveMessage(MessageDto messageDto, Post post, MultipartFile[] files);
+    void saveMessage(MessageDto messageDto, Post post, MultipartFile[] files, boolean isMainMessage);
 
     Message getMessageById(long id);
 
