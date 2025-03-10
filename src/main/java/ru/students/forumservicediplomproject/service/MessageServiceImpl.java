@@ -40,8 +40,6 @@ public class MessageServiceImpl implements MessageService {
         message.setMessageBy(userService.getCurrentUserCredentials());
         message.setCreationDate(new Timestamp(new Date().getTime()));
 
-        //TODO: уведомление пользователя о неудаче при сохранении сообщения
-
         if (files != null && !Arrays.stream(files).allMatch(MultipartFile::isEmpty)) {
             try {
                 List<Resource> content = new ArrayList<>(files.length);

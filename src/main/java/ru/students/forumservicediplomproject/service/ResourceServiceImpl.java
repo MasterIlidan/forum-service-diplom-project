@@ -19,7 +19,6 @@ import ru.students.forumservicediplomproject.entity.Resource;
 import ru.students.forumservicediplomproject.repository.ResourceRepository;
 
 import java.net.URI;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -122,17 +121,19 @@ public class ResourceServiceImpl implements ResourceService {
                 log.warn("Не удалось получить ресурс. Попытка {}", retry);
                 if (retry > 3) {
                     log.error("Ошибка при получении ресурса", e);
-                    throw e;
+                    resource.setBase64Image("");
+                    break;
                 }
                 continue;
             }
+            if (response != null & response.getBody() == null) {
+                log.error("Ресурс {} не найден сервисом.", resource.getUuid());
+                return;
+            }
+            resource.setBase64Image(response.getBody());
             break;
         }
-        if (response.getBody() == null) {
-            log.error("Ресурс {} не найден сервисом.", resource.getUuid());
-            return;
-        }
-        resource.setBase64Image(response.getBody());
+
     }
 
     @Override
