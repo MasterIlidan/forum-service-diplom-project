@@ -1,11 +1,10 @@
 package ru.students.forumservicediplomproject.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-import ru.students.forumservicediplomproject.entity.Statistics;
+import ru.students.forumservicediplomproject.service.model.Statistics;
 
 import java.net.URI;
 import java.util.HashMap;

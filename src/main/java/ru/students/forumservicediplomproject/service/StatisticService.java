@@ -1,6 +1,6 @@
 package ru.students.forumservicediplomproject.service;
 
-import ru.students.forumservicediplomproject.entity.Statistics;
+import ru.students.forumservicediplomproject.service.model.Statistics;
 
 import java.util.HashMap;
 

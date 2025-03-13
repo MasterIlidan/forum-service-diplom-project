@@ -1,4 +1,4 @@
-package ru.students.forumservicediplomproject.entity;
+package ru.students.forumservicediplomproject.service.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
