@@ -17,7 +17,7 @@ import ru.students.forumservicediplomproject.dto.PostDto;
 import ru.students.forumservicediplomproject.dto.UserDto;
 import ru.students.forumservicediplomproject.entity.Thread;
 import ru.students.forumservicediplomproject.entity.*;
-import ru.students.forumservicediplomproject.exeption.HashAlreadyRegisteredExeption;
+import ru.students.forumservicediplomproject.exeption.HashAlreadyRegisteredException;
 import ru.students.forumservicediplomproject.exeption.ResourceNotFoundException;
 import ru.students.forumservicediplomproject.exeption.TrackerServiceException;
 import ru.students.forumservicediplomproject.service.*;
@@ -103,7 +103,7 @@ public class PostController {
             result.rejectValue("torrentFile", null, "При регистрации торрента произошла ошибка. Попробуйте позже");
             model.addAttribute("post", postDto);
             return "forms/add-post-page";
-        } catch (HashAlreadyRegisteredExeption e) {
+        } catch (HashAlreadyRegisteredException e) {
             result.rejectValue("torrentFile", null, "Раздача с таким хешем уже зарегистрирована. " +
                                                     "Попробуйте немного изменить содержимое раздачи (например, добавить/удалить файлы или изменить их имя");
             model.addAttribute("post", postDto);

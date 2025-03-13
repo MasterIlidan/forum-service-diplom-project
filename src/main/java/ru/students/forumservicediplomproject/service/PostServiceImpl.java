@@ -19,7 +19,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import ru.students.forumservicediplomproject.dto.PostDto;
 import ru.students.forumservicediplomproject.entity.Post;
 import ru.students.forumservicediplomproject.entity.Thread;
-import ru.students.forumservicediplomproject.exeption.HashAlreadyRegisteredExeption;
+import ru.students.forumservicediplomproject.exeption.HashAlreadyRegisteredException;
 import ru.students.forumservicediplomproject.exeption.ResourceNotFoundException;
 import ru.students.forumservicediplomproject.exeption.TrackerServiceException;
 import ru.students.forumservicediplomproject.repository.PeersRepository;
@@ -59,7 +59,7 @@ public class PostServiceImpl implements PostService {
         String hash = getHash(torrentFile);
         if (postRepository.existsByHashInfo(hash)) {
             log.error("Тема с таким хешем {} уже существует", hash);
-            throw new HashAlreadyRegisteredExeption("Тема с таким хешем %s уже существует".formatted(hash));
+            throw new HashAlreadyRegisteredException("Тема с таким хешем %s уже существует".formatted(hash));
         }
         Post post = new Post();
         post.setTitle(postDto.getTitle());
@@ -76,7 +76,7 @@ public class PostServiceImpl implements PostService {
         } catch (HttpClientErrorException.Conflict e) {
             log.error("На трекере уже есть такой торрент. Откат сохранения поста");
             postRepository.delete(post);
-            throw new HashAlreadyRegisteredExeption("На трекере уже есть такой торрент", e);
+            throw new HashAlreadyRegisteredException("На трекере уже есть такой торрент", e);
         } catch (RestClientException e) {
             log.error("При регистрации раздачи на трекере произошла ошибка. Откат сохранения поста");
             postRepository.delete(post);
