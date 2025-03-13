@@ -26,8 +26,6 @@ public class Forum{
     @ManyToOne
     @NotNull
     private User createdBy;
-    @OneToMany
-    private List<Thread> threads;
     @NotNull
     private Timestamp creationDate;
     @Transient

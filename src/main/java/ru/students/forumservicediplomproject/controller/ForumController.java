@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
-import ru.students.forumservicediplomproject.Search;
+import ru.students.forumservicediplomproject.controller.form.Search;
 import ru.students.forumservicediplomproject.dto.ForumDto;
 import ru.students.forumservicediplomproject.entity.Forum;
 import ru.students.forumservicediplomproject.service.*;

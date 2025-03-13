@@ -1,4 +1,4 @@
-package ru.students.forumservicediplomproject;
+package ru.students.forumservicediplomproject.controller.form;
 
 import lombok.Getter;
 import lombok.Setter;

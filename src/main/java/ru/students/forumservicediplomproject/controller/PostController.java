@@ -11,7 +11,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
-import ru.students.forumservicediplomproject.Search;
+import ru.students.forumservicediplomproject.controller.form.Search;
 import ru.students.forumservicediplomproject.dto.MessageDto;
 import ru.students.forumservicediplomproject.dto.PostDto;
 import ru.students.forumservicediplomproject.dto.UserDto;
