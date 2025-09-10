@@ -21,6 +21,7 @@ public class Thread {
     @NotNull
     private String threadName;
     @ManyToOne
+    @NotNull
     private Forum forumId;
     @ManyToOne
     private User createdBy;
