@@ -9,7 +9,7 @@ import java.util.List;
 public interface ThreadService {
 
 
-    void saveThread(ThreadDto threadDto, Forum forumId);
+    long saveThread(ThreadDto threadDto, Forum forumId);
 
     Thread getThreadById(long id);
 

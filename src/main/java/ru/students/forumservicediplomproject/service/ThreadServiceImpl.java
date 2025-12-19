@@ -30,7 +30,7 @@ public class ThreadServiceImpl implements ThreadService {
     }
 
     @Override
-    public void saveThread(ThreadDto threadDto, Forum forum) {
+    public long saveThread(ThreadDto threadDto, Forum forum) {
         Thread thread = new Thread();
         thread.setThreadName(threadDto.getThreadName());
         thread.setCreatedBy(userService.getCurrentUserCredentials());
@@ -38,6 +38,7 @@ public class ThreadServiceImpl implements ThreadService {
         thread.setForumId(forum);
 
         threadRepository.save(thread);
+        return thread.getThreadId();
     }
 
     @Override

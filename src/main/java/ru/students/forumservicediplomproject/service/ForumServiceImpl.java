@@ -1,5 +1,7 @@
 package ru.students.forumservicediplomproject.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +18,7 @@ import java.util.Optional;
 @Service
 public class ForumServiceImpl implements ForumService {
 
+    private static final Logger log = LoggerFactory.getLogger(ForumServiceImpl.class);
     private final ForumRepository forumRepository;
     private final UserService userService;
     private final ThreadService threadService;
@@ -29,7 +32,7 @@ public class ForumServiceImpl implements ForumService {
     }
 
     @Override
-    public void saveForum(ForumDto forumDto) {
+    public long saveForum(ForumDto forumDto) {
         Forum forum = new Forum();
 
         forum.setForumName(forumDto.getForumName());
@@ -37,6 +40,8 @@ public class ForumServiceImpl implements ForumService {
         forum.setCreatedBy(userService.getCurrentUserCredentials());
         forum.setCreationDate(new Timestamp(new Date().getTime()));
         forumRepository.save(forum);
+        log.debug("Saved forum: {}", forum);
+        return forum.getForumId();
     }
 
     @Override

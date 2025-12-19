@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface ForumService {
 
-    void saveForum(ForumDto forumDto);
+    long saveForum(ForumDto forumDto);
 
     Forum getForum(long id);
 
