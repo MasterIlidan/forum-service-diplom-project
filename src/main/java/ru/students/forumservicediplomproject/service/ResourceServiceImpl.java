@@ -14,6 +14,7 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
+import ru.students.forumservicediplomproject.config.ExternalServiceUrls;
 import ru.students.forumservicediplomproject.entity.Message;
 import ru.students.forumservicediplomproject.entity.Resource;
 import ru.students.forumservicediplomproject.repository.ResourceRepository;
@@ -27,9 +28,11 @@ import java.util.Map;
 @Service
 public class ResourceServiceImpl implements ResourceService {
     private final ResourceRepository resourceRepository;
+    private final ExternalServiceUrls externalServiceUrls;
 
-    public ResourceServiceImpl(ResourceRepository resourceRepository) {
+    public ResourceServiceImpl(ResourceRepository resourceRepository, ExternalServiceUrls externalServiceUrls) {
         this.resourceRepository = resourceRepository;
+        this.externalServiceUrls = externalServiceUrls;
     }
 
     @Override
@@ -39,7 +42,7 @@ public class ResourceServiceImpl implements ResourceService {
         //log.debug("Регистрация новых ресурсов для сообщения {} количество {}", message.getMessageId(), files.length);
 
         RestTemplate restTemplate = new RestTemplate();
-        String url = "http://localhost:8082/resource";
+        String url = externalServiceUrls.getResourceServiceUrl() + "/resource";
         URI uri1 = UriComponentsBuilder.fromUriString(url)
                 .build().toUri();
 
@@ -104,8 +107,7 @@ public class ResourceServiceImpl implements ResourceService {
     @Override
     public void getResource(Resource resource) {
         RestTemplate restTemplate = new RestTemplate();
-        //TODO: настраиваемая ссылка из конфигурации
-        String uri = "http://localhost:8082/resource{uuid}";
+        String uri = externalServiceUrls.getResourceServiceUrl() + "/resource{uuid}";
 
         Map<String, String> params = Collections.singletonMap("uuid", resource.getUuid());
 
@@ -139,8 +141,7 @@ public class ResourceServiceImpl implements ResourceService {
     @Override
     public void removeMessageResources(Message message) {
         RestTemplate restTemplate = new RestTemplate();
-        //TODO: настраиваемая ссылка из конфигурации
-        String uri = "http://localhost:8082/resource{uuid}";
+        String uri = externalServiceUrls.getResourceServiceUrl() + "/resource{uuid}";
 
         for (Resource resource : message.getContent()) {
             Map<String, String> params = Collections.singletonMap("uuid", resource.getUuid());

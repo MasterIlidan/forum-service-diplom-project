@@ -16,6 +16,7 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
+import ru.students.forumservicediplomproject.config.ExternalServiceUrls;
 import ru.students.forumservicediplomproject.dto.PostDto;
 import ru.students.forumservicediplomproject.entity.Post;
 import ru.students.forumservicediplomproject.entity.Thread;
@@ -36,13 +37,15 @@ public class PostServiceImpl implements PostService {
     private final UserService userService;
     private final PeersRepository peersRepository;
     private final MessageService messageService;
+    private final ExternalServiceUrls externalServiceUrls;
 
     public PostServiceImpl(PostRepository postRepository, UserService userService,
-                           PeersRepository peersRepository, MessageService messageService) {
+                           PeersRepository peersRepository, MessageService messageService, ExternalServiceUrls externalServiceUrls) {
         this.postRepository = postRepository;
         this.userService = userService;
         this.peersRepository = peersRepository;
         this.messageService = messageService;
+        this.externalServiceUrls = externalServiceUrls;
     }
 
     /**
@@ -96,7 +99,7 @@ public class PostServiceImpl implements PostService {
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
 
         RestTemplate restTemplate = new RestTemplate();
-        String uri = "http://localhost:8081/getHash";
+        String uri = externalServiceUrls.getTrackerServiceUrl() + "/getHash";
         URI uri1 = UriComponentsBuilder.fromUriString(uri)
                 .build().toUri();
         ResponseEntity<String> response = restTemplate.postForEntity(uri1, requestEntity, String.class);
@@ -165,7 +168,7 @@ public class PostServiceImpl implements PostService {
     @Transactional(propagation = Propagation.REQUIRED, noRollbackFor = Exception.class)
     public void deletePost(Post post) {
         RestTemplate restTemplate = new RestTemplate();
-        URI uri = UriComponentsBuilder.fromUriString("http://localhost:8081/deleteTorrent/{hash}")
+        URI uri = UriComponentsBuilder.fromUriString(externalServiceUrls.getTrackerServiceUrl() + "/deleteTorrent/{hash}")
                 .build(Collections.singletonMap("hash", post.getHashInfo()));
         try {
             restTemplate.delete(uri);
@@ -251,7 +254,7 @@ public class PostServiceImpl implements PostService {
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
 
         RestTemplate restTemplate = new RestTemplate();
-        String uri = "http://localhost:8081/register";
+        String uri = externalServiceUrls.getTrackerServiceUrl() + "/register";
         URI uri1 = UriComponentsBuilder.fromUriString(uri)
                 .build().toUri();
         ResponseEntity<String> response;
@@ -281,7 +284,7 @@ public class PostServiceImpl implements PostService {
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
 
         RestTemplate restTemplate = new RestTemplate();
-        String uri = "http://localhost:8081/announce";
+        String uri = externalServiceUrls.getTrackerServiceUrl() + "/announce";
         URI uri1 = UriComponentsBuilder.fromUriString(uri)
                 .build().toUri();
         restTemplate.postForEntity(uri1, requestEntity, String.class);
@@ -304,7 +307,7 @@ public class PostServiceImpl implements PostService {
         Post post = getPostById(postId);
 
         RestTemplate restTemplate = new RestTemplate();
-        String url = "http://localhost:8081/download/{hashInfo}";
+        String url = externalServiceUrls.getTrackerServiceUrl() + "/download/{hashInfo}";
         Map<String, String> params = Collections.singletonMap("hashInfo", post.getHashInfo());
 
         ResponseEntity response = restTemplate.getForEntity(url, byte[].class, params);

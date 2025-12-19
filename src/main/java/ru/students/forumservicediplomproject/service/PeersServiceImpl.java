@@ -7,6 +7,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+import ru.students.forumservicediplomproject.config.ExternalServiceUrls;
 import ru.students.forumservicediplomproject.entity.Peers;
 import ru.students.forumservicediplomproject.entity.Post;
 import ru.students.forumservicediplomproject.repository.PeersRepository;
@@ -22,8 +23,11 @@ import java.util.Map;
 public class PeersServiceImpl implements PeersService {
     private final PeersRepository peersRepository;
 
-    public PeersServiceImpl(PeersRepository peersRepository, PostService postService) {
+    private final ExternalServiceUrls externalServiceUrls;
+
+    public PeersServiceImpl(PeersRepository peersRepository, PostService postService, ExternalServiceUrls externalServiceUrls) {
         this.peersRepository = peersRepository;
+        this.externalServiceUrls = externalServiceUrls;
     }
 
     /**
@@ -68,8 +72,7 @@ public class PeersServiceImpl implements PeersService {
      */
     private ResponseEntity<LinkedHashMap> getResponseEntity() {
         RestTemplate restTemplate = new RestTemplate();
-        //TODO: настраиваемая ссылка из конфигурации
-        String uri = "http://localhost:8081/getPeers";
+        String uri = externalServiceUrls.getTrackerServiceUrl() + "/getPeers";
         URI uri1 = UriComponentsBuilder.fromUriString(uri)
                 .build().toUri();
         ResponseEntity<LinkedHashMap> response = null;

@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+import ru.students.forumservicediplomproject.config.ExternalServiceUrls;
 import ru.students.forumservicediplomproject.service.model.Statistics;
 
 import java.net.URI;
@@ -14,10 +15,12 @@ import java.util.HashMap;
 public class StatisticServiceImpl implements StatisticService {
     private final PostService postService;
     private final PeersService peersService;
+    private final ExternalServiceUrls externalServiceUrls;
 
-    public StatisticServiceImpl(PostService postService, PeersService peersService) {
+    public StatisticServiceImpl(PostService postService, PeersService peersService, ExternalServiceUrls externalServiceUrls) {
         this.postService = postService;
         this.peersService = peersService;
+        this.externalServiceUrls = externalServiceUrls;
     }
 
     @Override
@@ -43,8 +46,7 @@ public class StatisticServiceImpl implements StatisticService {
     @Override
     public double getAllTrackerSize() {
         RestTemplate restTemplate = new RestTemplate();
-        //TODO: настраиваемая ссылка из конфигурации
-        String uri = "http://localhost:8081/getSizeOfTracker";
+        String uri = externalServiceUrls.getTrackerServiceUrl() + "/getSizeOfTracker";
         URI uri1 = UriComponentsBuilder.fromUriString(uri)
                 .build().toUri();
         Double response = null;
