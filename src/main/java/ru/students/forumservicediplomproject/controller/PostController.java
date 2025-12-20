@@ -34,15 +34,17 @@ public class PostController {
     private final MessageService messageService;
     private final ResourceService resourceService;
     private final UserService userService;
+    private final PeersService peersService;
 
     public PostController(ThreadService threadService, PostService postService,
                           MessageService messageService, ResourceService resourceService,
-                          UserService userService) {
+                          UserService userService, PeersService peersService) {
         this.threadService = threadService;
         this.postService = postService;
         this.messageService = messageService;
         this.resourceService = resourceService;
         this.userService = userService;
+        this.peersService = peersService;
     }
 
 
@@ -53,6 +55,10 @@ public class PostController {
         Thread thread = threadService.getThreadById(threadId);
 
         List<Post> postList = postService.getAllPostsByThread(thread);
+
+        List<Peers> peersForPosts = peersService.getPeersForPosts(postList);
+
+        postList.forEach(post -> post.setPeers(peersForPosts.stream().filter(peers -> peers.getPost().equals(post)).findFirst().get()));
 
         modelAndView.addObject("search", new Search());
 
@@ -170,6 +176,8 @@ public class PostController {
         for (User user : users) {
             userService.loadUserAvatar(user);
         }
+
+        post.setPeers(peersService.getPeersForPost(post));
 
         modelAndView.addObject("post", post);
         modelAndView.addObject("currentUser", userDto);

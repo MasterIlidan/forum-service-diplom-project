@@ -32,7 +32,8 @@ public class Post {
     private Status postStatus;
     @NotNull
     private Timestamp creationDate;
-    @OneToOne(orphanRemoval = true, mappedBy = "post", cascade = CascadeType.PERSIST)
+//    @OneToOne(orphanRemoval = true, mappedBy = "post", cascade = CascadeType.PERSIST)
+    @Transient
     private Peers peers;
     @NotNull
     private long countOfDownloads;
@@ -42,13 +43,13 @@ public class Post {
     @Transient
     private Message lastMessageInPost;
 
-    @PrePersist
-    public void prePersist() {
-        if (peers == null) {
-            this.peers = new Peers();
-            peers.setPost(this);
-        }
-    }
+//    @PrePersist
+//    public void prePersist() {
+//        if (peers == null) {
+//            this.peers = new Peers();
+//            peers.setPost(this);
+//        }
+//    }
 
     public enum Status {
         NEW, APPROVED, ACTIVE, INACTIVE, ARCHIVE
